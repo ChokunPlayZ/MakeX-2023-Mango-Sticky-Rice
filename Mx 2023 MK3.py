@@ -129,17 +129,12 @@ def Movement ():
     TURN_SPEED = RXn / TURN_SPEED_MODIFIER
     if LYp > 5 or LYp < -5:
         Motor_Control(LYn, LYn, LYp, LYp)
-
+    elif LXp > 5 or LXp < -5:
+        Motor_Control(LXp, LXn, LXp, LXn)
+    elif RXp > 5 or RXp < -5:
+        Motor_Control(TURN_SPEED, TURN_SPEED, TURN_SPEED, TURN_SPEED)
     else:
-        if LXp > 5 or LXp < -5:
-            Motor_Control(LXp, LXn, LXp, LXn)
-
-        else:
-            if RXp > 5 or RXp < -5:
-                Motor_Control(TURN_SPEED, TURN_SPEED, TURN_SPEED, TURN_SPEED)
-
-            else:
-                Motor_Control(0, 0, 0, 0)
+        Motor_Control(0, 0, 0, 0)
 
 def Reverse_movement ():
     LYp = gamepad.get_joystick("Ly") / Speed_Modifier
@@ -151,95 +146,91 @@ def Reverse_movement ():
     TURN_SPEED = RXn / TURN_SPEED_MODIFIER
     if LYp > 5 or LYp < -5:
         Motor_Control(LYp, LYp, LYn, LYn)
+    elif LXp > 5 or LXp < -5:
+        Motor_Control(LXn, LXp, LXn, LXp)
+    elif RXp > 5 or RXp < -5:
+        Motor_Control(TURN_SPEED, TURN_SPEED, TURN_SPEED, TURN_SPEED)
     else:
-        if LXp > 5 or LXp < -5:
-            Motor_Control(LXn, LXp, LXn, LXp)
-        else:
-            if RXp > 5 or RXp < -5:
-                Motor_Control(TURN_SPEED, TURN_SPEED, TURN_SPEED, TURN_SPEED)
-            else:
-                Motor_Control(0, 0, 0, 0)
+        Motor_Control(0, 0, 0, 0)
 
 def S1_Keymap ():
     if gamepad.is_key_pressed("N1"):
         power_expand_board.set_power("DC1", 100)
         power_expand_board.set_power("DC2", 100)
+
     if gamepad.is_key_pressed("Right"):
         power_expand_board.set_power("DC2", -100)
-    else:
-        if gamepad.is_key_pressed("Left"):
-            power_expand_board.set_power("DC1", -100)
-        else:
-            if gamepad.is_key_pressed("Up"):
-                power_expand_board.set_power("DC1", 0)
-                power_expand_board.set_power("DC2", 0)
+    elif gamepad.is_key_pressed("Left"):
+        power_expand_board.set_power("DC1", -100)
+    elif gamepad.is_key_pressed("Up"):
+        power_expand_board.set_power("DC1", 0)
+        power_expand_board.set_power("DC2", 0)
+
     if gamepad.is_key_pressed("L1"):
         power_expand_board.set_power("DC1", 0)
         power_expand_board.set_power("DC2", 0)
+
     if gamepad.is_key_pressed("N2"):
         power_expand_board.set_power("DC3", -100)
+    elif gamepad.is_key_pressed("N3"):
+        power_expand_board.set_power("DC3", 100)
     else:
-        if gamepad.is_key_pressed("N3"):
-            power_expand_board.set_power("DC3", 100)
-        else:
-            power_expand_board.set_power("DC3", 0)
+        power_expand_board.set_power("DC3", 0)
+
     if gamepad.is_key_pressed("N4"):
         power_expand_board.set_power("BL1", 100)
         power_expand_board.set_power("BL2", 100)
-    else:
-        if gamepad.is_key_pressed("R1"):
+    elif gamepad.is_key_pressed("R1"):
             power_expand_board.stop("BL1")
             power_expand_board.stop("BL2")
+
     if gamepad.is_key_pressed("+"):
         BRUSHLESS_SERVO.move_to(-7, 100)
-    else:
-        if gamepad.is_key_pressed("≡"):
+    elif gamepad.is_key_pressed("≡"):
             BRUSHLESS_SERVO.move_to(2, 100)
+
     if gamepad.is_key_pressed("R_Thumb"):
         power_expand_board.set_power("DC2", 100)
         power_expand_board.set_power("DC1", 0)
-    else:
-        if gamepad.is_key_pressed("L2"):
+    elif gamepad.is_key_pressed("L2"):
             power_expand_board.set_power("DC1", 0)
-
-def S3_Keymap ():
-    if gamepad.is_key_pressed("N1"):
-        smartservo_2.move_to(19, 50)
-    else:
-        if gamepad.is_key_pressed("N4"):
-            smartservo_2.move_to(-56, 50)
-    if gamepad.is_key_pressed("N2"):
-        smartservo_2.move_to(-75, 50)
-    else:
-        if gamepad.is_key_pressed("N3"):
-            smartservo_2.move_to(-68, 50)
-    if gamepad.is_key_pressed("Down"):
-        smartservo_2.move(1, 75)
-    else:
-        if gamepad.is_key_pressed("Up"):
-            smartservo_2.move(-1, 75)
 
 def S2_Keymap ():
     if gamepad.is_key_pressed("N1"):
         power_expand_board.set_power("DC5", 100)
         power_expand_board.set_power("DC4", 100)
+    elif gamepad.is_key_pressed("N4"):
+        power_expand_board.set_power("DC5", -100)
     else:
-        if gamepad.is_key_pressed("N4"):
-            power_expand_board.set_power("DC5", -100)
+        power_expand_board.set_power("DC5", 0)
+        if gamepad.is_key_pressed("Up"):
+            power_expand_board.set_power("DC4", -100)
+        elif gamepad.is_key_pressed("Down"):
+            power_expand_board.set_power("DC4", 100)
         else:
-            power_expand_board.set_power("DC5", 0)
-            if gamepad.is_key_pressed("Up"):
-                power_expand_board.set_power("DC4", -100)
-            else:
-                if gamepad.is_key_pressed("Down"):
-                    power_expand_board.set_power("DC4", 100)
-                else:
-                    power_expand_board.set_power("DC4", -2)
+            power_expand_board.set_power("DC4", -2)
+            
     if gamepad.is_key_pressed("N2"):
         smartservo_3.move_to(90, 50)
     else:
         if gamepad.is_key_pressed("N3"):
             smartservo_3.move_to(0, 50)
+
+def S3_Keymap ():
+    if gamepad.is_key_pressed("N1"):
+        smartservo_2.move_to(19, 50)
+    elif gamepad.is_key_pressed("N4"):
+        smartservo_2.move_to(-56, 50)
+
+    if gamepad.is_key_pressed("N2"):
+        smartservo_2.move_to(-75, 50)
+    elif gamepad.is_key_pressed("N3"):
+        smartservo_2.move_to(-68, 50)
+
+    if gamepad.is_key_pressed("Down"):
+        smartservo_2.move(1, 75)
+    elif gamepad.is_key_pressed("Up"):
+            smartservo_2.move(-1, 75)
 
 def feeder_control ():
     if gamepad.is_key_pressed("N1"):
@@ -265,21 +256,20 @@ def Motor_Safety_CTL ():
     if smartservo_2.get_value("current") > 500:
         BRUSHLESS_SERVO.set_power(0)
 
-
+power_expand_board.set_power("DC4", -100)
 led_matrix_1.show('S0', wait = False)
 smartservo_3.move_to(0, 50)
 smartservo_2.move_to(19, 50)
 BRUSHLESS_SERVO.move_to(0, 50)
 Motor_Control(0, 0, 0, 0)
-while not (GRIPPER_RANGING.get_distance() < 3.5 or GRIPPER_RANGING.get_distance() == 200):
-    time.sleep(0.001)
-    power_expand_board.set_power("DC4", -100)
+# while not (GRIPPER_RANGING.get_distance() < 3.5 or GRIPPER_RANGING.get_distance() == 200):
+#     time.sleep(0.001)
+#     power_expand_board.set_power("DC4", -100)
 
-power_expand_board.set_power("DC4", -2)
+# power_expand_board.set_power("DC4", -2)
 led_matrix_1.show('OK!', wait = False)
-AUTO_SIDE = 'L'
+power_expand_board.set_power("DC4", -2)
 while True:
-    time.sleep(0.001)
     Motor_Safety_CTL()
     if button_1.is_pressed():
         AUTO_STAGE = 0
@@ -294,25 +284,21 @@ while True:
         if gamepad.is_key_pressed("L2") and gamepad.is_key_pressed("R2"):
             led_matrix_1.show('K1', wait = False)
             CTLMODE = 1
-        else:
-            if gamepad.is_key_pressed("L1") and gamepad.is_key_pressed("R1"):
-                led_matrix_1.show('K2', wait = False)
-                CTLMODE = 2
-            else:
-                if gamepad.is_key_pressed("+") and gamepad.is_key_pressed("≡"):
-                    led_matrix_1.show('K3', wait = False)
-                    CTLMODE = 3
+        elif gamepad.is_key_pressed("L1") and gamepad.is_key_pressed("R1"):
+            led_matrix_1.show('K2', wait = False)
+            CTLMODE = 2
+        elif gamepad.is_key_pressed("+") and gamepad.is_key_pressed("≡"):
+            led_matrix_1.show('K3', wait = False)
+            CTLMODE = 3
 
         if CTLMODE == 1:
             smartservo_2.move_to(19, 50)
             Movement()
             S1_Keymap()
-        else:
-            if CTLMODE == 2:
-                smartservo_2.move_to(19, 50)
-                Reverse_movement()
-                S2_Keymap()
-            else:
-                if CTLMODE == 3:
-                    Reverse_movement()
-                    S3_Keymap()
+        elif CTLMODE == 2:
+            smartservo_2.move_to(19, 50)
+            Reverse_movement()
+            S2_Keymap()
+        elif CTLMODE == 3:
+            Reverse_movement()
+            S3_Keymap()
