@@ -39,6 +39,11 @@ def get_acceleration(axis:str):
     """
     return
 
+def get_gyroscope(axis:str):
+    """
+    get the angular speed of the specified axis, in deg/s
+    """
+
 def reset_rotation(axis:str):
     """
     Reset the angle rotated around the x, y, z axis, parameters:
