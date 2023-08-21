@@ -4,7 +4,7 @@ from mbuild import power_manage_module #done
 from mbuild.encoder_motor import encoder_motor_class # done
 from mbuild import power_expand_board #done
 from mbuild import gamepad #done
-from mbuild.smartservo import smartservo_class 
+from mbuild.smartservo import smartservo_class #done
 from mbuild.ranging_sensor import ranging_sensor_class
 from mbuild.smart_camera import smart_camera_class
 from mbuild.led_matrix import led_matrix_class
