@@ -19,6 +19,8 @@ TURN_SPEED_MODIFIER = 1.3
 AUTO_STAGE = 0
 AUTO_RPM = 150
 
+AUTO_SIDE = None
+
 # new class
 BR_ENCODE_M1 = encoder_motor_class("M1", "INDEX1")
 FR_ENCODE_M2 = encoder_motor_class("M2", "INDEX1")
@@ -78,7 +80,6 @@ def Auto_stage ():
         led_matrix_1.show('A D', wait=False)
         return
     if ENABLE_AUTO == 1:
-        AUTO_SIDE = None
         led_matrix_1.show('A P', wait=False)
         smart_camera_1.open_light()
         smart_camera_1.set_mode("color")
@@ -89,7 +90,7 @@ def Auto_stage ():
         else:
             AUTO_SIDE = 'L'
 
-        while not (not power_manage_module.is_auto_mode()):
+        while power_manage_module.is_auto_mode():
             led_matrix_1.show(str('A') + str(str(AUTO_SIDE) + str(AUTO_STAGE)), wait=False)
             if AUTO_STAGE == 0:
                 if AUTO_SIDE == "L":
@@ -228,9 +229,9 @@ def S3_Keymap ():
         smartservo_2.move_to(-68, 50)
 
     if gamepad.is_key_pressed("Down"):
-        smartservo_2.move(1, 75)
+        smartservo_2.move(3, 100)
     elif gamepad.is_key_pressed("Up"):
-            smartservo_2.move(-1, 75)
+            smartservo_2.move(-3, 100)
 
 def feeder_control ():
     if gamepad.is_key_pressed("N1"):
