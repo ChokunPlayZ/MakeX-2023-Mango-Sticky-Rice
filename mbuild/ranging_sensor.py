@@ -6,7 +6,7 @@ class ranging_sensor_class() :
         INDEX, the sensor number in the chain INDEX<1-10>
         """
     
-    def get_distance():
+    def get_distance(self):
         """
         Get the ranging sensor distance, range 2~200 cm
         """
