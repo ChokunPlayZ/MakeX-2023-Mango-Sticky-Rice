@@ -12,15 +12,6 @@ from mbuild.button import button_class
 import mbuild
 import time
 
-Speed_Modifier = 1.6
-CTLMODE = 1
-ENABLE_AUTO = 1
-TURN_SPEED_MODIFIER = 1.3
-AUTO_STAGE = 0
-AUTO_RPM = 150
-
-AUTO_SIDE = None
-
 # new class
 BR_ENCODE_M1 = encoder_motor_class("M1", "INDEX1")
 FR_ENCODE_M2 = encoder_motor_class("M2", "INDEX1")
@@ -76,6 +67,7 @@ def Auto_Grip ():
     power_expand_board.set_power("DC5", 0)
 
 def Auto_stage ():
+    global ENABLE_AUTO, V_AUTO_STAGE
     if ENABLE_AUTO == 0:
         led_matrix_1.show('A D', wait=False)
         return
@@ -91,24 +83,26 @@ def Auto_stage ():
             AUTO_SIDE = 'L'
 
         while power_manage_module.is_auto_mode():
-            led_matrix_1.show(str('A') + str(str(AUTO_SIDE) + str(AUTO_STAGE)), wait=False)
-            if AUTO_STAGE == 0:
+            led_matrix_1.show('A' + str(str(AUTO_SIDE) + str(V_AUTO_STAGE)), wait=False)
+            if V_AUTO_STAGE == 0:
                 if AUTO_SIDE == "L":
-                    if FRONT_RANGING.get_distance() < 10:
-                        power_expand_board.set_power("DC4", 50)
-                        Motor_RPM(0, AUTO_RPM, 0, AUTO_RPM)
-                        power_expand_board.set_power("DC4", -2)
-                        AUTO_STAGE += 1
+                    if FRONT_RANGING.get_distance() > 10:
+                        power_expand_board.set_power("DC4", -50)
+                        Motor_RPM(AUTO_RPM, 0, 0, NEG_AUTO_RPM)
                     else:
                         Motor_Control(0, -2, 0, -2)
+                        power_expand_board.set_power("DC4", -2)
+                        led_matrix_1.show("done", wait=False)
+                        V_AUTO_STAGE = V_AUTO_STAGE + 1
                 else:
-                    if FRONT_RANGING.get_distance() < 10:
+                    if FRONT_RANGING.get_distance() > 10:
                         power_expand_board.set_power("DC4", 50)
-                        Motor_RPM(AUTO_RPM, 0, AUTO_RPM, 0)
+                        Motor_RPM(NEG_AUTO_RPM, 0, 0, AUTO_RPM)
                     else:
                         Motor_Control(-2, 0, -2, 0)
                         power_expand_board.set_power("DC4", -2)
-                        AUTO_STAGE += 1
+                        V_AUTO_STAGE = V_AUTO_STAGE + 1
+        led_matrix_1.show('A E', wait=False)
         return
 
  ######  ##   ##  #####               ###    ##   ##   ######   #####   ##   ##    ###     ######   ######    ####             ####     ######    ###      ####    ######  
@@ -257,6 +251,16 @@ def Motor_Safety_CTL ():
     if smartservo_2.get_value("current") > 500:
         BRUSHLESS_SERVO.set_power(0)
 
+Speed_Modifier = 1.6
+CTLMODE = 1
+ENABLE_AUTO = 1
+TURN_SPEED_MODIFIER = 1.3
+V_AUTO_STAGE = 0
+AUTO_RPM = 150
+NEG_AUTO_RPM = -150
+
+AUTO_SIDE = 0
+
 power_expand_board.set_power("DC4", -100)
 led_matrix_1.show('S0', wait = False)
 smartservo_3.move_to(0, 50)
@@ -273,7 +277,7 @@ power_expand_board.set_power("DC4", -2)
 while True:
     Motor_Safety_CTL()
     if button_1.is_pressed():
-        AUTO_STAGE = 0
+        V_AUTO_STAGE = 0
         ENABLE_AUTO = 1
         smart_camera_1.open_light()
         smart_camera_1.reset()
