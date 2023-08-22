@@ -6,7 +6,7 @@ from mbuild import power_expand_board #done
 from mbuild import gamepad #done
 from mbuild.smartservo import smartservo_class #done
 from mbuild.ranging_sensor import ranging_sensor_class #done
-from mbuild.smart_camera import smart_camera_class
+from mbuild.smart_camera import smart_camera_class # part done
 from mbuild.led_matrix import led_matrix_class
 from mbuild.button import button_class
 import mbuild
