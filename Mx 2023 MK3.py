@@ -90,18 +90,19 @@ def Auto_stage ():
                         power_expand_board.set_power("DC4", -50)
                         Motor_RPM(AUTO_RPM, 0, 0, NEG_AUTO_RPM)
                     else:
-                        Motor_Control(0, -2, 0, -2)
+                        Motor_Control(-2, 0, 0, 2)
                         power_expand_board.set_power("DC4", -2)
                         led_matrix_1.show("done", wait=False)
                         V_AUTO_STAGE = V_AUTO_STAGE + 1
                 else:
                     if FRONT_RANGING.get_distance() > 10:
-                        power_expand_board.set_power("DC4", 50)
-                        Motor_RPM(NEG_AUTO_RPM, 0, 0, AUTO_RPM)
+                        power_expand_board.set_power("DC4",-50)
+                        Motor_RPM(0, AUTO_RPM, NEG_AUTO_RPM, 0)
                     else:
-                        Motor_Control(-2, 0, -2, 0)
+                        Motor_Control(-2, 0, 0, 2)
                         power_expand_board.set_power("DC4", -2)
                         V_AUTO_STAGE = V_AUTO_STAGE + 1
+        Motor_Control(0, 0, 0, 0)
         led_matrix_1.show('A E', wait=False)
         return
 
@@ -275,6 +276,7 @@ Motor_Control(0, 0, 0, 0)
 led_matrix_1.show('OK!', wait = False)
 power_expand_board.set_power("DC4", -2)
 while True:
+    led_matrix_1.show(smart_camera_1.get_sign_x(1))
     Motor_Safety_CTL()
     if button_1.is_pressed():
         V_AUTO_STAGE = 0
