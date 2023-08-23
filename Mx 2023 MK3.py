@@ -66,6 +66,30 @@ def Auto_Grip ():
     time.sleep(1)
     power_expand_board.set_power("DC5", 0)
 
+def Auto_Fix_Stuck():
+    last_movement_time = novapi.timer()
+
+    # Check if the robot is stuck based on the ranging sensor readings
+    front_range = FRONT_RANGING.get_distance()
+    left_range = LEFT_RANGING.get_distance()
+    right_range = RIGHT_RANGING.get_distance()
+
+    if (
+        front_range == last_front_range
+        and left_range == last_left_range
+        and right_range == last_right_range
+        and novapi.timer() - last_range_change_time > RANGE_CHANGE_TIMEOUT
+    ):
+       # Ranging sensor values haven't changed for too long, try to get unstuck
+        Motor_Control(100, 100, 100, 100)
+        time.sleep(1)
+        Motor_Control(0, 0, 0, 0)
+
+        last_front_range = front_range
+        last_left_range = left_range
+        last_right_range = right_range
+        last_range_change_time = novapi.timer()
+
 def Auto_stage ():
     global ENABLE_AUTO, V_AUTO_STAGE
     if ENABLE_AUTO == 0:
@@ -77,6 +101,9 @@ def Auto_stage ():
         smart_camera_1.set_mode("color")
         led_matrix_1.show('A W', wait=False)
 
+        initial_yaw = novapi.get_yaw()
+        MAX_YAW_ERROR = 10
+
         if LEFT_RANGING.get_distance() > RIGHT_RANGING.get_distance():
             AUTO_SIDE = 'R'
         else:
@@ -84,7 +111,13 @@ def Auto_stage ():
 
         while power_manage_module.is_auto_mode():
             led_matrix_1.show('A' + str(str(AUTO_SIDE) + str(V_AUTO_STAGE)), wait=False)
+
+            yaw_error = initial_yaw - novapi.get_yaw()
+
             if V_AUTO_STAGE == 0:
+                if abs(yaw_error) > MAX_YAW_ERROR:
+                    corrected_yaw = min(MAX_YAW_ERROR, max(-MAX_YAW_ERROR, yaw_error))
+                    Motor_Control(corrected_yaw * -0.5, corrected_yaw * -0.5, corrected_yaw * 0.5, corrected_yaw * 0.5)
                 if AUTO_SIDE == "L":
                     if FRONT_RANGING.get_distance() > 10:
                         power_expand_board.set_power("DC4", -50)
@@ -260,7 +293,16 @@ V_AUTO_STAGE = 0
 AUTO_RPM = 150
 NEG_AUTO_RPM = -150
 
-AUTO_SIDE = 0
+AUTO_SIDE = None
+
+STUCK_DISTANCE_THRESHOLD = 5  # Distance threshold to consider the robot as stuck
+RANGE_CHANGE_TIMEOUT = 5  # Timeout in seconds for detecting a lack of range changes
+
+last_movement_time = 0  # Initialize the last movement time
+last_range_change_time = 0  # Initialize the last range change time
+last_front_range = -1
+last_left_range = -1
+last_right_range = -1
 
 power_expand_board.set_power("DC4", -100)
 led_matrix_1.show('S0', wait = False)
@@ -275,8 +317,18 @@ Motor_Control(0, 0, 0, 0)
 # power_expand_board.set_power("DC4", -2)
 led_matrix_1.show('OK!', wait = False)
 power_expand_board.set_power("DC4", -2)
+
+Motor_Control(10,0,0,0)
+time.sleep(1)
+Motor_Control(0,10,0,0)
+time.sleep(1)
+Motor_Control(0,0,10,0)
+time.sleep(1)
+Motor_Control(0,0,0,10)
+time.sleep(1)
+
 while True:
-    led_matrix_1.show(smart_camera_1.get_sign_x(1))
+    led_matrix_1.show(round(smart_camera_1.get_sign_x(1), 1))
     Motor_Safety_CTL()
     if button_1.is_pressed():
         V_AUTO_STAGE = 0
