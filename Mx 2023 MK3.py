@@ -16,7 +16,7 @@ import time
 BR_ENCODE_M1 = encoder_motor_class("M1", "INDEX1")
 FR_ENCODE_M2 = encoder_motor_class("M2", "INDEX1")
 BL_ENCODE_M3 = encoder_motor_class("M3", "INDEX1")
-BR_ENCODE_M4 = encoder_motor_class("M4", "INDEX1")
+FR_ENCODE_M4 = encoder_motor_class("M4", "INDEX1")
 BRUSHLESS_SERVO = smartservo_class("M5", "INDEX1")
 smartservo_2 = smartservo_class("M5", "INDEX2")
 smartservo_3 = smartservo_class("M5", "INDEX3")
@@ -33,13 +33,13 @@ def Motor_Control(M1, M2, M3, M4):
     BR_ENCODE_M1.set_power(M1)
     FR_ENCODE_M2.set_power(M2)
     BL_ENCODE_M3.set_power(M3)
-    BR_ENCODE_M4.set_power(M4)
+    FR_ENCODE_M4.set_power(M4)
 
 def Motor_RPM(M1, M2, M3, M4):
     BR_ENCODE_M1.set_speed(M1)
     FR_ENCODE_M2.set_speed(M2)
     BL_ENCODE_M3.set_speed(M3)
-    BR_ENCODE_M4.set_speed(M4)
+    FR_ENCODE_M4.set_speed(M4)
 
 def Auto_Grip ():
     while not (FRONT_RANGING.get_distance() < 15):
@@ -56,7 +56,7 @@ def Auto_Grip ():
         time.sleep(0.001)
         power_expand_board.set_power("DC4", -50)
 
-    power_expand_board.set_power("DC4", -2)
+    power_expand_board.set_power("DC4", DC_LOCK_V)
     while not (FRONT_RANGING.get_distance() > 20 and not FRONT_RANGING.get_distance() == 200):
         time.sleep(0.001)
         Motor_RPM(-100, -100, 100, 100)
@@ -102,7 +102,7 @@ def Auto_stage ():
         led_matrix_1.show('A W', wait=False)
 
         initial_yaw = novapi.get_yaw()
-        MAX_YAW_ERROR = 10
+        MAX_YAW_ERROR = 5
 
         if LEFT_RANGING.get_distance() > RIGHT_RANGING.get_distance():
             AUTO_SIDE = 'R'
@@ -110,7 +110,8 @@ def Auto_stage ():
             AUTO_SIDE = 'L'
 
         while power_manage_module.is_auto_mode():
-            led_matrix_1.show('A' + str(str(AUTO_SIDE) + str(V_AUTO_STAGE)), wait=False)
+            # led_matrix_1.show('A' + str(str(AUTO_SIDE) + str(V_AUTO_STAGE)), wait=False)
+            led_matrix_1.show(str(novapi.get_yaw()), wait=False)
 
             yaw_error = initial_yaw - novapi.get_yaw()
 
@@ -120,20 +121,20 @@ def Auto_stage ():
                     Motor_Control(corrected_yaw * -0.5, corrected_yaw * -0.5, corrected_yaw * 0.5, corrected_yaw * 0.5)
                 if AUTO_SIDE == "L":
                     if FRONT_RANGING.get_distance() > 10:
-                        power_expand_board.set_power("DC4", -50)
+                        power_expand_board.set_power("DC4", -100)
                         Motor_RPM(AUTO_RPM, 0, 0, NEG_AUTO_RPM)
                     else:
                         Motor_Control(-2, 0, 0, 2)
-                        power_expand_board.set_power("DC4", -2)
+                        power_expand_board.set_power("DC4", DC_LOCK_V)
                         led_matrix_1.show("done", wait=False)
                         V_AUTO_STAGE = V_AUTO_STAGE + 1
                 else:
                     if FRONT_RANGING.get_distance() > 10:
-                        power_expand_board.set_power("DC4",-50)
+                        power_expand_board.set_power("DC4",-100)
                         Motor_RPM(0, AUTO_RPM, NEG_AUTO_RPM, 0)
                     else:
                         Motor_Control(-2, 0, 0, 2)
-                        power_expand_board.set_power("DC4", -2)
+                        power_expand_board.set_power("DC4", DC_LOCK_V)
                         V_AUTO_STAGE = V_AUTO_STAGE + 1
         Motor_Control(0, 0, 0, 0)
         led_matrix_1.show('A E', wait=False)
@@ -237,7 +238,7 @@ def S2_Keymap ():
         elif gamepad.is_key_pressed("Down"):
             power_expand_board.set_power("DC4", 100)
         else:
-            power_expand_board.set_power("DC4", -2)
+            power_expand_board.set_power("DC4", DC_LOCK_V)
             
     if gamepad.is_key_pressed("N2"):
         smartservo_3.move_to(90, 50)
@@ -293,6 +294,8 @@ V_AUTO_STAGE = 0
 AUTO_RPM = 150
 NEG_AUTO_RPM = -150
 
+DC_LOCK_V = -10
+
 AUTO_SIDE = None
 
 STUCK_DISTANCE_THRESHOLD = 5  # Distance threshold to consider the robot as stuck
@@ -314,18 +317,18 @@ Motor_Control(0, 0, 0, 0)
 #     time.sleep(0.001)
 #     power_expand_board.set_power("DC4", -100)
 
-# power_expand_board.set_power("DC4", -2)
+# power_expand_board.set_power("DC4", DC_LOCK_V)
 led_matrix_1.show('OK!', wait = False)
-power_expand_board.set_power("DC4", -2)
+power_expand_board.set_power("DC4", DC_LOCK_V)
 
-Motor_Control(10,0,0,0)
-time.sleep(1)
-Motor_Control(0,10,0,0)
-time.sleep(1)
-Motor_Control(0,0,10,0)
-time.sleep(1)
-Motor_Control(0,0,0,10)
-time.sleep(1)
+# Motor_Control(10,0,0,0)
+# time.sleep(1)
+# Motor_Control(0,10,0,0)
+# time.sleep(1)
+# Motor_Control(0,0,10,0)
+# time.sleep(1)
+# Motor_Control(0,0,0,10)
+# time.sleep(1)
 
 while True:
     led_matrix_1.show(round(smart_camera_1.get_sign_x(1), 1))
