@@ -16,7 +16,7 @@ import time
 BR_ENCODE_M1 = encoder_motor_class("M1", "INDEX1")
 FR_ENCODE_M2 = encoder_motor_class("M2", "INDEX1")
 BL_ENCODE_M3 = encoder_motor_class("M3", "INDEX1")
-FR_ENCODE_M4 = encoder_motor_class("M4", "INDEX1")
+FL_ENCODE_M4 = encoder_motor_class("M4", "INDEX1")
 BRUSHLESS_SERVO = smartservo_class("M5", "INDEX1")
 smartservo_2 = smartservo_class("M5", "INDEX2")
 smartservo_3 = smartservo_class("M5", "INDEX3")
@@ -33,13 +33,13 @@ def Motor_Control(M1, M2, M3, M4):
     BR_ENCODE_M1.set_power(M1)
     FR_ENCODE_M2.set_power(M2)
     BL_ENCODE_M3.set_power(M3)
-    FR_ENCODE_M4.set_power(M4)
+    FL_ENCODE_M4.set_power(M4)
 
 def Motor_RPM(M1, M2, M3, M4):
     BR_ENCODE_M1.set_speed(M1)
     FR_ENCODE_M2.set_speed(M2)
     BL_ENCODE_M3.set_speed(M3)
-    FR_ENCODE_M4.set_speed(M4)
+    FL_ENCODE_M4.set_speed(M4)
 
 def Auto_Grip ():
     while not (FRONT_RANGING.get_distance() < 15):
@@ -116,9 +116,9 @@ def Auto_stage ():
             yaw_error = initial_yaw - novapi.get_yaw()
 
             if V_AUTO_STAGE == 0:
-                if abs(yaw_error) > MAX_YAW_ERROR:
-                    corrected_yaw = min(MAX_YAW_ERROR, max(-MAX_YAW_ERROR, yaw_error))
-                    Motor_Control(corrected_yaw * -0.5, corrected_yaw * -0.5, corrected_yaw * 0.5, corrected_yaw * 0.5)
+                # if abs(yaw_error) > MAX_YAW_ERROR:
+                    # corrected_yaw = min(MAX_YAW_ERROR, max(-MAX_YAW_ERROR, yaw_error))
+                    # Motor_Control(corrected_yaw * -0.5, corrected_yaw * -0.5, corrected_yaw * 0.5, corrected_yaw * 0.5)
                 if AUTO_SIDE == "L":
                     if FRONT_RANGING.get_distance() > 10:
                         power_expand_board.set_power("DC4", -100)
@@ -294,7 +294,7 @@ V_AUTO_STAGE = 0
 AUTO_RPM = 150
 NEG_AUTO_RPM = -150
 
-DC_LOCK_V = -10
+DC_LOCK_V = -20
 
 AUTO_SIDE = None
 
@@ -331,7 +331,7 @@ power_expand_board.set_power("DC4", DC_LOCK_V)
 # time.sleep(1)
 
 while True:
-    led_matrix_1.show(round(smart_camera_1.get_sign_x(1), 1))
+    # led_matrix_1.show(round(smart_camera_1.get_sign_x(1), 1))
     Motor_Safety_CTL()
     if button_1.is_pressed():
         V_AUTO_STAGE = 0
