@@ -294,7 +294,7 @@ V_AUTO_STAGE = 0
 AUTO_RPM = 150
 NEG_AUTO_RPM = -150
 
-DC_LOCK_V = -20
+DC_LOCK_V = -15
 
 AUTO_SIDE = None
 
@@ -332,6 +332,7 @@ power_expand_board.set_power("DC4", DC_LOCK_V)
 
 while True:
     # led_matrix_1.show(round(smart_camera_1.get_sign_x(1), 1))
+    # led_matrix_1.show(round(novapi.timer(), 1))
     Motor_Safety_CTL()
     if button_1.is_pressed():
         V_AUTO_STAGE = 0
