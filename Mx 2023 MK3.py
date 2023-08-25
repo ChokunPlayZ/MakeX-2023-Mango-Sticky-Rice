@@ -248,14 +248,17 @@ def S2_Keymap ():
 
 def S3_Keymap ():
     if gamepad.is_key_pressed("N1"):
-        smartservo_2.move_to(19, 50)
+        #Release
+        smartservo_2.move_to(194, 50)
     elif gamepad.is_key_pressed("N4"):
-        smartservo_2.move_to(-56, 50)
-
-    if gamepad.is_key_pressed("N2"):
-        smartservo_2.move_to(-75, 50)
+        #Grab Block
+        smartservo_2.move_to(-240, 50)
+    elif gamepad.is_key_pressed("N2"):
+        #Grab pin top
+        smartservo_2.move_to(-250, 50)
     elif gamepad.is_key_pressed("N3"):
-        smartservo_2.move_to(-68, 50)
+        # Grab Pin Buttom
+        smartservo_2.move_to(-242, 50)
 
     if gamepad.is_key_pressed("Down"):
         smartservo_2.move(3, 100)
@@ -310,7 +313,7 @@ last_right_range = -1
 power_expand_board.set_power("DC4", -100)
 led_matrix_1.show('S0', wait = False)
 smartservo_3.move_to(0, 50)
-smartservo_2.move_to(19, 50)
+smartservo_2.move_to(194, 50)
 BRUSHLESS_SERVO.move_to(0, 50)
 Motor_Control(0, 0, 0, 0)
 # while not (GRIPPER_RANGING.get_distance() < 3.5 or GRIPPER_RANGING.get_distance() == 200):
@@ -333,6 +336,7 @@ power_expand_board.set_power("DC4", DC_LOCK_V)
 while True:
     # led_matrix_1.show(round(smart_camera_1.get_sign_x(1), 1))
     # led_matrix_1.show(round(novapi.timer(), 1))
+    led_matrix_1.show(smartservo_2.get_value("angle"), wait=False)
     Motor_Safety_CTL()
     if button_1.is_pressed():
         V_AUTO_STAGE = 0
@@ -355,11 +359,11 @@ while True:
             CTLMODE = 3
 
         if CTLMODE == 1:
-            smartservo_2.move_to(19, 50)
+            smartservo_2.move_to(194, 50)
             Movement()
             S1_Keymap()
         elif CTLMODE == 2:
-            smartservo_2.move_to(19, 50)
+            smartservo_2.move_to(194, 50)
             Reverse_movement()
             S2_Keymap()
         elif CTLMODE == 3:
