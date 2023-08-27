@@ -122,7 +122,8 @@ def Auto_stage ():
                 if AUTO_SIDE == "L":
                     if FRONT_RANGING.get_distance() > 10:
                         power_expand_board.set_power("DC4", -100)
-                        Motor_RPM(AUTO_RPM, 0, 0, NEG_AUTO_RPM)
+                        # Motor_RPM(AUTO_RPM, 0, 0, NEG_AUTO_RPM)
+                        Motor_Control(100, 0, 0, 100)
                     else:
                         Motor_Control(-2, 0, 0, 2)
                         power_expand_board.set_power("DC4", DC_LOCK_V)
@@ -131,7 +132,8 @@ def Auto_stage ():
                 else:
                     if FRONT_RANGING.get_distance() > 10:
                         power_expand_board.set_power("DC4",-100)
-                        Motor_RPM(0, AUTO_RPM, NEG_AUTO_RPM, 0)
+                        # Motor_RPM(0, AUTO_RPM, NEG_AUTO_RPM, 0)
+                        Motor_Control(0, 100, 100, 0)
                     else:
                         Motor_Control(-2, 0, 0, 2)
                         power_expand_board.set_power("DC4", DC_LOCK_V)
