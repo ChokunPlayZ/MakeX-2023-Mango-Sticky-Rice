@@ -247,7 +247,7 @@ def S2_Keymap ():
     elif gamepad.is_key_pressed("N3"):
         smartservo_3.move_to(0, 50)
     elif gamepad.is_key_pressed("R1"):
-        smartservo_3.move_to(-45, 50)
+        smartservo_3.move_to(45, 50)
         
 
 def S3_Keymap ():
