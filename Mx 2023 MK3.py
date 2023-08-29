@@ -217,7 +217,7 @@ def S1_Keymap ():
             power_expand_board.stop("BL2")
 
     if gamepad.is_key_pressed("+"):
-        BRUSHLESS_SERVO.move_to(-7, 100)
+        BRUSHLESS_SERVO.move_to(-9, 100)
     elif gamepad.is_key_pressed("≡"):
             BRUSHLESS_SERVO.move_to(2, 100)
 
@@ -244,9 +244,11 @@ def S2_Keymap ():
             
     if gamepad.is_key_pressed("N2"):
         smartservo_3.move_to(90, 50)
-    else:
-        if gamepad.is_key_pressed("N3"):
-            smartservo_3.move_to(0, 50)
+    elif gamepad.is_key_pressed("N3"):
+        smartservo_3.move_to(0, 50)
+    elif gamepad.is_key_pressed("R1"):
+        smartservo_3.move_to(-45, 50)
+        
 
 def S3_Keymap ():
     if gamepad.is_key_pressed("N1"):
