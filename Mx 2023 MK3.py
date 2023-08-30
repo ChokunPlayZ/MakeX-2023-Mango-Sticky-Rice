@@ -253,16 +253,16 @@ def S2_Keymap ():
 def S3_Keymap ():
     if gamepad.is_key_pressed("N1"):
         #Release
-        smartservo_2.move_to(194, 50)
+        smartservo_2.move_to(186, 50)
     elif gamepad.is_key_pressed("N4"):
         #Grab Block
-        smartservo_2.move_to(-240, 50)
+        smartservo_2.move_to(122, 50)
     elif gamepad.is_key_pressed("N2"):
         #Grab pin top
-        smartservo_2.move_to(-250, 50)
+        smartservo_2.move_to(105, 50)
     elif gamepad.is_key_pressed("N3"):
         # Grab Pin Buttom
-        smartservo_2.move_to(-242, 50)
+        smartservo_2.move_to(108, 50)
 
     if gamepad.is_key_pressed("Down"):
         smartservo_2.move(3, 100)
@@ -317,7 +317,7 @@ last_right_range = -1
 power_expand_board.set_power("DC4", -100)
 led_matrix_1.show('S0', wait = False)
 smartservo_3.move_to(0, 50)
-smartservo_2.move_to(194, 50)
+smartservo_2.move_to(186, 50)
 BRUSHLESS_SERVO.move_to(0, 50)
 Motor_Control(0, 0, 0, 0)
 # while not (GRIPPER_RANGING.get_distance() < 3.5 or GRIPPER_RANGING.get_distance() == 200):
@@ -363,11 +363,11 @@ while True:
             CTLMODE = 3
 
         if CTLMODE == 1:
-            smartservo_2.move_to(194, 50)
+            smartservo_2.move_to(186, 50)
             Movement()
             S1_Keymap()
         elif CTLMODE == 2:
-            smartservo_2.move_to(194, 50)
+            smartservo_2.move_to(186, 50)
             Reverse_movement()
             S2_Keymap()
         elif CTLMODE == 3:
