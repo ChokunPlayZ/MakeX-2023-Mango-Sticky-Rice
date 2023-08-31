@@ -256,13 +256,13 @@ def S3_Keymap ():
         smartservo_2.move_to(0, 50)
     elif gamepad.is_key_pressed("N4"):
         #Grab Block
-        smartservo_2.move_to(-75, 50)
+        smartservo_2.move_to(-73, 50)
     elif gamepad.is_key_pressed("N2"):
         #Grab pin top
-        smartservo_2.move_to(-92, 50)
+        smartservo_2.move_to(-93, 50)
     elif gamepad.is_key_pressed("N3"):
         # Grab Pin Buttom
-        smartservo_2.move_to(-88, 50)
+        smartservo_2.move_to(-86, 50)
 
     if gamepad.is_key_pressed("Down"):
         smartservo_2.move(3, 100)
@@ -301,7 +301,7 @@ V_AUTO_STAGE = 0
 AUTO_RPM = 150
 NEG_AUTO_RPM = -150
 
-DC_LOCK_V = -15
+DC_LOCK_V = -10
 
 AUTO_SIDE = None
 
