@@ -10,7 +10,7 @@ def get_joystick(joystick:str):
     ```
     """
 
-def s_key_pressed(button:str):
+def is_key_pressed(button:str):
     """
     Get the status of the button on the makeblock joystick
     ```
