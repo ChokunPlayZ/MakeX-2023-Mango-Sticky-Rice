@@ -259,8 +259,14 @@ def S3_Keymap ():
         smartservo_2.move_to(-73, 50)
     elif gamepad.is_key_pressed("N2"):
         #Grab pin top
-        smartservo_2.move_to(-93, 50)
+        smartservo_2.move_to(-91, 50)
     elif gamepad.is_key_pressed("N3"):
+        # Grab Pin Buttom
+        smartservo_2.move_to(-85, 50)
+    elif gamepad.is_key_pressed("L1"):
+        # Grab Block 2
+        smartservo_2.move_to(-75, 50)
+    elif gamepad.is_key_pressed("R1"):
         # Grab Pin Buttom
         smartservo_2.move_to(-86, 50)
 
