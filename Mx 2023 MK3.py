@@ -233,15 +233,18 @@ def S2_Keymap ():
         power_expand_board.set_power("DC4", 100)
     elif gamepad.is_key_pressed("N4"):
         power_expand_board.set_power("DC5", -100)
+    elif gamepad.is_key_pressed("L1"):
+        power_expand_board.set_power("DC5", 100)
     else:
         power_expand_board.set_power("DC5", 0)
-        if gamepad.is_key_pressed("Up"):
-            power_expand_board.set_power("DC4", -100)
-        elif gamepad.is_key_pressed("Down"):
-            power_expand_board.set_power("DC4", 100)
-        else:
-            power_expand_board.set_power("DC4", DC_LOCK_V)
-            
+
+    if gamepad.is_key_pressed("Up"):
+        power_expand_board.set_power("DC4", -100)
+    elif gamepad.is_key_pressed("Down"):
+        power_expand_board.set_power("DC4", 100)
+    else:
+        power_expand_board.set_power("DC4", DC_LOCK_V)
+        
     if gamepad.is_key_pressed("N2"):
         smartservo_3.move_to(90, 50)
     elif gamepad.is_key_pressed("N3"):
