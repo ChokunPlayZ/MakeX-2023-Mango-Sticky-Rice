@@ -1,4 +1,3 @@
-# codes make you happy
 import novapi
 from mbuild import power_manage_module
 from mbuild.encoder_motor import encoder_motor_class
@@ -12,18 +11,23 @@ from mbuild.button import button_class
 import mbuild
 import time
 
-# new class
+# stuff
 BR_ENCODE_M1 = encoder_motor_class("M1", "INDEX1")
 FR_ENCODE_M2 = encoder_motor_class("M2", "INDEX1")
 BL_ENCODE_M3 = encoder_motor_class("M3", "INDEX1")
 FL_ENCODE_M4 = encoder_motor_class("M4", "INDEX1")
 BRUSHLESS_SERVO = smartservo_class("M5", "INDEX1")
-smartservo_2 = smartservo_class("M5", "INDEX2")
-smartservo_3 = smartservo_class("M5", "INDEX3")
+BUTTOM_GRIPPER = smartservo_class("M5", "INDEX2")
+GRIPPER_ANGLE = smartservo_class("M5", "INDEX3")
+
+# Ranging
 LEFT_RANGING = ranging_sensor_class("PORT5", "INDEX1")
 BACK_RANGING = ranging_sensor_class("PORT5", "INDEX2")
 RIGHT_RANGING = ranging_sensor_class("PORT5", "INDEX3")
-FRONT_RANGING = ranging_sensor_class("PORT5", "INDEX4")
+FRONT_L_RANGING = ranging_sensor_class("PORT5", "INDEX4")
+FRONT_R_RANGING = ranging_sensor_class("PORT5", "INDEX5")
+
+# Gripper
 GRIPPER_RANGING = ranging_sensor_class("PORT4", "INDEX1")
 smart_camera_1 = smart_camera_class("PORT4", "INDEX1")
 led_matrix_1 = led_matrix_class("PORT4", "INDEX1")
@@ -42,7 +46,7 @@ def Motor_RPM(M1, M2, M3, M4):
     FL_ENCODE_M4.set_speed(M4)
 
 def Auto_Grip ():
-    while not (FRONT_RANGING.get_distance() < 15):
+    while not (FRONT_R_RANGING.get_distance() < 15):
         time.sleep(0.001)
         Motor_RPM(100, 100, -100, AUTO_RPM)
 
@@ -57,7 +61,7 @@ def Auto_Grip ():
         power_expand_board.set_power("DC4", -50)
 
     power_expand_board.set_power("DC4", DC_LOCK_V)
-    while not (FRONT_RANGING.get_distance() > 20 and not FRONT_RANGING.get_distance() == 200):
+    while not (FRONT_R_RANGING.get_distance() > 20 and not FRONT_R_RANGING.get_distance() == 200):
         time.sleep(0.001)
         Motor_RPM(-100, -100, 100, 100)
 
@@ -70,7 +74,7 @@ def Auto_Fix_Stuck():
     last_movement_time = novapi.timer()
 
     # Check if the robot is stuck based on the ranging sensor readings
-    front_range = FRONT_RANGING.get_distance()
+    front_range = FRONT_R_RANGING.get_distance()
     left_range = LEFT_RANGING.get_distance()
     right_range = RIGHT_RANGING.get_distance()
 
@@ -120,7 +124,7 @@ def Auto_stage ():
                     # corrected_yaw = min(MAX_YAW_ERROR, max(-MAX_YAW_ERROR, yaw_error))
                     # Motor_Control(corrected_yaw * -0.5, corrected_yaw * -0.5, corrected_yaw * 0.5, corrected_yaw * 0.5)
                 if AUTO_SIDE == "L":
-                    if FRONT_RANGING.get_distance() > 10:
+                    if FRONT_R_RANGING.get_distance() > 10:
                         power_expand_board.set_power("DC4", -100)
                         # Motor_RPM(AUTO_RPM, 0, 0, NEG_AUTO_RPM)
                         Motor_Control(100, 0, 0, 100)
@@ -130,7 +134,7 @@ def Auto_stage ():
                         led_matrix_1.show("done", wait=False)
                         V_AUTO_STAGE = V_AUTO_STAGE + 1
                 else:
-                    if FRONT_RANGING.get_distance() > 10:
+                    if FRONT_R_RANGING.get_distance() > 10:
                         power_expand_board.set_power("DC4",-100)
                         # Motor_RPM(0, AUTO_RPM, NEG_AUTO_RPM, 0)
                         Motor_Control(0, 100, 100, 0)
@@ -231,9 +235,10 @@ def S2_Keymap ():
     if gamepad.is_key_pressed("N1"):
         power_expand_board.set_power("DC5", 100)
         power_expand_board.set_power("DC4", 100)
+
     elif gamepad.is_key_pressed("N4"):
         power_expand_board.set_power("DC5", -100)
-    elif gamepad.is_key_pressed("L1"):
+    elif gamepad.is_key_pressed("R1"):
         power_expand_board.set_power("DC5", 100)
     else:
         power_expand_board.set_power("DC5", 0)
@@ -246,37 +251,37 @@ def S2_Keymap ():
         power_expand_board.set_power("DC4", DC_LOCK_V)
         
     if gamepad.is_key_pressed("N2"):
-        smartservo_3.move_to(90, 50)
+        GRIPPER_ANGLE.move_to(90, 50)
     elif gamepad.is_key_pressed("N3"):
-        smartservo_3.move_to(0, 50)
-    elif gamepad.is_key_pressed("R1"):
-        smartservo_3.move_to(45, 50)
+        GRIPPER_ANGLE.move_to(0, 50)
+    elif gamepad.is_key_pressed("L1"):
+        GRIPPER_ANGLE.move_to(45, 50)
         
 
 def S3_Keymap ():
     if gamepad.is_key_pressed("N1"):
         #Release
-        smartservo_2.move_to(0, 50)
+        BUTTOM_GRIPPER.move_to(0, 50)
     elif gamepad.is_key_pressed("N4"):
         #Grab Block
-        smartservo_2.move_to(-73, 50)
+        BUTTOM_GRIPPER.move_to(-73, 50)
     elif gamepad.is_key_pressed("N2"):
         #Grab pin top
-        smartservo_2.move_to(-94, 50)
+        BUTTOM_GRIPPER.move_to(-94, 50)
     elif gamepad.is_key_pressed("N3"):
         # Grab Pin Buttom
-        smartservo_2.move_to(-85, 50)
+        BUTTOM_GRIPPER.move_to(-85, 50)
     elif gamepad.is_key_pressed("L1"):
         # Grab Block 2
-        smartservo_2.move_to(-75, 50)
+        BUTTOM_GRIPPER.move_to(-75, 50)
     elif gamepad.is_key_pressed("R1"):
         # Grab Pin Buttom
-        smartservo_2.move_to(-86, 50)
+        BUTTOM_GRIPPER.move_to(-86, 50)
 
     if gamepad.is_key_pressed("Down"):
-        smartservo_2.move(3, 100)
+        BUTTOM_GRIPPER.move(3, 100)
     elif gamepad.is_key_pressed("Up"):
-            smartservo_2.move(-3, 100)
+            BUTTOM_GRIPPER.move(-3, 100)
 
 def feeder_control ():
     if gamepad.is_key_pressed("N1"):
@@ -299,7 +304,7 @@ def feeder_control ():
         time.sleep(0.2)
 
 def Motor_Safety_CTL ():
-    if smartservo_2.get_value("current") > 500:
+    if BUTTOM_GRIPPER.get_value("current") > 500:
         BRUSHLESS_SERVO.set_power(0)
 
 Speed_Modifier = 1.6
@@ -325,8 +330,8 @@ last_right_range = -1
 
 power_expand_board.set_power("DC4", -100)
 led_matrix_1.show('S0', wait = False)
-smartservo_3.move_to(0, 50)
-smartservo_2.move_to(0, 50)
+GRIPPER_ANGLE.move_to(0, 50)
+BUTTOM_GRIPPER.move_to(0, 50)
 BRUSHLESS_SERVO.move_to(0, 50)
 Motor_Control(0, 0, 0, 0)
 # while not (GRIPPER_RANGING.get_distance() < 3.5 or GRIPPER_RANGING.get_distance() == 200):
@@ -349,7 +354,7 @@ power_expand_board.set_power("DC4", DC_LOCK_V)
 while True:
     # led_matrix_1.show(round(smart_camera_1.get_sign_x(1), 1))
     # led_matrix_1.show(round(novapi.timer(), 1))
-    led_matrix_1.show(smartservo_2.get_value("angle"), wait=False)
+    led_matrix_1.show(BUTTOM_GRIPPER.get_value("angle"), wait=False)
     Motor_Safety_CTL()
     if button_1.is_pressed():
         V_AUTO_STAGE = 0
@@ -372,11 +377,11 @@ while True:
             CTLMODE = 3
 
         if CTLMODE == 1:
-            smartservo_2.move_to(0, 50)
+            BUTTOM_GRIPPER.move_to(0, 50)
             Movement()
             S1_Keymap()
         elif CTLMODE == 2:
-            smartservo_2.move_to(0, 50)
+            BUTTOM_GRIPPER.move_to(0, 50)
             Reverse_movement()
             S2_Keymap()
         elif CTLMODE == 3:
