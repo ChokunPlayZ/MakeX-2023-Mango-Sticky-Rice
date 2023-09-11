@@ -70,6 +70,8 @@ def Auto_Grip ():
     time.sleep(1)
     power_expand_board.set_power("DC5", 0)
 
+
+
 def Auto_stage():
     global ENABLE_AUTO, V_AUTO_STAGE
     if ENABLE_AUTO == 0:
@@ -77,6 +79,10 @@ def Auto_stage():
         return
     if ENABLE_AUTO == 1:
         led_matrix_1.show('A P', wait=False)
+        BR_ENCODE_M1.set_power(0)
+        FR_ENCODE_M2.set_power(0)
+        BL_ENCODE_M3.set_power(0)
+        FL_ENCODE_M4.set_power(0)
         smart_camera_1.open_light()
         smart_camera_1.set_mode("color")
         led_matrix_1.show('A W', wait=False)
@@ -86,52 +92,48 @@ def Auto_stage():
         else:
             AUTO_SIDE = 'L'
 
-        target_distance = 10  # Set your desired distance to the wall
-
         while power_manage_module.is_auto_mode():
-            # Read distances from both sensors
-            distance_right = FRONT_R_RANGING.get_distance()
-            distance_left = FRONT_L_RANGING.get_distance()
+
+            if GRIPPER_RANGING.get_distance() > 50:
+                power_expand_board.set_power("DC4", -100)
+            elif GRIPPER_RANGING.get_distance() < 45:
+                power_expand_board.set_power("DC4", 100)
+            else:
+                power_expand_board.set_power("DC4", DC_LOCK_V)
 
             if V_AUTO_STAGE == 0:
                 if AUTO_SIDE == "L":
-                    if distance_right > target_distance and distance_left > target_distance:
-                        # Both sensors have clear paths, move forward left
-                        # Activate motors as needed
-                        BR_ENCODE_M1.set_power(100)
-                        FR_ENCODE_M2.set_power(0)
-                        BL_ENCODE_M3.set_power(0)
-                        FL_ENCODE_M4.set_power(100)
+                    if FRONT_L_RANGING.get_distance() > 10:
+                        if FRONT_R_RANGING.get_distance() > FRONT_L_RANGING.get_distance() + 3:
+                            Motor_Control(2, 0, 0, -2)
+                        elif FRONT_R_RANGING.get_distance() < FRONT_L_RANGING.get_distance() - 3:
+                            Motor_Control(-2, 0, 0, 2)
+                        else :
+                            Motor_Control(100, 0, 0, 100)
                     else:
-                        # One or both sensors detect an obstacle, adjust the motors
-                        # Implement correction on the fly by turning on/off individual motors
-                        BR_ENCODE_M1.set_power(100)
-                        FR_ENCODE_M2.set_power(0)
-                        BL_ENCODE_M3.set_power(100)
-                        FL_ENCODE_M4.set_power(0)
-
+                        Motor_Control(-2, 0, 0, 2)
+                        V_AUTO_STAGE = V_AUTO_STAGE + 1
                 else:
-                    if distance_right > target_distance and distance_left > target_distance:
-                        # Both sensors have clear paths, move forward right
-                        # Activate motors as needed
-                        BR_ENCODE_M1.set_power(0)
-                        FR_ENCODE_M2.set_power(100)
-                        BL_ENCODE_M3.set_power(100)
-                        FL_ENCODE_M4.set_power(0)
+                    if FRONT_L_RANGING.get_distance() > 10:
+                        if FRONT_R_RANGING.get_distance() > FRONT_L_RANGING.get_distance() + 3:
+                            Motor_Control(0, 2, -2, 0)
+                        elif FRONT_R_RANGING.get_distance() < FRONT_L_RANGING.get_distance() - 3:
+                            Motor_Control(0, -2, 2, 0)
+                        else:
+                            Motor_Control(0, 100, 100, 0)
                     else:
-                        # One or both sensors detect an obstacle, adjust the motors
-                        # Implement correction on the fly by turning on/off individual motors
-                        BR_ENCODE_M1.set_power(0)
-                        FR_ENCODE_M2.set_power(100)
-                        BL_ENCODE_M3.set_power(0)
-                        FL_ENCODE_M4.set_power(100)
+                        Motor_Control(-2, 0, 0, 2)
+                        V_AUTO_STAGE = V_AUTO_STAGE + 1
 
-            # Check if the robot has reached the desired stage
-            if (
-                distance_right > target_distance and distance_left > target_distance
-            ):
-                led_matrix_1.show("done", wait=False)
-                V_AUTO_STAGE = V_AUTO_STAGE + 1
+            if V_AUTO_STAGE == 1:
+                while V_AUTO_STAGE == 1:
+                    # walk right until the smart camera detect block 1 at arround center
+                    if smart_camera_1.detect_sign_location(1, "middle"):
+                        Motor_Control(0, 0, 0, 0)
+                        V_AUTO_STAGE = V_AUTO_STAGE + 1
+                    else :
+                        Motor_Control(100,-100, -100, 100)
+
 
         # Stop all motors when the loop ends
         BR_ENCODE_M1.set_power(0)
@@ -304,7 +306,7 @@ V_AUTO_STAGE = 0
 AUTO_RPM = 150
 NEG_AUTO_RPM = -150
 
-DC_LOCK_V = -10
+DC_LOCK_V = -5
 
 AUTO_SIDE = None
 
