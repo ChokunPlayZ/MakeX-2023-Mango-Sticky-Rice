@@ -345,7 +345,12 @@ power_expand_board.set_power("DC4", DC_LOCK_V)
 while True:
     # led_matrix_1.show(round(smart_camera_1.get_sign_x(1), 1))
     # led_matrix_1.show(round(novapi.timer(), 1))
-    led_matrix_1.show(BUTTOM_GRIPPER.get_value("angle"), wait=False)
+    # led_matrix_1.show(smart_camera_1.detect_sign_location(1, "middle"))
+    if smart_camera_1.detect_sign_location(1, "middle"):
+        led_matrix_1.show('t', wait = False)
+    else:
+        led_matrix_1.show('f', wait = False)
+    # led_matrix_1.show(BUTTOM_GRIPPER.get_value("angle"), wait=False)
     Motor_Safety_CTL()
     if button_1.is_pressed():
         V_AUTO_STAGE = 0
