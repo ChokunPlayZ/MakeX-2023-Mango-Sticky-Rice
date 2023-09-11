@@ -298,26 +298,19 @@ def Motor_Safety_CTL ():
     if BUTTOM_GRIPPER.get_value("current") > 500:
         BRUSHLESS_SERVO.set_power(0)
 
-Speed_Modifier = 1.6
-CTLMODE = 1
-ENABLE_AUTO = 1
+# Control System Config
+Speed_Modifier = 1.6 # หหารความเร็วด้วย
 TURN_SPEED_MODIFIER = 1.3
+CTLMODE = 2
+DC_LOCK_V = -5
+
+# Automatic Stage Config
+ENABLE_AUTO = 1
 V_AUTO_STAGE = 0
 AUTO_RPM = 150
 NEG_AUTO_RPM = -150
 
-DC_LOCK_V = -5
-
 AUTO_SIDE = None
-
-STUCK_DISTANCE_THRESHOLD = 5  # Distance threshold to consider the robot as stuck
-RANGE_CHANGE_TIMEOUT = 5  # Timeout in seconds for detecting a lack of range changes
-
-last_movement_time = 0  # Initialize the last movement time
-last_range_change_time = 0  # Initialize the last range change time
-last_front_range = -1
-last_left_range = -1
-last_right_range = -1
 
 power_expand_board.set_power("DC4", -100)
 led_matrix_1.show('S0', wait = False)
