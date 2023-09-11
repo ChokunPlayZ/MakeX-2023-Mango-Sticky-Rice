@@ -70,31 +70,7 @@ def Auto_Grip ():
     time.sleep(1)
     power_expand_board.set_power("DC5", 0)
 
-def Auto_Fix_Stuck():
-    last_movement_time = novapi.timer()
-
-    # Check if the robot is stuck based on the ranging sensor readings
-    front_range = FRONT_R_RANGING.get_distance()
-    left_range = LEFT_RANGING.get_distance()
-    right_range = RIGHT_RANGING.get_distance()
-
-    if (
-        front_range == last_front_range
-        and left_range == last_left_range
-        and right_range == last_right_range
-        and novapi.timer() - last_range_change_time > RANGE_CHANGE_TIMEOUT
-    ):
-       # Ranging sensor values haven't changed for too long, try to get unstuck
-        Motor_Control(100, 100, 100, 100)
-        time.sleep(1)
-        Motor_Control(0, 0, 0, 0)
-
-        last_front_range = front_range
-        last_left_range = left_range
-        last_right_range = right_range
-        last_range_change_time = novapi.timer()
-
-def Auto_stage ():
+def Auto_stage():
     global ENABLE_AUTO, V_AUTO_STAGE
     if ENABLE_AUTO == 0:
         led_matrix_1.show('A D', wait=False)
@@ -105,56 +81,70 @@ def Auto_stage ():
         smart_camera_1.set_mode("color")
         led_matrix_1.show('A W', wait=False)
 
-        initial_yaw = novapi.get_yaw()
-        MAX_YAW_ERROR = 5
-
         if LEFT_RANGING.get_distance() > RIGHT_RANGING.get_distance():
             AUTO_SIDE = 'R'
         else:
             AUTO_SIDE = 'L'
 
-        while power_manage_module.is_auto_mode():
-            # led_matrix_1.show('A' + str(str(AUTO_SIDE) + str(V_AUTO_STAGE)), wait=False)
-            led_matrix_1.show(str(novapi.get_yaw()), wait=False)
+        target_distance = 10  # Set your desired distance to the wall
 
-            yaw_error = initial_yaw - novapi.get_yaw()
+        while power_manage_module.is_auto_mode():
+            # Read distances from both sensors
+            distance_right = FRONT_R_RANGING.get_distance()
+            distance_left = FRONT_L_RANGING.get_distance()
 
             if V_AUTO_STAGE == 0:
-                # if abs(yaw_error) > MAX_YAW_ERROR:
-                    # corrected_yaw = min(MAX_YAW_ERROR, max(-MAX_YAW_ERROR, yaw_error))
-                    # Motor_Control(corrected_yaw * -0.5, corrected_yaw * -0.5, corrected_yaw * 0.5, corrected_yaw * 0.5)
                 if AUTO_SIDE == "L":
-                    if FRONT_R_RANGING.get_distance() > 10:
-                        power_expand_board.set_power("DC4", -100)
-                        # Motor_RPM(AUTO_RPM, 0, 0, NEG_AUTO_RPM)
-                        Motor_Control(100, 0, 0, 100)
+                    if distance_right > target_distance and distance_left > target_distance:
+                        # Both sensors have clear paths, move forward left
+                        # Activate motors as needed
+                        BR_ENCODE_M1.set_power(100)
+                        FR_ENCODE_M2.set_power(0)
+                        BL_ENCODE_M3.set_power(0)
+                        FL_ENCODE_M4.set_power(100)
                     else:
-                        Motor_Control(-2, 0, 0, 2)
-                        power_expand_board.set_power("DC4", DC_LOCK_V)
-                        led_matrix_1.show("done", wait=False)
-                        V_AUTO_STAGE = V_AUTO_STAGE + 1
+                        # One or both sensors detect an obstacle, adjust the motors
+                        # Implement correction on the fly by turning on/off individual motors
+                        BR_ENCODE_M1.set_power(100)
+                        FR_ENCODE_M2.set_power(0)
+                        BL_ENCODE_M3.set_power(100)
+                        FL_ENCODE_M4.set_power(0)
+
                 else:
-                    if FRONT_R_RANGING.get_distance() > 10:
-                        power_expand_board.set_power("DC4",-100)
-                        # Motor_RPM(0, AUTO_RPM, NEG_AUTO_RPM, 0)
-                        Motor_Control(0, 100, 100, 0)
+                    if distance_right > target_distance and distance_left > target_distance:
+                        # Both sensors have clear paths, move forward right
+                        # Activate motors as needed
+                        BR_ENCODE_M1.set_power(0)
+                        FR_ENCODE_M2.set_power(100)
+                        BL_ENCODE_M3.set_power(100)
+                        FL_ENCODE_M4.set_power(0)
                     else:
-                        Motor_Control(-2, 0, 0, 2)
-                        power_expand_board.set_power("DC4", DC_LOCK_V)
-                        V_AUTO_STAGE = V_AUTO_STAGE + 1
-        Motor_Control(0, 0, 0, 0)
+                        # One or both sensors detect an obstacle, adjust the motors
+                        # Implement correction on the fly by turning on/off individual motors
+                        BR_ENCODE_M1.set_power(0)
+                        FR_ENCODE_M2.set_power(100)
+                        BL_ENCODE_M3.set_power(0)
+                        FL_ENCODE_M4.set_power(100)
+
+            # Check if the robot has reached the desired stage
+            if (
+                distance_right > target_distance and distance_left > target_distance
+            ):
+                led_matrix_1.show("done", wait=False)
+                V_AUTO_STAGE = V_AUTO_STAGE + 1
+
+        # Stop all motors when the loop ends
+        BR_ENCODE_M1.set_power(0)
+        FR_ENCODE_M2.set_power(0)
+        BL_ENCODE_M3.set_power(0)
+        FL_ENCODE_M4.set_power(0)
+
         led_matrix_1.show('A E', wait=False)
         return
 
- ######  ##   ##  #####               ###    ##   ##   ######   #####   ##   ##    ###     ######   ######    ####             ####     ######    ###      ####    ######  
- ##      ###  ##  ##  ##             ## ##   ##   ##   # ## #  ##   ##  ### ###   ## ##    # ## #   # ## #   ##  ##           ##  ##    # ## #   ## ##    #   ##   ##      
- ##      #### ##  ##   ##           ##   ##  ##   ##     ##    ##   ##  #######  ##   ##     ##       ##    ##                ##          ##    ##   ##  ##        ##      
- #####   #######  ##   ##           ##   ##  ##   ##     ##    ##   ##  #######  ##   ##     ##       ##    ##                 #####      ##    ##   ##  ##  ###   #####   
- ##      ## ####  ##   ##           #######  ##   ##     ##    ##   ##  ## # ##  #######     ##       ##    ##                     ##     ##    #######  ##   ##   ##      
- ##      ##  ###  ##  ##            ##   ##  ##   ##     ##    ##   ##  ##   ##  ##   ##     ##     # ## #   ##  ##           ##   ##     ##    ##   ##   #   ##   ##      
- ######  ##   ##  #####             ##   ##   #####      ##     #####   ##   ##  ##   ##     ##     ######    ####             #####      ##    ##   ##    ####    ######  
-                                                                                                                                                                         
-
+## END
+## END
+## END
 def Movement ():
     LYp = gamepad.get_joystick("Ly") / Speed_Modifier
     LYn = LYp * -1
@@ -235,7 +225,6 @@ def S2_Keymap ():
     if gamepad.is_key_pressed("N1"):
         power_expand_board.set_power("DC5", 100)
         power_expand_board.set_power("DC4", 100)
-
     elif gamepad.is_key_pressed("N4"):
         power_expand_board.set_power("DC5", -100)
     elif gamepad.is_key_pressed("R1"):
@@ -243,12 +232,12 @@ def S2_Keymap ():
     else:
         power_expand_board.set_power("DC5", 0)
 
-    if gamepad.is_key_pressed("Up"):
-        power_expand_board.set_power("DC4", -100)
-    elif gamepad.is_key_pressed("Down"):
-        power_expand_board.set_power("DC4", 100)
-    else:
-        power_expand_board.set_power("DC4", DC_LOCK_V)
+        if gamepad.is_key_pressed("Up"):
+            power_expand_board.set_power("DC4", -100)
+        elif gamepad.is_key_pressed("Down"):
+            power_expand_board.set_power("DC4", 100)
+        else:
+            power_expand_board.set_power("DC4", DC_LOCK_V)
         
     if gamepad.is_key_pressed("N2"):
         GRIPPER_ANGLE.move_to(90, 50)
@@ -330,7 +319,7 @@ last_right_range = -1
 
 power_expand_board.set_power("DC4", -100)
 led_matrix_1.show('S0', wait = False)
-GRIPPER_ANGLE.move_to(0, 50)
+GRIPPER_ANGLE.move_to(45, 50)
 BUTTOM_GRIPPER.move_to(0, 50)
 BRUSHLESS_SERVO.move_to(0, 50)
 Motor_Control(0, 0, 0, 0)
