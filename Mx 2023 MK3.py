@@ -24,8 +24,8 @@ GRIPPER_ANGLE = smartservo_class("M5", "INDEX3")
 LEFT_RANGING = ranging_sensor_class("PORT5", "INDEX1")
 BACK_RANGING = ranging_sensor_class("PORT5", "INDEX2")
 RIGHT_RANGING = ranging_sensor_class("PORT5", "INDEX3")
-FRONT_L_RANGING = ranging_sensor_class("PORT5", "INDEX4")
-FRONT_R_RANGING = ranging_sensor_class("PORT5", "INDEX5")
+FRONT_L_RANGING = ranging_sensor_class("PORT5", "INDEX5")
+FRONT_R_RANGING = ranging_sensor_class("PORT5", "INDEX4")
 
 # Gripper
 GRIPPER_RANGING = ranging_sensor_class("PORT4", "INDEX1")
@@ -46,29 +46,35 @@ def Motor_RPM(M1, M2, M3, M4):
     FL_ENCODE_M4.set_speed(M4)
 
 def Auto_Grip ():
-    while not (FRONT_R_RANGING.get_distance() < 15):
-        time.sleep(0.001)
-        Motor_RPM(100, 100, -100, AUTO_RPM)
-
-    Motor_Control(-2, -2, 2, 2)
+    GRIPPER_ANGLE.move_to(45, 50)
     power_expand_board.set_power("DC5", 100)
-    power_expand_board.set_power("DC4", 50)
-    time.sleep(1)
-    power_expand_board.set_power("DC4", 0)
-    power_expand_board.set_power("DC5", 0)
-    while not (GRIPPER_RANGING.get_distance() < 3.5 or GRIPPER_RANGING.get_distance() == 200):
+    Motor_RPM(100, 100, -100, -100)
+    while FRONT_L_RANGING.get_distance() > 8:
+        led_matrix_1.show(FRONT_L_RANGING.get_distance(), wait=False)
         time.sleep(0.001)
-        power_expand_board.set_power("DC4", -50)
+    power_expand_board.set_power("DC5", 0)
+    Motor_Control(-2, -2, 2, 2)
 
-    power_expand_board.set_power("DC4", DC_LOCK_V)
-    while not (FRONT_R_RANGING.get_distance() > 20 and not FRONT_R_RANGING.get_distance() == 200):
+    while FRONT_L_RANGING.get_distance() < 20:
         time.sleep(0.001)
         Motor_RPM(-100, -100, 100, 100)
-
     Motor_Control(2, 2, -2, -2)
+
+    target_angle = novapi.get_yaw() + 85
+    while novapi.get_yaw() < target_angle :
+        time.sleep(0.001)
+        Motor_RPM(-100, -100, -100, -100)
+    Motor_Control(2, 2, 2, 2)
+
     power_expand_board.set_power("DC5", -100)
     time.sleep(1)
     power_expand_board.set_power("DC5", 0)
+
+    target_angle = novapi.get_yaw() - 80
+    while novapi.get_yaw() > target_angle :
+        time.sleep(0.001)
+        Motor_RPM(100, 100, 100, 100)
+    Motor_Control(-2, -2, -2, -2)
 
 
 
@@ -93,46 +99,68 @@ def Auto_stage():
             AUTO_SIDE = 'L'
 
         while power_manage_module.is_auto_mode():
+            led_matrix_1.show('A' + str(str(AUTO_SIDE) + str(V_AUTO_STAGE)), wait=False)
 
-            if GRIPPER_RANGING.get_distance() > 50:
+            if GRIPPER_RANGING.get_distance() > 20:
                 power_expand_board.set_power("DC4", -100)
-            elif GRIPPER_RANGING.get_distance() < 45:
-                power_expand_board.set_power("DC4", 100)
+            elif GRIPPER_RANGING.get_distance() < 15:
+                power_expand_board.set_power("DC4", 10)
             else:
                 power_expand_board.set_power("DC4", DC_LOCK_V)
 
             if V_AUTO_STAGE == 0:
                 if AUTO_SIDE == "L":
-                    if FRONT_L_RANGING.get_distance() > 10:
-                        if FRONT_R_RANGING.get_distance() > FRONT_L_RANGING.get_distance() + 3:
-                            Motor_Control(2, 0, 0, -2)
-                        elif FRONT_R_RANGING.get_distance() < FRONT_L_RANGING.get_distance() - 3:
-                            Motor_Control(-2, 0, 0, 2)
-                        else :
-                            Motor_Control(100, 0, 0, 100)
-                    else:
-                        Motor_Control(-2, 0, 0, 2)
-                        V_AUTO_STAGE = V_AUTO_STAGE + 1
+                    target_angle = novapi.get_yaw() - 30
+                    while novapi.get_yaw() > target_angle :
+                        time.sleep(0.001)
+                        Motor_RPM(100, 100, 100, 100)
+                    Motor_Control(-2, -2, -2, -2)
+                    V_AUTO_STAGE = V_AUTO_STAGE + 1
+                elif AUTO_SIDE == "R":
+                    target_angle = novapi.get_yaw() + 30
+                    while novapi.get_yaw() < target_angle :
+                        time.sleep(0.001)
+                        Motor_RPM(-100, -100, -100, -100)
+                    Motor_Control(2, 2, 2, 2)
+                    V_AUTO_STAGE = V_AUTO_STAGE + 1
                 else:
-                    if FRONT_L_RANGING.get_distance() > 10:
-                        if FRONT_R_RANGING.get_distance() > FRONT_L_RANGING.get_distance() + 3:
-                            Motor_Control(0, 2, -2, 0)
-                        elif FRONT_R_RANGING.get_distance() < FRONT_L_RANGING.get_distance() - 3:
-                            Motor_Control(0, -2, 2, 0)
-                        else:
-                            Motor_Control(0, 100, 100, 0)
-                    else:
-                        Motor_Control(-2, 0, 0, 2)
-                        V_AUTO_STAGE = V_AUTO_STAGE + 1
+                    led_matrix_1.show('AE', wait=False)
+                    time.sleep(500)
 
             if V_AUTO_STAGE == 1:
-                while V_AUTO_STAGE == 1:
-                    # walk right until the smart camera detect block 1 at arround center
-                    if smart_camera_1.detect_sign_location(1, "middle"):
-                        Motor_Control(0, 0, 0, 0)
-                        V_AUTO_STAGE = V_AUTO_STAGE + 1
-                    else :
-                        Motor_Control(100,-100, -100, 100)
+                if FRONT_L_RANGING.get_distance() > 20:
+                    Motor_RPM(100, 100, -100, -100)
+                else:
+                    Motor_Control(-2, -2, 2, 2)
+                    V_AUTO_STAGE = V_AUTO_STAGE + 1
+
+            if V_AUTO_STAGE == 0:
+                if AUTO_SIDE == "L":
+                    target_angle = novapi.get_yaw() + 30
+                    while novapi.get_yaw() < target_angle :
+                        time.sleep(0.001)
+                        Motor_RPM(-100, -100, -100, -100)
+                    Motor_Control(-2, -2, -2, -2)
+                    V_AUTO_STAGE = V_AUTO_STAGE + 1
+                elif AUTO_SIDE == "R":
+                    target_angle = novapi.get_yaw() - 30
+                    while novapi.get_yaw() > target_angle :
+                        time.sleep(0.001)
+                        Motor_RPM(100, 100, 100, 100)
+                    Motor_Control(2, 2, 2, 2)
+                    V_AUTO_STAGE = V_AUTO_STAGE + 1
+                else:
+                    led_matrix_1.show('AE', wait=False)
+                    time.sleep(500)
+
+            # if V_AUTO_STAGE == 1:
+            #     while V_AUTO_STAGE == 1:
+            #         # walk right until the smart camera detect block 1 at arround center
+            #         if smart_camera_1.detect_sign_location(1, "middle"):
+            #             Motor_Control(0, 0, 0, 0)
+            #             V_AUTO_STAGE = V_AUTO_STAGE + 1
+            #         else :
+            #             Motor_Control(100,-100, -100, 100)
 
 
         # Stop all motors when the loop ends
@@ -339,18 +367,22 @@ while True:
     # led_matrix_1.show(round(smart_camera_1.get_sign_x(1), 1))
     # led_matrix_1.show(round(novapi.timer(), 1))
     # led_matrix_1.show(smart_camera_1.detect_sign_location(1, "middle"))
-    if smart_camera_1.detect_sign_location(1, "middle"):
-        led_matrix_1.show('t', wait = False)
-    else:
-        led_matrix_1.show('f', wait = False)
+    # if smart_camera_1.detect_sign_location(1, "middle"): 
+    #     led_matrix_1.show('t', wait = False)
+    # else:
+    #     led_matrix_1.show('f', wait = False)
     # led_matrix_1.show(BUTTOM_GRIPPER.get_value("angle"), wait=False)
+    # led_matrix_1.show(FRONT_L_RANGING.get_distance(), wait=False)
+    # led_matrix_1.show(novapi.get_yaw(), wait=False)
+    led_matrix_1.show(GRIPPER_RANGING.get_distance(), wait=False)
     Motor_Safety_CTL()
     if button_1.is_pressed():
-        V_AUTO_STAGE = 0
-        ENABLE_AUTO = 1
-        smart_camera_1.open_light()
-        smart_camera_1.reset()
-        smart_camera_1.close_light()
+        Auto_Grip()
+        # V_AUTO_STAGE = 0
+        # ENABLE_AUTO = 1
+        # smart_camera_1.open_light()
+        # smart_camera_1.reset()
+        # smart_camera_1.close_light()
 
     if power_manage_module.is_auto_mode():
         Auto_stage()
