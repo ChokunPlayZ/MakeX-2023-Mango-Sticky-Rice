@@ -105,6 +105,8 @@ def Auto_stage():
         else:
             AUTO_SIDE = 'L'
 
+        AMS = None
+
         while power_manage_module.is_auto_mode():
             led_matrix_1.show('A' + str(str(AUTO_SIDE) + str(V_AUTO_STAGE)), wait=False)
 
@@ -159,15 +161,16 @@ def Auto_stage():
                     led_matrix_1.show('AE', wait=False)
                     time.sleep(500)
 
-            # if V_AUTO_STAGE == 1:
-            #     while V_AUTO_STAGE == 1:
-            #         # walk right until the smart camera detect block 1 at arround center
-            #         if smart_camera_1.detect_sign_location(1, "middle"):
-            #             Motor_Control(0, 0, 0, 0)
-            #             V_AUTO_STAGE = V_AUTO_STAGE + 1
-            #         else :
-            #             Motor_Control(100,-100, -100, 100)
+            if V_AUTO_STAGE == 3:
+                if LEFT_RANGING.get_distance() > RIGHT_RANGING.get_distance():
+                    AMS = 'L'
+                else:
+                    AMS = 'R'
+                V_AUTO_STAGE = V_AUTO_STAGE + 1
 
+            if V_AUTO_STAGE == 4:
+                if AMS == "L":
+                    pass
 
         # Stop all motors when the loop ends
         BR_ENCODE_M1.set_power(0)
