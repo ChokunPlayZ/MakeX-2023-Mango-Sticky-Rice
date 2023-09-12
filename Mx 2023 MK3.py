@@ -76,6 +76,13 @@ def Auto_Grip ():
         Motor_RPM(100, 100, 100, 100)
     Motor_Control(-2, -2, -2, -2)
 
+def Auto_Maintain_Grip():
+    if GRIPPER_RANGING.get_distance() > 20:
+        power_expand_board.set_power("DC4", -100)
+    elif GRIPPER_RANGING.get_distance() < 15:
+        power_expand_board.set_power("DC4", 10)
+    else:
+        power_expand_board.set_power("DC4", DC_LOCK_V)
 
 
 def Auto_stage():
@@ -101,12 +108,7 @@ def Auto_stage():
         while power_manage_module.is_auto_mode():
             led_matrix_1.show('A' + str(str(AUTO_SIDE) + str(V_AUTO_STAGE)), wait=False)
 
-            if GRIPPER_RANGING.get_distance() > 20:
-                power_expand_board.set_power("DC4", -100)
-            elif GRIPPER_RANGING.get_distance() < 15:
-                power_expand_board.set_power("DC4", 10)
-            else:
-                power_expand_board.set_power("DC4", DC_LOCK_V)
+            Auto_Maintain_Grip()
 
             if V_AUTO_STAGE == 0:
                 if AUTO_SIDE == "L":
@@ -114,6 +116,7 @@ def Auto_stage():
                     while novapi.get_yaw() > target_angle :
                         time.sleep(0.001)
                         Motor_RPM(100, 100, 100, 100)
+                        Auto_Maintain_Grip()
                     Motor_Control(-2, -2, -2, -2)
                     V_AUTO_STAGE = V_AUTO_STAGE + 1
                 elif AUTO_SIDE == "R":
@@ -121,6 +124,7 @@ def Auto_stage():
                     while novapi.get_yaw() < target_angle :
                         time.sleep(0.001)
                         Motor_RPM(-100, -100, -100, -100)
+                        Auto_Maintain_Grip()
                     Motor_Control(2, 2, 2, 2)
                     V_AUTO_STAGE = V_AUTO_STAGE + 1
                 else:
@@ -134,12 +138,13 @@ def Auto_stage():
                     Motor_Control(-2, -2, 2, 2)
                     V_AUTO_STAGE = V_AUTO_STAGE + 1
 
-            if V_AUTO_STAGE == 0:
+            if V_AUTO_STAGE == 2:
                 if AUTO_SIDE == "L":
                     target_angle = novapi.get_yaw() + 30
                     while novapi.get_yaw() < target_angle :
                         time.sleep(0.001)
                         Motor_RPM(-100, -100, -100, -100)
+                        Auto_Maintain_Grip()
                     Motor_Control(-2, -2, -2, -2)
                     V_AUTO_STAGE = V_AUTO_STAGE + 1
                 elif AUTO_SIDE == "R":
@@ -147,6 +152,7 @@ def Auto_stage():
                     while novapi.get_yaw() > target_angle :
                         time.sleep(0.001)
                         Motor_RPM(100, 100, 100, 100)
+                        Auto_Maintain_Grip()
                     Motor_Control(2, 2, 2, 2)
                     V_AUTO_STAGE = V_AUTO_STAGE + 1
                 else:
