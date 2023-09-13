@@ -45,7 +45,7 @@ def Motor_RPM(M1, M2, M3, M4):
     BL_ENCODE_M3.set_speed(M3)
     FL_ENCODE_M4.set_speed(M4)
 
-def Auto_Grip ():
+def oAuto_Grip ():
     GRIPPER_ANGLE.move_to(45, 50)
     power_expand_board.set_power("DC5", 100)
     Motor_RPM(100, 100, -100, -100)
@@ -76,10 +76,29 @@ def Auto_Grip ():
         Motor_RPM(100, 100, 100, 100)
     Motor_Control(-2, -2, -2, -2)
 
+def Auto_Grip ():
+    GRIPPER_ANGLE.move_to(45, 50)
+    power_expand_board.set_power("DC5", 100)
+    Motor_RPM(100, 100, -100, -100)
+    while FRONT_L_RANGING.get_distance() > 8:
+        led_matrix_1.show(FRONT_L_RANGING.get_distance(), wait=False)
+        time.sleep(0.001)
+    power_expand_board.set_power("DC5", 0)
+    Motor_Control(-2, -2, 2, 2)
+
+    while FRONT_L_RANGING.get_distance() < 30:
+        time.sleep(0.001)
+        Motor_RPM(-100, -100, 100, 100)
+    Motor_Control(2, 2, -2, -2)
+
+    power_expand_board.set_power("DC5", -100)
+    time.sleep(1)
+    power_expand_board.set_power("DC5", 0)
+
 def Auto_Maintain_Grip():
-    if GRIPPER_RANGING.get_distance() > 20:
+    if GRIPPER_RANGING.get_distance() > 15:
         power_expand_board.set_power("DC4", -100)
-    elif GRIPPER_RANGING.get_distance() < 15:
+    elif GRIPPER_RANGING.get_distance() < 13:
         power_expand_board.set_power("DC4", 10)
     else:
         power_expand_board.set_power("DC4", DC_LOCK_V)
@@ -134,7 +153,7 @@ def Auto_stage():
                     time.sleep(500)
 
             if V_AUTO_STAGE == 1:
-                if FRONT_L_RANGING.get_distance() > 20:
+                if FRONT_L_RANGING.get_distance() > 50:
                     Motor_RPM(100, 100, -100, -100)
                 else:
                     Motor_Control(-2, -2, 2, 2)
@@ -163,14 +182,64 @@ def Auto_stage():
 
             if V_AUTO_STAGE == 3:
                 if LEFT_RANGING.get_distance() > RIGHT_RANGING.get_distance():
-                    AMS = 'L'
-                else:
                     AMS = 'R'
+                else:
+                    AMS = 'L'
                 V_AUTO_STAGE = V_AUTO_STAGE + 1
 
             if V_AUTO_STAGE == 4:
                 if AMS == "L":
-                    pass
+                    if LEFT_RANGING.get_distance() < 150:
+                        Motor_RPM(100, -90, 100, -100)
+                    else:
+                        # power_expand_board.set_power("DC5", 0)
+                        Motor_Control(-2, 2, -2, 2)
+                        V_AUTO_STAGE = V_AUTO_STAGE + 1
+            
+            if V_AUTO_STAGE == 5:
+                Auto_Grip()
+                V_AUTO_STAGE = V_AUTO_STAGE + 1
+
+            if V_AUTO_STAGE == 6:
+                if AMS == "L":
+                    if RIGHT_RANGING.get_distance() > 55:
+                        Motor_RPM(100, -100, 100, -100)
+                    else:
+                        # power_expand_board.set_power("DC5", 0)
+                        Motor_Control(-2, 2, -2, 2)
+                        V_AUTO_STAGE = V_AUTO_STAGE + 1
+
+            if V_AUTO_STAGE == 7:
+                Auto_Grip()
+                V_AUTO_STAGE = V_AUTO_STAGE + 1
+
+            if V_AUTO_STAGE == 8:
+                if AMS == "L":
+                    if RIGHT_RANGING.get_distance() < 150:
+                        Motor_RPM(-100, 100, -100, 100)
+                    else:
+                        # power_expand_board.set_power("DC5", 0)
+                        Motor_Control(-2, 2, -2, 2)
+                        V_AUTO_STAGE = V_AUTO_STAGE + 1
+                    
+            if V_AUTO_STAGE == 9:
+                Auto_Grip()
+                V_AUTO_STAGE = V_AUTO_STAGE + 1
+
+            if V_AUTO_STAGE == 10:
+                if AMS == "L":
+                    if LEFT_RANGING.get_distance() > 55:
+                        Motor_RPM(-100, 100, -100, 100)
+                    else:
+                        # power_expand_board.set_power("DC5", 0)
+                        Motor_Control(2, -2, 2, -2)
+                        V_AUTO_STAGE = V_AUTO_STAGE + 1
+
+            if V_AUTO_STAGE == 11:
+                Auto_Grip()
+                V_AUTO_STAGE = V_AUTO_STAGE + 1
+                    
+
 
         # Stop all motors when the loop ends
         BR_ENCODE_M1.set_power(0)
