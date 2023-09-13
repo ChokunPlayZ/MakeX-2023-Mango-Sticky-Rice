@@ -45,36 +45,25 @@ def Motor_RPM(M1, M2, M3, M4):
     BL_ENCODE_M3.set_speed(M3)
     FL_ENCODE_M4.set_speed(M4)
 
-def oAuto_Grip ():
-    GRIPPER_ANGLE.move_to(45, 50)
-    power_expand_board.set_power("DC5", 100)
-    Motor_RPM(100, 100, -100, -100)
-    while FRONT_L_RANGING.get_distance() > 8:
-        led_matrix_1.show(FRONT_L_RANGING.get_distance(), wait=False)
-        time.sleep(0.001)
-    power_expand_board.set_power("DC5", 0)
-    Motor_Control(-2, -2, 2, 2)
+def Move_Dia_LR(power):
+    """Move Diagonal Left and Right (+power for Right, -power for Left)"""
+    Motor_RPM(power * -1, 0, 0, power)
 
-    while FRONT_L_RANGING.get_distance() < 20:
-        time.sleep(0.001)
-        Motor_RPM(-100, -100, 100, 100)
-    Motor_Control(2, 2, -2, -2)
+def Move_Dia_FB(power):
+    """Move Diagonal Forward and Backward (+power for Forward, -power for Backward)"""
+    Motor_RPM(power, 0, 0, power * -1)
 
-    target_angle = novapi.get_yaw() + 85
-    while novapi.get_yaw() < target_angle :
-        time.sleep(0.001)
-        Motor_RPM(-100, -100, -100, -100)
-    Motor_Control(2, 2, 2, 2)
+def Move_FB(power):
+    """Move Forward and Backward (+power for Forward, -power for Backward)"""
+    Motor_RPM(power, power, power * -1, power * -1)
 
-    power_expand_board.set_power("DC5", -100)
-    time.sleep(1)
-    power_expand_board.set_power("DC5", 0)
+def Move_LR(power):
+    """Move Side Left and Right (+power for Right, -power for Left)"""
+    Motor_RPM(power * -1, power, power * -1, power)
 
-    target_angle = novapi.get_yaw() - 80
-    while novapi.get_yaw() > target_angle :
-        time.sleep(0.001)
-        Motor_RPM(100, 100, 100, 100)
-    Motor_Control(-2, -2, -2, -2)
+def Move_Turn(power):
+    """Turn (+power for Right, -power for Left)"""
+    Motor_RPM(power, power, power, power)
 
 def Auto_Grip ():
     GRIPPER_ANGLE.move_to(45, 50)
@@ -242,8 +231,7 @@ def Auto_stage():
             if V_AUTO_STAGE == 11:
                 Auto_Grip()
                 V_AUTO_STAGE = V_AUTO_STAGE + 1
-                    
-        # Stop all motors when the loop ends
+
         BR_ENCODE_M1.set_power(0)
         FR_ENCODE_M2.set_power(0)
         BL_ENCODE_M3.set_power(0)
