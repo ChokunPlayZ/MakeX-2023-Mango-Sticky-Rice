@@ -195,7 +195,7 @@ def Auto_stage():
                     if RIGHT_RANGING.get_distance() < 150:
                         Move_LR(100)
                     else:
-                        Motor_Control(-2, 2, -2, 2)
+                        Motor_Control(2, -2, 2, -2)
                         V_AUTO_STAGE = V_AUTO_STAGE + 1
             
             if V_AUTO_STAGE == 5:
@@ -213,7 +213,7 @@ def Auto_stage():
                     if LEFT_RANGING.get_distance() > 55:
                         Move_LR(100)
                     else:
-                        Motor_Control(-2, 2, -2, 2)
+                        Motor_Control(2, -2, 2, -2)
                         V_AUTO_STAGE = V_AUTO_STAGE + 1
 
             if V_AUTO_STAGE == 7:
@@ -231,7 +231,7 @@ def Auto_stage():
                     if LEFT_RANGING.get_distance() < 150:
                         Move_LR(-100)
                     else:
-                        Motor_Control(-2, 2, -2, 2)
+                        Motor_Control(2, -2, 2, -2)
                         V_AUTO_STAGE = V_AUTO_STAGE + 1
                     
             if V_AUTO_STAGE == 9:
@@ -249,7 +249,7 @@ def Auto_stage():
                     if RIGHT_RANGING.get_distance() > 55:
                         Move_LR(-100)
                     else:
-                        Motor_Control(2, -2, 2, -2)
+                        Motor_Control(-2, 2, -2, 2)
                         V_AUTO_STAGE = V_AUTO_STAGE + 1
 
             if V_AUTO_STAGE == 11:
