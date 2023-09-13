@@ -103,6 +103,18 @@ def Auto_Maintain_Grip():
     else:
         power_expand_board.set_power("DC4", DC_LOCK_V)
 
+def Auto_Correct_Angle():
+    lockV = 0
+    while not FRONT_L_RANGING.get_distance() == FRONT_R_RANGING.get_distance():
+        if FRONT_L_RANGING.get_distance() > FRONT_R_RANGING():
+            Motor_RPM(50, 50, 50, 50)
+            lockV = -2
+        elif FRONT_L_RANGING.get_distance() < FRONT_R_RANGING():
+            Motor_RPM(-50, -50, -50, -50)
+            lockV = 2
+    Motor_Control(lockV, lockV, lockV, lockV)
+    pass
+
 
 def Auto_stage():
     global ENABLE_AUTO, V_AUTO_STAGE
@@ -130,12 +142,12 @@ def Auto_stage():
             led_matrix_1.show('A' + str(str(AUTO_SIDE) + str(V_AUTO_STAGE)), wait=False)
 
             Auto_Maintain_Grip()
+            Auto_Correct_Angle()
 
             if V_AUTO_STAGE == 0:
                 if AUTO_SIDE == "L":
                     target_angle = novapi.get_yaw() - 30
                     while novapi.get_yaw() > target_angle :
-                        time.sleep(0.001)
                         Motor_RPM(100, 100, 100, 100)
                         Auto_Maintain_Grip()
                     Motor_Control(-2, -2, -2, -2)
@@ -143,7 +155,6 @@ def Auto_stage():
                 elif AUTO_SIDE == "R":
                     target_angle = novapi.get_yaw() + 30
                     while novapi.get_yaw() < target_angle :
-                        time.sleep(0.001)
                         Motor_RPM(-100, -100, -100, -100)
                         Auto_Maintain_Grip()
                     Motor_Control(2, 2, 2, 2)
@@ -163,7 +174,6 @@ def Auto_stage():
                 if AUTO_SIDE == "L":
                     target_angle = novapi.get_yaw() + 30
                     while novapi.get_yaw() < target_angle :
-                        time.sleep(0.001)
                         Motor_RPM(-100, -100, -100, -100)
                         Auto_Maintain_Grip()
                     Motor_Control(-2, -2, -2, -2)
@@ -171,7 +181,6 @@ def Auto_stage():
                 elif AUTO_SIDE == "R":
                     target_angle = novapi.get_yaw() - 30
                     while novapi.get_yaw() > target_angle :
-                        time.sleep(0.001)
                         Motor_RPM(100, 100, 100, 100)
                         Auto_Maintain_Grip()
                     Motor_Control(2, 2, 2, 2)
@@ -192,7 +201,6 @@ def Auto_stage():
                     if LEFT_RANGING.get_distance() < 150:
                         Motor_RPM(100, -90, 100, -100)
                     else:
-                        # power_expand_board.set_power("DC5", 0)
                         Motor_Control(-2, 2, -2, 2)
                         V_AUTO_STAGE = V_AUTO_STAGE + 1
             
@@ -205,7 +213,6 @@ def Auto_stage():
                     if RIGHT_RANGING.get_distance() > 55:
                         Motor_RPM(100, -100, 100, -100)
                     else:
-                        # power_expand_board.set_power("DC5", 0)
                         Motor_Control(-2, 2, -2, 2)
                         V_AUTO_STAGE = V_AUTO_STAGE + 1
 
@@ -218,7 +225,6 @@ def Auto_stage():
                     if RIGHT_RANGING.get_distance() < 150:
                         Motor_RPM(-100, 100, -100, 100)
                     else:
-                        # power_expand_board.set_power("DC5", 0)
                         Motor_Control(-2, 2, -2, 2)
                         V_AUTO_STAGE = V_AUTO_STAGE + 1
                     
@@ -231,16 +237,12 @@ def Auto_stage():
                     if LEFT_RANGING.get_distance() > 55:
                         Motor_RPM(-100, 100, -100, 100)
                     else:
-                        # power_expand_board.set_power("DC5", 0)
                         Motor_Control(2, -2, 2, -2)
                         V_AUTO_STAGE = V_AUTO_STAGE + 1
-
             if V_AUTO_STAGE == 11:
                 Auto_Grip()
                 V_AUTO_STAGE = V_AUTO_STAGE + 1
                     
-
-
         # Stop all motors when the loop ends
         BR_ENCODE_M1.set_power(0)
         FR_ENCODE_M2.set_power(0)
