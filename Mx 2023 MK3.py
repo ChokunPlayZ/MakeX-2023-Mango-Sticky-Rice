@@ -68,13 +68,13 @@ def Move_Turn(rpm):
 def Auto_Grip ():
     GRIPPER_ANGLE.move_to(45, 50)
     power_expand_board.set_power("DC5", 100)
-    while FRONT_L_RANGING.get_distance() > 8:
+    while FRONT_L_RANGING.get_distance() > 5:
         time.sleep(0.001)
         Move_FB(100)
     power_expand_board.set_power("DC5", 0)
     Motor_Control(-2, -2, 2, 2)
 
-    while FRONT_L_RANGING.get_distance() < 30:
+    while FRONT_L_RANGING.get_distance() < 30 or FRONT_L_RANGING.get_distance() == 200:
         time.sleep(0.001)
         Move_FB(-100)
     Motor_Control(2, 2, -2, -2)
@@ -132,7 +132,7 @@ def Auto_stage1():
             led_matrix_1.show('A' + str(str(AUTO_SIDE) + str(V_AUTO_STAGE)), wait=False)
 
             Auto_Maintain_Grip()
-            Auto_Correct_Angle()
+            # Auto_Correct_Angle()
 
             if V_AUTO_STAGE == 0:
                 if AUTO_SIDE == "L":
@@ -188,13 +188,13 @@ def Auto_stage1():
 
             elif V_AUTO_STAGE == 4:
                 if AMS == "L":
-                    if LEFT_RANGING.get_distance() < 150:
+                    if LEFT_RANGING.get_distance() < 155:
                         Move_LR(-100)
                     else:
                         Motor_Control(-2, 2, -2, 2)
                         V_AUTO_STAGE = V_AUTO_STAGE + 1
                 if AMS == "R":
-                    if RIGHT_RANGING.get_distance() < 150:
+                    if RIGHT_RANGING.get_distance() < 155:
                         Move_LR(100)
                     else:
                         Motor_Control(2, -2, 2, -2)
@@ -206,13 +206,13 @@ def Auto_stage1():
 
             elif V_AUTO_STAGE == 6:
                 if AMS == "L":
-                    if RIGHT_RANGING.get_distance() > 55:
+                    if RIGHT_RANGING.get_distance() > 60:
                         Move_LR(-100)
                     else:
                         Motor_Control(-2, 2, -2, 2)
                         V_AUTO_STAGE = V_AUTO_STAGE + 1
                 if AMS == "R":
-                    if LEFT_RANGING.get_distance() > 55:
+                    if LEFT_RANGING.get_distance() > 60:
                         Move_LR(100)
                     else:
                         Motor_Control(2, -2, 2, -2)
@@ -224,13 +224,13 @@ def Auto_stage1():
 
             elif V_AUTO_STAGE == 8:
                 if AMS == "L":
-                    if RIGHT_RANGING.get_distance() < 150:
+                    if RIGHT_RANGING.get_distance() < 99:
                         Move_LR(100)
                     else:
                         Motor_Control(-2, 2, -2, 2)
                         V_AUTO_STAGE = V_AUTO_STAGE + 1
                 if AMS == "R":
-                    if LEFT_RANGING.get_distance() < 150:
+                    if LEFT_RANGING.get_distance() < 99:
                         Move_LR(-100)
                     else:
                         Motor_Control(2, -2, 2, -2)
@@ -240,23 +240,23 @@ def Auto_stage1():
                 Auto_Grip()
                 V_AUTO_STAGE = V_AUTO_STAGE + 1
 
-            elif V_AUTO_STAGE == 10:
-                if AMS == "L":
-                    if LEFT_RANGING.get_distance() > 55:
-                        Move_LR(100)
-                    else:
-                        Motor_Control(2, -2, 2, -2)
-                        V_AUTO_STAGE = V_AUTO_STAGE + 1
-                if AMS == "R":
-                    if RIGHT_RANGING.get_distance() > 55:
-                        Move_LR(-100)
-                    else:
-                        Motor_Control(-2, 2, -2, 2)
-                        V_AUTO_STAGE = V_AUTO_STAGE + 1
+            # elif V_AUTO_STAGE == 10:
+            #     if AMS == "L":
+            #         if LEFT_RANGING.get_distance() > 32:
+            #             Move_LR(100)
+            #         else:
+            #             Motor_Control(2, -2, 2, -2)
+            #             V_AUTO_STAGE = V_AUTO_STAGE + 1
+            #     if AMS == "R":
+            #         if RIGHT_RANGING.get_distance() > 32:
+            #             Move_LR(-100)
+            #         else:
+            #             Motor_Control(-2, 2, -2, 2)
+            #             V_AUTO_STAGE = V_AUTO_STAGE + 1
 
-            elif V_AUTO_STAGE == 11:
-                Auto_Grip()
-                V_AUTO_STAGE = V_AUTO_STAGE + 1
+            # elif V_AUTO_STAGE == 11:
+            #     Auto_Grip()
+            #     V_AUTO_STAGE = V_AUTO_STAGE + 1
 
         BR_ENCODE_M1.set_power(0)
         FR_ENCODE_M2.set_power(0)
@@ -521,11 +521,11 @@ while True:
     # led_matrix_1.show(BUTTOM_GRIPPER.get_value("angle"), wait=False)
     # led_matrix_1.show(FRONT_L_RANGING.get_distance(), wait=False)
     # led_matrix_1.show(novapi.get_yaw(), wait=False)
-    led_matrix_1.show(GRIPPER_RANGING.get_distance(), wait=False)
+    led_matrix_1.show(LEFT_RANGING.get_distance(), wait=False)
     Motor_Safety_CTL()
     if button_1.is_pressed():
-        # Auto_Grip()
-        Auto_Correct_Angle()
+        Auto_Grip()
+        # Auto_Correct_Angle()
         # V_AUTO_STAGE = 0
         # ENABLE_AUTO = 1
         # smart_camera_1.open_light()
