@@ -374,9 +374,9 @@ def S1_Keymap ():
         power_expand_board.set_power("DC2", 0)
 
     if gamepad.is_key_pressed("N2"):
-        power_expand_board.set_power("DC3", -100)
-    elif gamepad.is_key_pressed("N3"):
         power_expand_board.set_power("DC3", 100)
+    elif gamepad.is_key_pressed("N3"):
+        power_expand_board.set_power("DC3", -100)
     else:
         power_expand_board.set_power("DC3", 0)
 
