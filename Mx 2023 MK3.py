@@ -190,19 +190,20 @@ def Auto_stage1():
                 if AMS == "L":
                     if RIGHT_RANGING.get_distance() > 20:
                         if smart_camera_1.detect_sign(1):
-                            if smart_camera_1.detect_sign_location(1, "middle"):
-                                Motor_RPM(0,0,0,0)
-                                Auto_Grip()
-                            elif smart_camera_1.detect_sign_location(1, "left"):
-                                Move_LR(100)
-                            elif smart_camera_1.detect_sign_location(1, "right"):
-                                Move_LR(-100)
+                            Motor_RPM(0,0,0,0)
+                            # if smart_camera_1.detect_sign_location(1, "middle"):
+                            #     Motor_RPM(0,0,0,0)
+                            #     # Auto_Grip()
+                            # elif smart_camera_1.detect_sign_location(1, "left"):
+                            #     Move_LR(100)
+                            # elif smart_camera_1.detect_sign_location(1, "right"):
+                            #     Move_LR(-100)
                         Move_LR(-100)
                     else:
                         Motor_RPM(0, 0, 0, 0)
                         V_AUTO_STAGE = V_AUTO_STAGE + 1
                 if AMS == "R":
-                    if RIGHT_RANGING.get_distance() < 155:
+                    if LEFT_RANGING.get_distance() > 20:
                         Move_LR(100)
                     else:
                         Motor_Control(2, -2, 2, -2)
