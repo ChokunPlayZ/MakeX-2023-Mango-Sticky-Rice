@@ -208,13 +208,13 @@ def Auto_stage1():
                                     Motor_RPM(0,0,0,0)
                                     Auto_Grip()
                                 elif smart_camera_1.get_sign_x(1) < 130:
-                                    Move_LR(20)
+                                    Move_LR(40)
                                 elif smart_camera_1.get_sign_x(1) > 165:
-                                    Move_LR(-20)
-                        if FRONT_L_RANGING.get_distance() > 20:
-                            Move_FB(50)
-                        elif FRONT_L_RANGING.get_distance() < 10:
-                            Move_FB(-50)
+                                    Move_LR(-40)
+                        if FRONT_L_RANGING.get_distance() > 28:
+                            Move_FB(20)
+                        elif FRONT_L_RANGING.get_distance() < 12:
+                            Move_FB(-20)
                         else:
                             Auto_Correct_Angle()
                             Move_LR(-100)
@@ -229,14 +229,15 @@ def Auto_stage1():
                                     Motor_RPM(0,0,0,0)
                                     Auto_Grip()
                                 elif smart_camera_1.get_sign_x(1) < 130:
-                                    Move_LR(20)
+                                    Move_LR(40)
                                 elif smart_camera_1.get_sign_x(1) > 165:
-                                    Move_LR(-20)
-                        if FRONT_L_RANGING.get_distance() > 15:
+                                    Move_LR(-40)
+                        if FRONT_L_RANGING.get_distance() > 18:
                             Move_FB(50)
-                        elif FRONT_L_RANGING.get_distance() < 10:
+                        elif FRONT_L_RANGING.get_distance() < 12:
                             Move_FB(-50)
                         else:
+                            Auto_Correct_Angle()
                             Move_LR(100)
                     Motor_RPM(0, 0, 0, 0)
                     V_AUTO_STAGE = V_AUTO_STAGE + 1
