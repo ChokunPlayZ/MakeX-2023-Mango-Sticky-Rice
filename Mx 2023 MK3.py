@@ -29,7 +29,8 @@ FRONT_R_RANGING = ranging_sensor_class("PORT5", "INDEX4")
 
 # Gripper
 GRIPPER_RANGING = ranging_sensor_class("PORT4", "INDEX1")
-smart_camera_1 = smart_camera_class("PORT4", "INDEX1")
+FRONT_CAM = smart_camera_class("PORT4", "INDEX1")
+RIGHT_CAM = smart_camera_class("PORT5", "INDEX1")
 led_matrix_1 = led_matrix_class("PORT4", "INDEX1")
 button_1 = button_class("PORT4", "INDEX1")
 
@@ -127,8 +128,8 @@ def Auto_stage1():
         FR_ENCODE_M2.set_power(0)
         BL_ENCODE_M3.set_power(0)
         FL_ENCODE_M4.set_power(0)
-        smart_camera_1.open_light()
-        smart_camera_1.set_mode("color")
+        FRONT_CAM.open_light()
+        FRONT_CAM.set_mode("color")
         led_matrix_1.show('A W', wait=False)
 
         if LEFT_RANGING.get_distance() > RIGHT_RANGING.get_distance():
@@ -201,15 +202,15 @@ def Auto_stage1():
             elif V_AUTO_STAGE == 4:
                 if AMS == "L":
                     while RIGHT_RANGING.get_distance() > 20:
-                        led_matrix_1.show(round(smart_camera_1.get_sign_x(1), 1))
-                        if smart_camera_1.detect_sign(1):
-                            while smart_camera_1.detect_sign(1):
-                                if smart_camera_1.get_sign_x(1) > 130 and smart_camera_1.get_sign_x(1) < 165:
+                        led_matrix_1.show(round(FRONT_CAM.get_sign_x(1), 1))
+                        if FRONT_CAM.detect_sign(1):
+                            while FRONT_CAM.detect_sign(1):
+                                if FRONT_CAM.get_sign_x(1) > 130 and FRONT_CAM.get_sign_x(1) < 165:
                                     Motor_RPM(0,0,0,0)
                                     Auto_Grip()
-                                elif smart_camera_1.get_sign_x(1) < 130:
+                                elif FRONT_CAM.get_sign_x(1) < 130:
                                     Move_LR(40)
-                                elif smart_camera_1.get_sign_x(1) > 165:
+                                elif FRONT_CAM.get_sign_x(1) > 165:
                                     Move_LR(-40)
                         if FRONT_L_RANGING.get_distance() > 28:
                             Move_FB(20)
@@ -222,15 +223,15 @@ def Auto_stage1():
                     V_AUTO_STAGE = V_AUTO_STAGE + 1
                 if AMS == "R":
                     while LEFT_RANGING.get_distance() > 20:
-                        led_matrix_1.show(round(smart_camera_1.get_sign_x(1), 1))
-                        if smart_camera_1.detect_sign(1):
-                            while smart_camera_1.detect_sign(1):
-                                if smart_camera_1.get_sign_x(1) > 130 and smart_camera_1.get_sign_x(1) < 165:
+                        led_matrix_1.show(round(FRONT_CAM.get_sign_x(1), 1))
+                        if FRONT_CAM.detect_sign(1):
+                            while FRONT_CAM.detect_sign(1):
+                                if FRONT_CAM.get_sign_x(1) > 130 and FRONT_CAM.get_sign_x(1) < 165:
                                     Motor_RPM(0,0,0,0)
                                     Auto_Grip()
-                                elif smart_camera_1.get_sign_x(1) < 130:
+                                elif FRONT_CAM.get_sign_x(1) < 130:
                                     Move_LR(40)
-                                elif smart_camera_1.get_sign_x(1) > 165:
+                                elif FRONT_CAM.get_sign_x(1) > 165:
                                     Move_LR(-40)
                         if FRONT_L_RANGING.get_distance() > 18:
                             Move_FB(50)
@@ -245,15 +246,15 @@ def Auto_stage1():
             elif V_AUTO_STAGE == 5:
                 if AMS == "R":
                     while RIGHT_RANGING.get_distance() > 20:
-                        led_matrix_1.show(round(smart_camera_1.get_sign_x(1), 1))
-                        if smart_camera_1.detect_sign(1):
-                            while smart_camera_1.detect_sign(1):
-                                if smart_camera_1.get_sign_x(1) > 130 and smart_camera_1.get_sign_x(1) < 165:
+                        led_matrix_1.show(round(FRONT_CAM.get_sign_x(1), 1))
+                        if FRONT_CAM.detect_sign(1):
+                            while FRONT_CAM.detect_sign(1):
+                                if FRONT_CAM.get_sign_x(1) > 130 and FRONT_CAM.get_sign_x(1) < 165:
                                     Motor_RPM(0,0,0,0)
                                     Auto_Grip()
-                                elif smart_camera_1.get_sign_x(1) < 130:
+                                elif FRONT_CAM.get_sign_x(1) < 130:
                                     Move_LR(20)
-                                elif smart_camera_1.get_sign_x(1) > 165:
+                                elif FRONT_CAM.get_sign_x(1) > 165:
                                     Move_LR(-20)
                         if FRONT_L_RANGING.get_distance() > 20:
                             Move_FB(50)
@@ -266,15 +267,15 @@ def Auto_stage1():
                     V_AUTO_STAGE = V_AUTO_STAGE + 1
                 if AMS == "L":
                     while LEFT_RANGING.get_distance() > 20:
-                        led_matrix_1.show(round(smart_camera_1.get_sign_x(1), 1))
-                        if smart_camera_1.detect_sign(1):
-                            while smart_camera_1.detect_sign(1):
-                                if smart_camera_1.get_sign_x(1) > 130 and smart_camera_1.get_sign_x(1) < 165:
+                        led_matrix_1.show(round(FRONT_CAM.get_sign_x(1), 1))
+                        if FRONT_CAM.detect_sign(1):
+                            while FRONT_CAM.detect_sign(1):
+                                if FRONT_CAM.get_sign_x(1) > 130 and FRONT_CAM.get_sign_x(1) < 165:
                                     Motor_RPM(0,0,0,0)
                                     Auto_Grip()
-                                elif smart_camera_1.get_sign_x(1) < 130:
+                                elif FRONT_CAM.get_sign_x(1) < 130:
                                     Move_LR(20)
-                                elif smart_camera_1.get_sign_x(1) > 165:
+                                elif FRONT_CAM.get_sign_x(1) > 165:
                                     Move_LR(-20)
                         if FRONT_L_RANGING.get_distance() > 15:
                             Move_FB(50)
@@ -306,8 +307,8 @@ def Auto_stage2():
         FR_ENCODE_M2.set_power(0)
         BL_ENCODE_M3.set_power(0)
         FL_ENCODE_M4.set_power(0)
-        smart_camera_1.open_light()
-        smart_camera_1.set_mode("color")
+        FRONT_CAM.open_light()
+        FRONT_CAM.set_mode("color")
         led_matrix_1.show('A W', wait=False)
 
         if LEFT_RANGING.get_distance() > RIGHT_RANGING.get_distance():
@@ -540,10 +541,10 @@ power_expand_board.set_power("DC4", DC_LOCK_V)
 # time.sleep(1)
 
 while True:
-    # led_matrix_1.show(round(smart_camera_1.get_sign_x(1), 1))
+    # led_matrix_1.show(round(FRONT_CAM.get_sign_x(1), 1))
     # led_matrix_1.show(round(novapi.timer(), 1))
-    # led_matrix_1.show(smart_camera_1.detect_sign_location(1, "middle"))
-    # if smart_camera_1.detect_sign_location(1, "middle"): 
+    # led_matrix_1.show(FRONT_CAM.detect_sign_location(1, "middle"))
+    # if FRONT_CAM.detect_sign_location(1, "middle"): 
     #     led_matrix_1.show('t', wait = False)
     # else:
     #     led_matrix_1.show('f', wait = False)
@@ -557,9 +558,9 @@ while True:
         # Auto_Correct_Angle()
         # V_AUTO_STAGE = 0
         # ENABLE_AUTO = 1
-        # smart_camera_1.open_light()
-        # smart_camera_1.reset()
-        # smart_camera_1.close_light()
+        # FRONT_CAM.open_light()
+        # FRONT_CAM.reset()
+        # FRONT_CAM.close_light()
 
     if power_manage_module.is_auto_mode():
         Auto_stage1()
