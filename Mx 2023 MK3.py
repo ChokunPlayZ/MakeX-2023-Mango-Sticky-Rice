@@ -88,16 +88,18 @@ def Auto_Grip ():
 
     power_expand_board.set_power("DC5", 0)
 
-    target_angle = novapi.get_yaw() - 80
-    while novapi.get_yaw() > target_angle :
-        time.sleep(0.001)
-        Motor_RPM(100, 100, 100, 100)
-    Motor_Control(-2, -2, -2, -2)
+    Motor_RPM(0,0,0,0)
+
+    # target_angle = novapi.get_yaw() - 80
+    # while novapi.get_yaw() > target_angle :
+    #     time.sleep(0.001)
+    #     Motor_RPM(100, 100, 100, 100)
+    # Motor_Control(-2, -2, -2, -2)
 
 def Auto_Maintain_Grip():
-    if GRIPPER_RANGING.get_distance() > 15:
+    if GRIPPER_RANGING.get_distance() > 14:
         power_expand_board.set_power("DC4", -100)
-    elif GRIPPER_RANGING.get_distance() < 13:
+    elif GRIPPER_RANGING.get_distance() < 12:
         power_expand_board.set_power("DC4", 10)
     else:
         power_expand_board.set_power("DC4", DC_LOCK_V)
