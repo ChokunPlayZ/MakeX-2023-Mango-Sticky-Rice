@@ -105,18 +105,12 @@ def Auto_Maintain_Grip():
         power_expand_board.set_power("DC4", DC_LOCK_V)
 
 def Auto_Correct_Angle():
-    lockV = 0
     tolerance = 2
     while abs(FRONT_L_RANGING.get_distance() - FRONT_R_RANGING.get_distance()) > tolerance:
         if FRONT_L_RANGING.get_distance() > FRONT_R_RANGING.get_distance():
             Move_Turn(25)
-            lockV = -2
         elif FRONT_L_RANGING.get_distance() < FRONT_R_RANGING.get_distance():
             Move_Turn(-25)
-            lockV = 2
-    # if lockV != 0:
-    #     Motor_Control(lockV, lockV, lockV, lockV)
-
 
 def Auto_stage1():
     """Automatic Stage 1, V5 (testing)"""
@@ -289,59 +283,6 @@ def Auto_stage1():
                     V_AUTO_STAGE = V_AUTO_STAGE + 1
 
             
-
-        BR_ENCODE_M1.set_power(0)
-        FR_ENCODE_M2.set_power(0)
-        BL_ENCODE_M3.set_power(0)
-        FL_ENCODE_M4.set_power(0)
-
-        led_matrix_1.show('A E', wait=False)
-        return
-
-def Auto_stage2():
-    global ENABLE_AUTO, V_AUTO_STAGE
-    if ENABLE_AUTO == 0:
-        led_matrix_1.show('A D', wait=False)
-        return
-    if ENABLE_AUTO == 1:
-        led_matrix_1.show('A P', wait=False)
-        BR_ENCODE_M1.set_power(0)
-        FR_ENCODE_M2.set_power(0)
-        BL_ENCODE_M3.set_power(0)
-        FL_ENCODE_M4.set_power(0)
-        FRONT_CAM.open_light()
-        FRONT_CAM.set_mode("color")
-        led_matrix_1.show('A W', wait=False)
-
-        if LEFT_RANGING.get_distance() > RIGHT_RANGING.get_distance():
-            AUTO_SIDE = 'R'
-        else:
-            AUTO_SIDE = 'L'
-
-        AMS = None
-
-        while power_manage_module.is_auto_mode():
-            led_matrix_1.show('A' + str(str(AUTO_SIDE) + str(V_AUTO_STAGE)), wait=False)
-
-            Auto_Maintain_Grip()
-            Auto_Correct_Angle()
-
-            if V_AUTO_STAGE == 0:
-                if AUTO_SIDE == "L":
-                    while FRONT_L_RANGING.get_distance() > 50 :
-                        Move_Dia_LR(100)
-                        Auto_Maintain_Grip()
-                    Motor_Control(-2, -2, -2, -2)
-                    V_AUTO_STAGE = V_AUTO_STAGE + 1
-                elif AUTO_SIDE == "R":
-                    while FRONT_L_RANGING.get_distance() > 50 :
-                        Move_Turn(100)
-                        Auto_Maintain_Grip()
-                    Motor_Control(2, 2, 2, 2)
-                    V_AUTO_STAGE = V_AUTO_STAGE + 1
-                else:
-                    led_matrix_1.show('AE', wait=False)
-                    time.sleep(500)
 
         BR_ENCODE_M1.set_power(0)
         FR_ENCODE_M2.set_power(0)
@@ -525,22 +466,8 @@ GRIPPER_ANGLE.move_to(45, 50)
 BUTTOM_GRIPPER.move_to(0, 50)
 BRUSHLESS_SERVO.move_to(0, 50)
 Motor_Control(0, 0, 0, 0)
-# while not (GRIPPER_RANGING.get_distance() < 3.5 or GRIPPER_RANGING.get_distance() == 200):
-#     time.sleep(0.001)
-#     power_expand_board.set_power("DC4", -100)
-
-# power_expand_board.set_power("DC4", DC_LOCK_V)
 led_matrix_1.show('OK!', wait = False)
 power_expand_board.set_power("DC4", DC_LOCK_V)
-
-# Motor_Control(10,0,0,0)
-# time.sleep(1)
-# Motor_Control(0,10,0,0)
-# time.sleep(1)
-# Motor_Control(0,0,10,0)
-# time.sleep(1)
-# Motor_Control(0,0,0,10)
-# time.sleep(1)
 
 while True:
     # led_matrix_1.show(round(FRONT_CAM.get_sign_x(1), 1))
@@ -556,17 +483,15 @@ while True:
     # led_matrix_1.show(LEFT_RANGING.get_distance(), wait=False)
     Motor_Safety_CTL()
     if button_1.is_pressed():
-        Auto_Grip()
         # Auto_Correct_Angle()
-        # V_AUTO_STAGE = 0
-        # ENABLE_AUTO = 1
-        # FRONT_CAM.open_light()
-        # FRONT_CAM.reset()
-        # FRONT_CAM.close_light()
+        V_AUTO_STAGE = 0
+        ENABLE_AUTO = 1
+        FRONT_CAM.open_light()
+        FRONT_CAM.reset()
+        FRONT_CAM.close_light()
 
     if power_manage_module.is_auto_mode():
         Auto_stage1()
-        # Auto_stage2()
     else:
         if gamepad.is_key_pressed("L2") and gamepad.is_key_pressed("R2"):
             led_matrix_1.show('K1', wait = False)
