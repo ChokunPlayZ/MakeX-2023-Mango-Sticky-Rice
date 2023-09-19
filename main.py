@@ -118,7 +118,7 @@ def Auto_Correct_Angle():
             Move_Turn(-25)
 
 def Auto_stage1():
-    """Automatic Stage 1, V5 (testing)"""
+    """Automatic Stage 1, V5.5 (testing)"""
     global ENABLE_AUTO, V_AUTO_STAGE
     if ENABLE_AUTO == 0:
         led_matrix_1.show('A D', wait=False)
@@ -174,14 +174,14 @@ def Auto_stage1():
 
             elif V_AUTO_STAGE == 2:
                 if AUTO_SIDE == "L":
-                    target_angle = novapi.get_yaw() + 30
+                    target_angle = novapi.get_yaw() + 100
                     while novapi.get_yaw() < target_angle :
                         Move_Turn(-100)
                         Auto_Maintain_Grip()
                     Motor_Control(-2, -2, -2, -2)
                     V_AUTO_STAGE = V_AUTO_STAGE + 1
                 elif AUTO_SIDE == "R":
-                    target_angle = novapi.get_yaw() - 30
+                    target_angle = novapi.get_yaw() - 100
                     while novapi.get_yaw() > target_angle :
                         Move_Turn(100)
                         Auto_Maintain_Grip()
@@ -202,17 +202,21 @@ def Auto_stage1():
             #Stage 4, try not to bump the arena
             elif V_AUTO_STAGE == 4:
                 if AMS == "L":
-                    while RIGHT_RANGING.get_distance() > 20:
-                        led_matrix_1.show(round(FRONT_CAM.get_sign_x(1), 1))
-                        if FRONT_CAM.detect_sign(1):
-                            while FRONT_CAM.detect_sign(1):
+                    while BACK_RANGING.get_distance() > 30:
+                        if RIGHT_CAM.detect_sign(1):
+                            target_angle = novapi.get_yaw() - 85
+                            while novapi.get_yaw() > target_angle :
+                                Move_Turn(100)
+                                Auto_Maintain_Grip()
+                            Motor_Control(-2, -2, -2, -2)
+                            while RIGHT_CAM.detect_sign(1):
                                 if FRONT_CAM.get_sign_x(1) > 130 and FRONT_CAM.get_sign_x(1) < 165:
                                     Motor_RPM(0,0,0,0)
                                     Auto_Grip()
                                 elif FRONT_CAM.get_sign_x(1) < 130:
-                                    Move_LR(40)
+                                    Move_LR(50)
                                 elif FRONT_CAM.get_sign_x(1) > 165:
-                                    Move_LR(-40)
+                                    Move_LR(-50)
                         if FRONT_L_RANGING.get_distance() > 28:
                             Move_FB(20)
                         elif FRONT_L_RANGING.get_distance() < 12:
@@ -223,72 +227,8 @@ def Auto_stage1():
                     Motor_RPM(0, 0, 0, 0)
                     V_AUTO_STAGE = V_AUTO_STAGE + 1
                 if AMS == "R":
-                    while LEFT_RANGING.get_distance() > 20:
-                        led_matrix_1.show(round(FRONT_CAM.get_sign_x(1), 1))
-                        if FRONT_CAM.detect_sign(1):
-                            while FRONT_CAM.detect_sign(1):
-                                if FRONT_CAM.get_sign_x(1) > 130 and FRONT_CAM.get_sign_x(1) < 165:
-                                    Motor_RPM(0,0,0,0)
-                                    Auto_Grip()
-                                elif FRONT_CAM.get_sign_x(1) < 130:
-                                    Move_LR(40)
-                                elif FRONT_CAM.get_sign_x(1) > 165:
-                                    Move_LR(-40)
-                        if FRONT_L_RANGING.get_distance() > 18:
-                            Move_FB(50)
-                        elif FRONT_L_RANGING.get_distance() < 12:
-                            Move_FB(-50)
-                        else:
-                            Auto_Correct_Angle()
-                            Move_LR(100)
-                    Motor_RPM(0, 0, 0, 0)
-                    V_AUTO_STAGE = V_AUTO_STAGE + 1
+                    pass
             
-            elif V_AUTO_STAGE == 5:
-                if AMS == "R":
-                    while RIGHT_RANGING.get_distance() > 20:
-                        led_matrix_1.show(round(FRONT_CAM.get_sign_x(1), 1))
-                        if FRONT_CAM.detect_sign(1):
-                            while FRONT_CAM.detect_sign(1):
-                                if FRONT_CAM.get_sign_x(1) > 130 and FRONT_CAM.get_sign_x(1) < 165:
-                                    Motor_RPM(0,0,0,0)
-                                    Auto_Grip()
-                                elif FRONT_CAM.get_sign_x(1) < 130:
-                                    Move_LR(20)
-                                elif FRONT_CAM.get_sign_x(1) > 165:
-                                    Move_LR(-20)
-                        if FRONT_L_RANGING.get_distance() > 20:
-                            Move_FB(50)
-                        elif FRONT_L_RANGING.get_distance() < 10:
-                            Move_FB(-50)
-                        else:
-                            Auto_Correct_Angle()
-                            Move_LR(-100)
-                    Motor_RPM(0, 0, 0, 0)
-                    V_AUTO_STAGE = V_AUTO_STAGE + 1
-                if AMS == "L":
-                    while LEFT_RANGING.get_distance() > 20:
-                        led_matrix_1.show(round(FRONT_CAM.get_sign_x(1), 1))
-                        if FRONT_CAM.detect_sign(1):
-                            while FRONT_CAM.detect_sign(1):
-                                if FRONT_CAM.get_sign_x(1) > 130 and FRONT_CAM.get_sign_x(1) < 165:
-                                    Motor_RPM(0,0,0,0)
-                                    Auto_Grip()
-                                elif FRONT_CAM.get_sign_x(1) < 130:
-                                    Move_LR(20)
-                                elif FRONT_CAM.get_sign_x(1) > 165:
-                                    Move_LR(-20)
-                        if FRONT_L_RANGING.get_distance() > 15:
-                            Move_FB(50)
-                        elif FRONT_L_RANGING.get_distance() < 10:
-                            Move_FB(-50)
-                        else:
-                            Move_LR(100)
-                    Motor_RPM(0, 0, 0, 0)
-                    V_AUTO_STAGE = V_AUTO_STAGE + 1
-
-            
-
         BR_ENCODE_M1.set_power(0)
         FR_ENCODE_M2.set_power(0)
         BL_ENCODE_M3.set_power(0)
