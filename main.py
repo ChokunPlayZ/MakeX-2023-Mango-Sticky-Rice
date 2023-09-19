@@ -1,3 +1,4 @@
+# code make you get less sleep
 import novapi
 from mbuild import power_manage_module
 from mbuild.encoder_motor import encoder_motor_class
@@ -29,10 +30,14 @@ FRONT_R_RANGING = ranging_sensor_class("PORT5", "INDEX4")
 
 # Gripper
 GRIPPER_RANGING = ranging_sensor_class("PORT4", "INDEX1")
-FRONT_CAM = smart_camera_class("PORT4", "INDEX1")
-RIGHT_CAM = smart_camera_class("PORT5", "INDEX1")
+
+# Debugging Hardware
 led_matrix_1 = led_matrix_class("PORT4", "INDEX1")
 button_1 = button_class("PORT4", "INDEX1")
+
+# Cameras
+FRONT_CAM = smart_camera_class("PORT4", "INDEX1")
+RIGHT_CAM = smart_camera_class("PORT5", "INDEX1")
 
 def Motor_Control(M1, M2, M3, M4):
     BR_ENCODE_M1.set_power(M1)
