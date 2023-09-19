@@ -72,16 +72,26 @@ def Auto_Grip ():
         time.sleep(0.001)
         Move_FB(100)
     power_expand_board.set_power("DC5", 0)
-    Motor_Control(-2, -2, 2, 2)
 
-    while FRONT_L_RANGING.get_distance() < 30 or FRONT_L_RANGING.get_distance() == 200:
+    while FRONT_L_RANGING.get_distance() < 20 or FRONT_L_RANGING.get_distance() == 200:
         time.sleep(0.001)
         Move_FB(-100)
-    Motor_Control(2, 2, -2, -2)
+    
+    target_angle = novapi.get_yaw() + 85
+    while novapi.get_yaw() < target_angle :
+        time.sleep(0.001)
+        # if about 75% through put DC5 at reverse
+        if novapi.get_yaw() > (target_angle - 30):
+            power_expand_board.set_power("DC5", -100)
+        Motor_RPM(-100, -100, -100, -100)
 
-    power_expand_board.set_power("DC5", -100)
-    time.sleep(1)
     power_expand_board.set_power("DC5", 0)
+
+    target_angle = novapi.get_yaw() - 80
+    while novapi.get_yaw() > target_angle :
+        time.sleep(0.001)
+        Motor_RPM(100, 100, 100, 100)
+    Motor_Control(-2, -2, -2, -2)
 
 def Auto_Maintain_Grip():
     if GRIPPER_RANGING.get_distance() > 15:
@@ -101,8 +111,8 @@ def Auto_Correct_Angle():
         elif FRONT_L_RANGING.get_distance() < FRONT_R_RANGING.get_distance():
             Move_Turn(-25)
             lockV = 2
-    if lockV != 0:
-        Motor_Control(lockV, lockV, lockV, lockV)
+    # if lockV != 0:
+    #     Motor_Control(lockV, lockV, lockV, lockV)
 
 
 def Auto_stage1():
@@ -182,32 +192,99 @@ def Auto_stage1():
             elif V_AUTO_STAGE == 3:
                 if LEFT_RANGING.get_distance() > RIGHT_RANGING.get_distance():
                     AMS = 'R'
+                    # AMS = 'L'
                 else:
                     AMS = 'L'
                 V_AUTO_STAGE = V_AUTO_STAGE + 1
 
+            #Stage 4, try not to bump the arena
             elif V_AUTO_STAGE == 4:
                 if AMS == "L":
-                    if RIGHT_RANGING.get_distance() > 20:
+                    while RIGHT_RANGING.get_distance() > 20:
+                        led_matrix_1.show(round(smart_camera_1.get_sign_x(1), 1))
                         if smart_camera_1.detect_sign(1):
-                            Motor_RPM(0,0,0,0)
-                            # if smart_camera_1.detect_sign_location(1, "middle"):
-                            #     Motor_RPM(0,0,0,0)
-                            #     # Auto_Grip()
-                            # elif smart_camera_1.detect_sign_location(1, "left"):
-                            #     Move_LR(100)
-                            # elif smart_camera_1.detect_sign_location(1, "right"):
-                            #     Move_LR(-100)
-                        Move_LR(-100)
-                    else:
-                        Motor_RPM(0, 0, 0, 0)
-                        V_AUTO_STAGE = V_AUTO_STAGE + 1
+                            while smart_camera_1.detect_sign(1):
+                                if smart_camera_1.get_sign_x(1) > 130 and smart_camera_1.get_sign_x(1) < 165:
+                                    Motor_RPM(0,0,0,0)
+                                    Auto_Grip()
+                                elif smart_camera_1.get_sign_x(1) < 130:
+                                    Move_LR(20)
+                                elif smart_camera_1.get_sign_x(1) > 165:
+                                    Move_LR(-20)
+                        if FRONT_L_RANGING.get_distance() > 20:
+                            Move_FB(50)
+                        elif FRONT_L_RANGING.get_distance() < 10:
+                            Move_FB(-50)
+                        else:
+                            Auto_Correct_Angle()
+                            Move_LR(-100)
+                    Motor_RPM(0, 0, 0, 0)
+                    V_AUTO_STAGE = V_AUTO_STAGE + 1
                 if AMS == "R":
-                    if LEFT_RANGING.get_distance() > 20:
-                        Move_LR(100)
-                    else:
-                        Motor_Control(2, -2, 2, -2)
-                        V_AUTO_STAGE = V_AUTO_STAGE + 1
+                    while LEFT_RANGING.get_distance() > 20:
+                        led_matrix_1.show(round(smart_camera_1.get_sign_x(1), 1))
+                        if smart_camera_1.detect_sign(1):
+                            while smart_camera_1.detect_sign(1):
+                                if smart_camera_1.get_sign_x(1) > 130 and smart_camera_1.get_sign_x(1) < 165:
+                                    Motor_RPM(0,0,0,0)
+                                    Auto_Grip()
+                                elif smart_camera_1.get_sign_x(1) < 130:
+                                    Move_LR(20)
+                                elif smart_camera_1.get_sign_x(1) > 165:
+                                    Move_LR(-20)
+                        if FRONT_L_RANGING.get_distance() > 15:
+                            Move_FB(50)
+                        elif FRONT_L_RANGING.get_distance() < 10:
+                            Move_FB(-50)
+                        else:
+                            Move_LR(100)
+                    Motor_RPM(0, 0, 0, 0)
+                    V_AUTO_STAGE = V_AUTO_STAGE + 1
+            
+            elif V_AUTO_STAGE == 5:
+                if AMS == "R":
+                    while RIGHT_RANGING.get_distance() > 20:
+                        led_matrix_1.show(round(smart_camera_1.get_sign_x(1), 1))
+                        if smart_camera_1.detect_sign(1):
+                            while smart_camera_1.detect_sign(1):
+                                if smart_camera_1.get_sign_x(1) > 130 and smart_camera_1.get_sign_x(1) < 165:
+                                    Motor_RPM(0,0,0,0)
+                                    Auto_Grip()
+                                elif smart_camera_1.get_sign_x(1) < 130:
+                                    Move_LR(20)
+                                elif smart_camera_1.get_sign_x(1) > 165:
+                                    Move_LR(-20)
+                        if FRONT_L_RANGING.get_distance() > 20:
+                            Move_FB(50)
+                        elif FRONT_L_RANGING.get_distance() < 10:
+                            Move_FB(-50)
+                        else:
+                            Auto_Correct_Angle()
+                            Move_LR(-100)
+                    Motor_RPM(0, 0, 0, 0)
+                    V_AUTO_STAGE = V_AUTO_STAGE + 1
+                if AMS == "L":
+                    while LEFT_RANGING.get_distance() > 20:
+                        led_matrix_1.show(round(smart_camera_1.get_sign_x(1), 1))
+                        if smart_camera_1.detect_sign(1):
+                            while smart_camera_1.detect_sign(1):
+                                if smart_camera_1.get_sign_x(1) > 130 and smart_camera_1.get_sign_x(1) < 165:
+                                    Motor_RPM(0,0,0,0)
+                                    Auto_Grip()
+                                elif smart_camera_1.get_sign_x(1) < 130:
+                                    Move_LR(20)
+                                elif smart_camera_1.get_sign_x(1) > 165:
+                                    Move_LR(-20)
+                        if FRONT_L_RANGING.get_distance() > 15:
+                            Move_FB(50)
+                        elif FRONT_L_RANGING.get_distance() < 10:
+                            Move_FB(-50)
+                        else:
+                            Move_LR(100)
+                    Motor_RPM(0, 0, 0, 0)
+                    V_AUTO_STAGE = V_AUTO_STAGE + 1
+
+            
 
         BR_ENCODE_M1.set_power(0)
         FR_ENCODE_M2.set_power(0)
@@ -470,7 +547,7 @@ while True:
     # else:
     #     led_matrix_1.show('f', wait = False)
     # led_matrix_1.show(BUTTOM_GRIPPER.get_value("angle"), wait=False)
-    # led_matrix_1.show(FRONT_L_RANGING.get_distance(), wait=False)
+    led_matrix_1.show(FRONT_L_RANGING.get_distance(), wait=False)
     # led_matrix_1.show(novapi.get_yaw(), wait=False)
     # led_matrix_1.show(LEFT_RANGING.get_distance(), wait=False)
     Motor_Safety_CTL()
