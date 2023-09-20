@@ -221,10 +221,25 @@ def Auto_stage1():
                                 elif FRONT_CAM.get_sign_x(1) > 165:
                                     Move_LR(-50)
                             Move_FB(100)
-                    Motor_RPM(0, 0, 0, 0)
-                    V_AUTO_STAGE = V_AUTO_STAGE + 1
                 if AMS == "R":
-                    pass
+                    while BACK_RANGING.get_distance() > 30:
+                        if RIGHT_CAM.detect_sign(1):
+                            target_angle = novapi.get_yaw() + 85
+                            while novapi.get_yaw() < target_angle :
+                                Move_Turn(-100)
+                                Auto_Maintain_Grip()
+                            Motor_Control(-2, -2, -2, -2)
+                            while FRONT_CAM.detect_sign(1):
+                                if FRONT_CAM.get_sign_x(1) > 130 and FRONT_CAM.get_sign_x(1) < 165:
+                                    Motor_RPM(0,0,0,0)
+                                    Auto_Grip()
+                                elif FRONT_CAM.get_sign_x(1) < 130:
+                                    Move_LR(50)
+                                elif FRONT_CAM.get_sign_x(1) > 165:
+                                    Move_LR(-50)
+                            Move_FB(100)
+                Motor_RPM(0, 0, 0, 0)
+                V_AUTO_STAGE = V_AUTO_STAGE + 1
             
         BR_ENCODE_M1.set_power(0)
         FR_ENCODE_M2.set_power(0)
