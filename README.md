@@ -1,6 +1,13 @@
 # Hope Crusher
 a not so simple sub 600 lines python script that powers the mango robot  
 
+and a fully custom python intelsense for
+- MakeBlock NovaPi
+- NovaPi Power Expander Board
+- MakeBlock Bluetooth Gamepad
+- mBuild Sensors (Smart Camera, Ranging, Button, LED Matrix)
+- Encoder Motor
+
 Code Name: Mango Engine  
 currenly at V5  
 

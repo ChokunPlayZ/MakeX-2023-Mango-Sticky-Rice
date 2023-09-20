@@ -36,7 +36,8 @@ led_matrix_1 = led_matrix_class("PORT4", "INDEX1")
 button_1 = button_class("PORT4", "INDEX1")
 
 # Cameras
-FRONT_CAM = smart_camera_class("PORT4", "INDEX1")
+FRONT_CAM = smart_camera_class("PORT4", "INDEX2")
+LEFT_CAM = smart_camera_class("PORT4", "INDEX1")
 RIGHT_CAM = smart_camera_class("PORT5", "INDEX1")
 
 def Motor_Control(M1, M2, M3, M4):
@@ -92,7 +93,6 @@ def Auto_Grip ():
         Motor_RPM(-100, -100, -100, -100)
 
     power_expand_board.set_power("DC5", 0)
-
     Motor_RPM(0,0,0,0)
 
     # target_angle = novapi.get_yaw() - 80
@@ -118,7 +118,10 @@ def Auto_Correct_Angle():
             Move_Turn(-25)
 
 def Auto_stage1():
-    """Automatic Stage 1, V5.5 (testing)"""
+    """
+    Automatic Stage 1, V5.5 (testing)
+    Dsc: Get EVERYTHING
+    """
     global ENABLE_AUTO, V_AUTO_STAGE
     if ENABLE_AUTO == 0:
         led_matrix_1.show('A D', wait=False)
