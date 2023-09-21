@@ -133,7 +133,11 @@ def Auto_stage1():
         BL_ENCODE_M3.set_power(0)
         FL_ENCODE_M4.set_power(0)
         FRONT_CAM.open_light()
+        LEFT_CAM.open_light()
+        RIGHT_CAM.open_light()
         FRONT_CAM.set_mode("color")
+        LEFT_CAM.set_mode("color")
+        RIGHT_CAM.set_mode("color")
         led_matrix_1.show('A W', wait=False)
 
         if LEFT_RANGING.get_distance() > RIGHT_RANGING.get_distance():
@@ -169,26 +173,25 @@ def Auto_stage1():
                     time.sleep(500)
 
             elif V_AUTO_STAGE == 1:
-                if FRONT_L_RANGING.get_distance() > 50:
-                    Move_FB(100)
-                else:
-                    Motor_Control(-2, -2, 2, 2)
-                    V_AUTO_STAGE = V_AUTO_STAGE + 1
+                while FRONT_L_RANGING.get_distance() > 45:
+                    Auto_Maintain_Grip()
+                    Move_FB(150)
+                V_AUTO_STAGE = V_AUTO_STAGE + 1
 
             elif V_AUTO_STAGE == 2:
                 if AUTO_SIDE == "L":
-                    target_angle = novapi.get_yaw() + 60
-                    while novapi.get_yaw() < target_angle :
-                        Move_Turn(-100)
-                        Auto_Maintain_Grip()
-                    Motor_Control(-2, -2, -2, -2)
-                    V_AUTO_STAGE = V_AUTO_STAGE + 1
-                elif AUTO_SIDE == "R":
-                    target_angle = novapi.get_yaw() - 60
+                    target_angle = novapi.get_yaw() - 30
                     while novapi.get_yaw() > target_angle :
-                        Move_Turn(100)
+                        Move_Turn(150)
                         Auto_Maintain_Grip()
                     Motor_Control(2, 2, 2, 2)
+                    V_AUTO_STAGE = V_AUTO_STAGE + 1
+                elif AUTO_SIDE == "R":
+                    target_angle = novapi.get_yaw() + 30
+                    while novapi.get_yaw() < target_angle :
+                        Move_Turn(-150)
+                        Auto_Maintain_Grip()
+                    Motor_Control(-2, -2, -2, -2)
                     V_AUTO_STAGE = V_AUTO_STAGE + 1
                 else:
                     led_matrix_1.show('AE', wait=False)
@@ -206,38 +209,54 @@ def Auto_stage1():
             elif V_AUTO_STAGE == 4:
                 if AMS == "F":
                     while FRONT_L_RANGING.get_distance() > 30:
-                        if LEFT_CAM.detect_sign(1):
-                            target_angle = novapi.get_yaw() - 85
-                            while novapi.get_yaw() > target_angle :
-                                Move_Turn(100)
-                                Auto_Maintain_Grip()
-                            Motor_Control(-2, -2, -2, -2)
-                            while FRONT_CAM.detect_sign(1):
-                                if FRONT_CAM.get_sign_x(1) > 130 and FRONT_CAM.get_sign_x(1) < 165:
-                                    Motor_RPM(0,0,0,0)
-                                    Auto_Grip()
-                                elif FRONT_CAM.get_sign_x(1) < 130:
-                                    Move_LR(50)
-                                elif FRONT_CAM.get_sign_x(1) > 165:
-                                    Move_LR(-50)
-                            Move_FB(100)
+                        if RIGHT_RANGING.get_distance() > LEFT_RANGING.get_distance():
+                            led_matrix_1.show("W", wait=False)
+                            if LEFT_CAM.detect_sign(1):
+                                target_angle = novapi.get_yaw() + 85
+                                while novapi.get_yaw() > target_angle :
+                                    Move_Turn(100)
+                                    Auto_Maintain_Grip()
+                                Motor_Control(-2, -2, -2, -2)
+                                while FRONT_CAM.detect_sign(1):
+                                    if FRONT_CAM.get_sign_x(1) > 130 and FRONT_CAM.get_sign_x(1) < 165:
+                                        Motor_RPM(0,0,0,0)
+                                        Auto_Grip()
+                                    elif FRONT_CAM.get_sign_x(1) < 130:
+                                        Move_LR(50)
+                                    elif FRONT_CAM.get_sign_x(1) > 165:
+                                        Move_LR(-50)
+                        # elif RIGHT_RANGING.get_distance() < LEFT_RANGING.get_distance():
+                        #     if FRONT_CAM.detect_sign(1) and FRONT_CAM.get_sign_x(1) < 130:
+                        #         target_angle = novapi.get_yaw() + 80
+                        #         while novapi.get_yaw() < target_angle :
+                        #             Move_Turn(-100)
+                        #             Auto_Maintain_Grip()
+                        #         Motor_Control(2, 2, 2, 2)
+                        #         while FRONT_CAM.detect_sign(1):
+                        #             if FRONT_CAM.get_sign_x(1) > 130 and FRONT_CAM.get_sign_x(1) < 165:
+                        #                 Motor_RPM(0,0,0,0)
+                        #                 Auto_Grip()
+                        #             elif FRONT_CAM.get_sign_x(1) < 130:
+                        #                 Move_LR(50)
+                        #             elif FRONT_CAM.get_sign_x(1) > 165:
+                        #                 Move_LR(-50)
+                        Move_FB(100)
                 if AMS == "R":
                     while BACK_RANGING.get_distance() > 30:
                         if RIGHT_CAM.detect_sign(1):
-                            target_angle = novapi.get_yaw() + 85
+                            target_angle = novapi.get_yaw() + 80
                             while novapi.get_yaw() < target_angle :
                                 Move_Turn(-100)
                                 Auto_Maintain_Grip()
-                            Motor_Control(-2, -2, -2, -2)
-                            while FRONT_CAM.detect_sign(1):
-                                if FRONT_CAM.get_sign_x(1) > 130 and FRONT_CAM.get_sign_x(1) < 165:
+                            Motor_Control(2, 2, 2, 2)
+                            while RIGHT_CAM.detect_sign(1):
+                                if RIGHT_CAM.get_sign_x(1) > 130 and RIGHT_CAM.get_sign_x(1) < 165:
                                     Motor_RPM(0,0,0,0)
                                     Auto_Grip()
-                                elif FRONT_CAM.get_sign_x(1) < 130:
+                                elif RIGHT_CAM.get_sign_x(1) < 130:
                                     Move_LR(50)
-                                elif FRONT_CAM.get_sign_x(1) > 165:
+                                elif RIGHT_CAM.get_sign_x(1) > 165:
                                     Move_LR(-50)
-                            Move_FB(100)
                 Motor_RPM(0, 0, 0, 0)
                 V_AUTO_STAGE = V_AUTO_STAGE + 1
             
@@ -427,7 +446,7 @@ led_matrix_1.show('OK!', wait = False)
 power_expand_board.set_power("DC4", DC_LOCK_V)
 
 while True:
-    # led_matrix_1.show(round(FRONT_CAM.get_sign_x(1), 1))
+    # led_matrix_1.show(round(LEFT_CAM.get_sign_x(1), 1))
     # led_matrix_1.show(round(novapi.timer(), 1))
     # led_matrix_1.show(FRONT_CAM.detect_sign_location(1, "middle"))
     # if FRONT_CAM.detect_sign_location(1, "middle"): 
@@ -435,17 +454,26 @@ while True:
     # else:
     #     led_matrix_1.show('f', wait = False)
     # led_matrix_1.show(BUTTOM_GRIPPER.get_value("angle"), wait=False)
-    led_matrix_1.show(FRONT_L_RANGING.get_distance(), wait=False)
+    # led_matrix_1.show(FRONT_L_RANGING.get_distance(), wait=False)
     # led_matrix_1.show(novapi.get_yaw(), wait=False)
     # led_matrix_1.show(LEFT_RANGING.get_distance(), wait=False)
     Motor_Safety_CTL()
     if button_1.is_pressed():
         # Auto_Correct_Angle()
-        V_AUTO_STAGE = 0
-        ENABLE_AUTO = 1
-        FRONT_CAM.open_light()
-        FRONT_CAM.reset()
-        FRONT_CAM.close_light()
+        # V_AUTO_STAGE = 0
+        # ENABLE_AUTO = 1
+        FRONT_CAM.set_mode("color")
+        LEFT_CAM.set_mode("color")
+        RIGHT_CAM.set_mode("color")
+        # FRONT_CAM.open_light()
+        # LEFT_CAM.open_light()
+        # RIGHT_CAM.open_light()
+        # FRONT_CAM.reset()
+        # FRONT_CAM.close_light()
+        # LEFT_CAM.reset()
+        # LEFT_CAM.close_light()
+        # RIGHT_CAM.reset()
+        # RIGHT_CAM.close_light()
 
     if power_manage_module.is_auto_mode():
         Auto_stage1()
