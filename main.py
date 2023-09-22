@@ -72,6 +72,17 @@ def Move_Turn(rpm):
     """Turn Left or Right (+rpm for Left, -rpm for Right)"""
     Motor_RPM(rpm, rpm, rpm, rpm)
 
+def Auto_Turn(degree:int):
+    """Turn Left or Right (+degree for Left, -degree for Right)"""
+    target_angle = novapi.get_yaw() + degree
+    if target_angle > novapi.get_yaw():
+        while novapi.get_yaw() < target_angle :
+            Move_Turn(100)
+    elif target_angle < novapi.get_yaw():
+        while novapi.get_yaw() > target_angle :
+            Move_Turn(-100)
+    Motor_Control(0, 0, 0, 0)
+
 def Auto_Grip ():
     GRIPPER_ANGLE.move_to(45, 50)
     power_expand_board.set_power("DC5", 100)
@@ -155,19 +166,9 @@ def Auto_stage1():
 
             if V_AUTO_STAGE == 0:
                 if AUTO_SIDE == "L":
-                    target_angle = novapi.get_yaw() - 30
-                    while novapi.get_yaw() > target_angle :
-                        Move_Turn(100)
-                        Auto_Maintain_Grip()
-                    Motor_Control(-2, -2, -2, -2)
-                    V_AUTO_STAGE = V_AUTO_STAGE + 1
+                    Auto_Turn(-30)
                 elif AUTO_SIDE == "R":
-                    target_angle = novapi.get_yaw() + 30
-                    while novapi.get_yaw() < target_angle :
-                        Move_Turn(-100)
-                        Auto_Maintain_Grip()
-                    Motor_Control(2, 2, 2, 2)
-                    V_AUTO_STAGE = V_AUTO_STAGE + 1
+                    Auto_Turn(30)
                 else:
                     led_matrix_1.show('AE', wait=False)
                     time.sleep(500)
@@ -180,41 +181,23 @@ def Auto_stage1():
 
             elif V_AUTO_STAGE == 2:
                 if AUTO_SIDE == "L":
-                    target_angle = novapi.get_yaw() - 35
-                    while novapi.get_yaw() > target_angle :
-                        Move_Turn(150)
-                        Auto_Maintain_Grip()
-                    Motor_Control(2, 2, 2, 2)
+                    Auto_Turn(35)
                     V_AUTO_STAGE = V_AUTO_STAGE + 1
                 elif AUTO_SIDE == "R":
-                    target_angle = novapi.get_yaw() + 35
-                    while novapi.get_yaw() < target_angle :
-                        Move_Turn(-150)
-                        Auto_Maintain_Grip()
-                    Motor_Control(-2, -2, -2, -2)
+                    Auto_Turn(-35)
                     V_AUTO_STAGE = V_AUTO_STAGE + 1
                 else:
                     led_matrix_1.show('AE', wait=False)
                     time.sleep(500)
 
-            elif V_AUTO_STAGE == 3:
-                if FRONT_L_RANGING.get_distance() > BACK_RANGING.get_distance():
-                    # AMS = 'B'
-                    AMS = 'F'
-                else:
-                    AMS = 'F'
-                V_AUTO_STAGE = V_AUTO_STAGE + 1
-
             #Stage 4, try not to bump the arena
-            elif V_AUTO_STAGE == 4:
+            elif V_AUTO_STAGE == 5:
                 if AMS == "F":
                     while FRONT_L_RANGING.get_distance() > 50:
                         # if RIGHT_RANGING.get_distance() > LEFT_RANGING.get_distance():
                         if LEFT_CAM.get_sign_x(1) > 50:
-                            target_angle = novapi.get_yaw() + 85
-                            while novapi.get_yaw() < target_angle :
-                                Move_Turn(-150)
-                                Auto_Maintain_Grip()
+                            # spin to the left 85 degree
+                            Auto_Turn(-85)
                             # target_angle = novapi.get_yaw() - 80
                             # while novapi.get_yaw() > target_angle :
                             #     time.sleep(0.001)
@@ -231,25 +214,31 @@ def Auto_stage1():
                                     GRIPPER_ANGLE.move_to(45, 50)
                                     power_expand_board.set_power("DC5", 100)
                                     
+                                    # move forward until the block is in the gripper
                                     while FRONT_L_RANGING.get_distance() > 8 and FRONT_L_RANGING.get_distance() == 200:
                                         time.sleep(0.001)
                                         Move_FB(100)
+                                    
+                                    # stop the spinner
                                     power_expand_board.set_power("DC5", 0)
 
+                                    # move backward
                                     while FRONT_L_RANGING.get_distance() < 20 or FRONT_L_RANGING.get_distance() == 200:
                                         time.sleep(0.001)
                                         Move_FB(-100)
                                     
+                                    # turn to the right
                                     target_angle = novapi.get_yaw() + 85
                                     while novapi.get_yaw() < target_angle :
                                         time.sleep(0.001)
                                         # if about 75% through put DC5 at reverse
                                         if novapi.get_yaw() > (target_angle - 30):
+                                            # Eject the block
                                             power_expand_board.set_power("DC5", -100)
                                         Motor_RPM(-100, -100, -100, -100)
-
+                                    
+                                    # turn off
                                     power_expand_board.set_power("DC5", 0)
-                                    Motor_RPM(0,0,0,0)
                                     # GRIP END DO NOT CHANGE
                                 # if the block is on the left slide to the left
                                 elif FRONT_CAM.get_sign_x(1) < 130:
