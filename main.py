@@ -83,35 +83,6 @@ def Auto_Turn(degree:int):
             Move_Turn(-100)
     Motor_Control(0, 0, 0, 0)
 
-def Auto_Grip ():
-    GRIPPER_ANGLE.move_to(45, 50)
-    power_expand_board.set_power("DC5", 100)
-    while FRONT_L_RANGING.get_distance() > 5:
-        time.sleep(0.001)
-        Move_FB(100)
-    power_expand_board.set_power("DC5", 0)
-
-    while FRONT_L_RANGING.get_distance() < 20 or FRONT_L_RANGING.get_distance() == 200:
-        time.sleep(0.001)
-        Move_FB(-100)
-    
-    target_angle = novapi.get_yaw() + 85
-    while novapi.get_yaw() < target_angle :
-        time.sleep(0.001)
-        # if about 75% through put DC5 at reverse
-        if novapi.get_yaw() > (target_angle - 30):
-            power_expand_board.set_power("DC5", -100)
-        Motor_RPM(-100, -100, -100, -100)
-
-    power_expand_board.set_power("DC5", 0)
-    Motor_RPM(0,0,0,0)
-
-    # target_angle = novapi.get_yaw() - 80
-    # while novapi.get_yaw() > target_angle :
-    #     time.sleep(0.001)
-    #     Motor_RPM(100, 100, 100, 100)
-    # Motor_Control(-2, -2, -2, -2)
-
 def Auto_Maintain_Grip():
     if GRIPPER_RANGING.get_distance() > 14:
         power_expand_board.set_power("DC4", -100)
@@ -191,43 +162,38 @@ def Auto_stage1():
                     time.sleep(500)
 
             #Stage 4, try not to bump the arena
-            elif V_AUTO_STAGE == 5:
-                if AMS == "F":
-                    while FRONT_L_RANGING.get_distance() > 50:
-                        # if RIGHT_RANGING.get_distance() > LEFT_RANGING.get_distance():
-                        if LEFT_CAM.get_sign_x(1) > 50:
-                            # spin to the left 85 degree
-                            Auto_Turn(-85)
-                            # target_angle = novapi.get_yaw() - 80
-                            # while novapi.get_yaw() > target_angle :
-                            #     time.sleep(0.001)
-                            #     Motor_RPM(100, 100, 100, 100)
-                            # Motor_Control(-2, -2, -2, -2)
-                            # loop until the block isnt there
-                            while FRONT_CAM.detect_sign(1):
-                                # get the blocks in the middle
-                                if FRONT_CAM.get_sign_x(1) > 130 and FRONT_CAM.get_sign_x(1) < 165:
-                                    # Kill all motor power
-                                    Motor_RPM(0,0,0,0)
-                                    # GRIP START DO NOT CHANGE
-                                    # prep the spinner and angle
-                                    GRIPPER_ANGLE.move_to(45, 50)
-                                    power_expand_board.set_power("DC5", 100)
-                                    
-                                    # move forward until the block is in the gripper
-                                    while FRONT_L_RANGING.get_distance() > 8 and FRONT_L_RANGING.get_distance() == 200:
-                                        time.sleep(0.001)
-                                        Move_FB(100)
-                                    
-                                    # stop the spinner
-                                    power_expand_board.set_power("DC5", 0)
+            elif V_AUTO_STAGE == 3:
+                while BACK_RANGING.get_distance() > 50:
+                    # if RIGHT_RANGING.get_distance() > LEFT_RANGING.get_distance():
+                    if LEFT_CAM.get_sign_x(1) > 50:
+                        # spin to the left 85 degree
+                        Auto_Turn(-85)
+                        # loop until the block isnt there
+                        while FRONT_CAM.detect_sign(1):
+                            # get the blocks in the middle
+                            if FRONT_CAM.get_sign_x(1) > 130 and FRONT_CAM.get_sign_x(1) < 165:
+                                # Kill all motor power
+                                Motor_RPM(0,0,0,0)
+                                # GRIP START DO NOT CHANGE
+                                # prep the spinner and angle
+                                GRIPPER_ANGLE.move_to(45, 50)
+                                power_expand_board.set_power("DC5", 100)
+                                
+                                # move forward until the block is in the gripper
+                                while FRONT_L_RANGING.get_distance() > 8 and FRONT_L_RANGING.get_distance() == 200:
+                                    time.sleep(0.001)
+                                    Move_FB(100)
+                                
+                                # stop the spinner
+                                power_expand_board.set_power("DC5", 0)
 
-                                    # move backward
-                                    while FRONT_L_RANGING.get_distance() < 20 or FRONT_L_RANGING.get_distance() == 200:
-                                        time.sleep(0.001)
-                                        Move_FB(-100)
-                                    
-                                    # turn to the right
+                                # move backward
+                                while FRONT_L_RANGING.get_distance() < 20 or FRONT_L_RANGING.get_distance() == 200:
+                                    time.sleep(0.001)
+                                    Move_FB(-100)
+                                
+                                # if is the last block in the row turn right instead to back up
+                                if RIGHT_RANGING.get_distance() > 60:
                                     target_angle = novapi.get_yaw() + 85
                                     while novapi.get_yaw() < target_angle :
                                         time.sleep(0.001)
@@ -235,53 +201,29 @@ def Auto_stage1():
                                         if novapi.get_yaw() > (target_angle - 30):
                                             # Eject the block
                                             power_expand_board.set_power("DC5", -100)
-                                        Motor_RPM(-100, -100, -100, -100)
-                                    
-                                    # turn off
-                                    power_expand_board.set_power("DC5", 0)
-                                    # GRIP END DO NOT CHANGE
-                                # if the block is on the left slide to the left
-                                elif FRONT_CAM.get_sign_x(1) < 130:
-                                    Move_LR(50)
-                                # if the block is on the right slide to the right
-                                elif FRONT_CAM.get_sign_x(1) > 165:
-                                    Move_LR(-50)
-                        # elif RIGHT_RANGING.get_distance() < LEFT_RANGING.get_distance():
-                        #     if FRONT_CAM.detect_sign(1) and FRONT_CAM.get_sign_x(1) < 130:
-                        #         target_angle = novapi.get_yaw() + 80
-                        #         while novapi.get_yaw() < target_angle :
-                        #             Move_Turn(-100)
-                        #             Auto_Maintain_Grip()
-                        #         Motor_Control(2, 2, 2, 2)
-                        #         while FRONT_CAM.detect_sign(1):
-                        #             if FRONT_CAM.get_sign_x(1) > 130 and FRONT_CAM.get_sign_x(1) < 165:
-                        #                 Motor_RPM(0,0,0,0)
-                        #                 Auto_Grip()
-                        #             elif FRONT_CAM.get_sign_x(1) < 130:
-                        #                 Move_LR(50)
-                        #             elif FRONT_CAM.get_sign_x(1) > 165:
-                        #                 Move_LR(-50)
-                        Move_FB(150)
-                    Motor_RPM(0,0,0,0)
-                    V_AUTO_STAGE = V_AUTO_STAGE + 1
-                # if AMS == "R":
-                #     while BACK_RANGING.get_distance() > 30:
-                #         if RIGHT_CAM.detect_sign(1):
-                #             target_angle = novapi.get_yaw() + 80
-                #             while novapi.get_yaw() < target_angle :
-                #                 Move_Turn(-100)
-                #                 Auto_Maintain_Grip()
-                #             Motor_Control(2, 2, 2, 2)
-                #             while RIGHT_CAM.detect_sign(1):
-                #                 if RIGHT_CAM.get_sign_x(1) > 130 and RIGHT_CAM.get_sign_x(1) < 165:
-                #                     Motor_RPM(0,0,0,0)
-                #                     Auto_Grip()
-                #                 elif RIGHT_CAM.get_sign_x(1) < 130:
-                #                     Move_LR(50)
-                #                 elif RIGHT_CAM.get_sign_x(1) > 165:
-                #                     Move_LR(-50)
-                # Motor_RPM(0, 0, 0, 0)
-                # V_AUTO_STAGE = V_AUTO_STAGE + 1
+                                        Move_Turn(-100)
+                                else :
+                                    target_angle = novapi.get_yaw() + 85
+                                    while novapi.get_yaw() > target_angle :
+                                        time.sleep(0.001)
+                                        if novapi.get_yaw() < (target_angle + 30):
+                                            power_expand_board.set_power("DC5", -100)
+                                        Move_Turn(100)
+                                
+                                Move_Turn(0)
+                                
+                                # turn off
+                                power_expand_board.set_power("DC5", 0)
+                                # GRIP END DO NOT CHANGE
+                            # if the block is on the left slide to the left
+                            elif FRONT_CAM.get_sign_x(1) < 130:
+                                Move_LR(50)
+                            # if the block is on the right slide to the right
+                            elif FRONT_CAM.get_sign_x(1) > 165:
+                                Move_LR(-50)
+                    Move_FB(150)
+                Motor_RPM(0,0,0,0)
+                V_AUTO_STAGE = V_AUTO_STAGE + 1
             
         BR_ENCODE_M1.set_power(0)
         FR_ENCODE_M2.set_power(0)
