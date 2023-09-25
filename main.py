@@ -81,7 +81,7 @@ def Auto_Turn(degree:int):
     elif target_angle < novapi.get_yaw():
         while novapi.get_yaw() > target_angle :
             Move_Turn(-100)
-    Motor_Control(0, 0, 0, 0)
+    Motor_RPM(0, 0, 0, 0)
 
 def Auto_Maintain_Grip():
     if GRIPPER_RANGING.get_distance() > 14:
@@ -143,6 +143,7 @@ def Auto_stage1():
                 else:
                     led_matrix_1.show('AE', wait=False)
                     time.sleep(500)
+                V_AUTO_STAGE = V_AUTO_STAGE + 1
 
             elif V_AUTO_STAGE == 1:
                 while FRONT_L_RANGING.get_distance() > 45:
