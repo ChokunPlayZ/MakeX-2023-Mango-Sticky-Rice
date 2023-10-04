@@ -171,67 +171,62 @@ def Auto_stage1():
                         if LEFT_CAM.detect_sign(1):
                             Auto_Turn(80)
                         
-                        FRONT_CAM.open_light()
-                        done = False
-                        if FRONT_CAM.detect_sign(1):
-                            while not done:
-                                if FRONT_CAM.get_sign_x(1) > 140 and FRONT_CAM.get_sign_x(1) < 170:
-                                    # Kill all motor power
-                                    Motor_RPM(0,0,0,0)
-                                    # GRIP START DO NOT CHANGE
-                                    # prep the spinner and angle
-                                    GRIPPER_ANGLE.move_to(45, 50)
-                                    power_expand_board.set_power("DC5", 100)
-                                    
-                                    # move forward until the block is in the gripper
-                                    while FRONT_L_RANGING.get_distance() > 5 and FRONT_R_RANGING.get_distance() > 5 : 
-                                        led_matrix_1.show(round(FRONT_L_RANGING.get_distance(), 1), wait=False)
+                            FRONT_CAM.open_light()
+                            done = False
+                            if FRONT_CAM.detect_sign(1):
+                                while not done:
+                                    if FRONT_CAM.get_sign_x(1) > 140 and FRONT_CAM.get_sign_x(1) < 170:
+                                        # Kill all motor power
+                                        Motor_RPM(0,0,0,0)
+                                        # GRIP START DO NOT CHANGE
+                                        # prep the spinner and angle
+                                        GRIPPER_ANGLE.move_to(45, 50)
                                         power_expand_board.set_power("DC5", 100)
-                                        Auto_Maintain_Grip()
-                                        Move_FB(100)
-                                    
-                                    # stop the spinner
-                                    power_expand_board.set_power("DC5", 0) 
+                                        
+                                        # move forward until the block is in the gripper
+                                        while FRONT_L_RANGING.get_distance() > 5 and FRONT_R_RANGING.get_distance() > 5 : 
+                                            led_matrix_1.show(round(FRONT_L_RANGING.get_distance(), 1), wait=False)
+                                            power_expand_board.set_power("DC5", 100)
+                                            Auto_Maintain_Grip()
+                                            Move_FB(100)
+                                        
+                                        # stop the spinner
+                                        power_expand_board.set_power("DC5", 0) 
 
-                                    # move backward
-                                    while FRONT_L_RANGING.get_distance() < 20:
-                                        led_matrix_1.show(FRONT_L_RANGING.get_distance(), wait=False)
-                                        Auto_Maintain_Grip()
-                                        Move_FB(-100)
-                                    # GRIP END DO NOT CHANGE
+                                        # move backward
+                                        while FRONT_L_RANGING.get_distance() < 20:
+                                            led_matrix_1.show(FRONT_L_RANGING.get_distance(), wait=False)
+                                            Auto_Maintain_Grip()
+                                            Move_FB(-100)
+                                        # GRIP END DO NOT CHANGE
 
-                                    done = True
-                                    continue
-                                # if the block is on the left slide to the left
-                                elif FRONT_CAM.get_sign_x(1) < 140:
-                                    Move_LR(50)
-                                # if the block is on the right slide to the right
-                                elif FRONT_CAM.get_sign_x(1) > 170:
-                                    Move_LR(-50)
-                                if not FRONT_CAM.detect_sign(1):
-                                    done = True
-                                    continue
-                        if RIGHT_RANGING.get_distance() > 60:
-                            Auto_Turn(50)
-                            power_expand_board.set_power("DC5", -100)
-                            Auto_Turn(30)
-                        else :
-                            Auto_Turn(-45)
-                            power_expand_board.set_power("DC5", -100)
-                            Auto_Turn(-30)
-                        
-                        power_expand_board.set_power("DC5",0)
-                        FRONT_CAM.close_light()
+                                        done = True
+                                        continue
+                                    # if the block is on the left slide to the left
+                                    elif FRONT_CAM.get_sign_x(1) < 140:
+                                        Move_LR(50)
+                                    # if the block is on the right slide to the right
+                                    elif FRONT_CAM.get_sign_x(1) > 170:
+                                        Move_LR(-50)
+                                    if not FRONT_CAM.detect_sign(1):
+                                        done = True
+                                        continue
+                                if LEFT_RANGING.get_distance() > 60:
+                                    Auto_Turn(50)
+                                    power_expand_board.set_power("DC5", -100)
+                                    Auto_Turn(30)
+                                else :
+                                    Auto_Turn(-45)
+                                    power_expand_board.set_power("DC5", -100)
+                                    Auto_Turn(-30)
+                            
+                            power_expand_board.set_power("DC5",0)
+                            FRONT_CAM.close_light()
                     else:
                         RIGHT_CAM.open_light()
                         LEFT_CAM.close_light()
                         if RIGHT_CAM.detect_sign(1):
                             Auto_Turn(-80)
-                            # while FRONT_L_RANGING.get_distance() > 10:
-                            #     time.sleep(0.001)
-                            #     Auto_Correct_Angle()
-                            #     Move_FB(100) 
-                            # Motor_RPM(0,0,0,0)
                             # loop until the block isnt there
                             FRONT_CAM.open_light()
                             done = False
@@ -287,10 +282,14 @@ def Auto_stage1():
                     if LEFT_RANGING.get_distance() < RIGHT_RANGING.get_distance() and not RIGHT_RANGING.get_distance() == 200:
                         if LEFT_RANGING.get_distance() < 10:
                             Move_LR(100)
+                        elif LEFT_RANGING.get_distance() > 30:
+                            Move_LR(-100)
                         else: 
                             Move_FB(-150)
                     else:
                         if RIGHT_RANGING.get_distance() < 10:
+                            Move_LR(100)
+                        elif RIGHT_RANGING.get_distance() > 30:
                             Move_LR(-100)
                         else:
                             Move_FB(-150)
