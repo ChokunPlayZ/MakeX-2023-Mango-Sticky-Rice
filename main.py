@@ -331,22 +331,19 @@ def Reverse_movement ():
         Motor_Control(0, 0, 0, 0)
 
 def S1_Keymap ():
+    # main loading system controls
     if gamepad.is_key_pressed("N1"):
         power_expand_board.set_power("DC1", 100)
         power_expand_board.set_power("DC2", 100)
-
-    if gamepad.is_key_pressed("Right"):
+    elif gamepad.is_key_pressed("Right"):
         power_expand_board.set_power("DC2", -100)
     elif gamepad.is_key_pressed("Left"):
         power_expand_board.set_power("DC1", -100)
-    elif gamepad.is_key_pressed("Up"):
+    elif gamepad.is_key_pressed("L1") or gamepad.is_key_pressed("Up"):
         power_expand_board.set_power("DC1", 0)
         power_expand_board.set_power("DC2", 0)
 
-    if gamepad.is_key_pressed("L1"):
-        power_expand_board.set_power("DC1", 0)
-        power_expand_board.set_power("DC2", 0)
-
+    # conveyor control
     if gamepad.is_key_pressed("N2"):
         power_expand_board.set_power("DC3", 100)
     elif gamepad.is_key_pressed("N3"):
@@ -354,6 +351,7 @@ def S1_Keymap ():
     else:
         power_expand_board.set_power("DC3", 0)
 
+    # Shooter Control
     if gamepad.is_key_pressed("N4"):
         power_expand_board.set_power("BL1", 100)
         power_expand_board.set_power("BL2", 100)
@@ -361,6 +359,7 @@ def S1_Keymap ():
             power_expand_board.stop("BL1")
             power_expand_board.stop("BL2")
 
+    # Brushless Angle
     if gamepad.is_key_pressed("+"):
         BRUSHLESS_SERVO.move_to(-9, 100)
         # BRUSHLESS_SERVO.move(1, 50)
@@ -377,7 +376,6 @@ def S1_Keymap ():
 def S2_Keymap ():
     if gamepad.is_key_pressed("N1"):
         power_expand_board.set_power("DC5", 100)
-        power_expand_board.set_power("DC4", 100)
     elif gamepad.is_key_pressed("N4"):
         power_expand_board.set_power("DC5", -100)
     elif gamepad.is_key_pressed("R1"):
@@ -388,12 +386,12 @@ def S2_Keymap ():
     else:
         power_expand_board.set_power("DC5", 0)
 
-        if gamepad.is_key_pressed("Up"):
-            power_expand_board.set_power("DC4", -100)
-        elif gamepad.is_key_pressed("Down"):
-            power_expand_board.set_power("DC4", 100)
-        else:
-            power_expand_board.set_power("DC4", DC_LOCK_V)
+    if gamepad.is_key_pressed("Up"):
+        power_expand_board.set_power("DC4", -100)
+    elif gamepad.is_key_pressed("Down") or gamepad.is_key_pressed("N1"):
+        power_expand_board.set_power("DC4", 100)
+    else:
+        power_expand_board.set_power("DC4", DC_LOCK_V)
         
     if gamepad.is_key_pressed("N2"):
         GRIPPER_ANGLE.move_to(90, 50)
@@ -453,7 +451,7 @@ def Motor_Safety_CTL ():
         BRUSHLESS_SERVO.set_power(0)
 
 # Control System Config
-Speed_Modifier = 1.6 # หหารความเร็วด้วย
+Speed_Modifier = 1.6 # หารความเร็วด้วย
 TURN_SPEED_MODIFIER = 1.3
 CTLMODE = 2
 DC_LOCK_V = -5
