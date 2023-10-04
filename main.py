@@ -103,6 +103,29 @@ def Auto_Turn(degree:int):
             Move_Turn(100)
     Motor_RPM(0, 0, 0, 0)
 
+def Auto_Grip():
+    # GRIP START DO NOT CHANGE
+    # prep the spinner and angle
+    GRIPPER_ANGLE.move_to(45, 50)
+    power_expand_board.set_power("DC5", 100)
+    
+    # move forward until the block is in the gripper
+    while FRONT_L_RANGING.get_distance() > 5 and FRONT_R_RANGING.get_distance() > 5 : 
+        led_matrix_1.show(round(FRONT_L_RANGING.get_distance(), 1), wait=False)
+        power_expand_board.set_power("DC5", 100)
+        Auto_Maintain_Grip()
+        Move_FB(100)
+    
+    # stop the spinner
+    power_expand_board.set_power("DC5", 0) 
+
+    # move backward
+    while FRONT_L_RANGING.get_distance() < 20:
+        led_matrix_1.show(FRONT_L_RANGING.get_distance(), wait=False)
+        Auto_Maintain_Grip()
+        Move_FB(-100)
+    # GRIP END DO NOT CHANGE
+
 def Auto_stage1():
     """
     Automatic Stage 1, V5.5 (testing)
@@ -182,27 +205,8 @@ def Auto_stage1():
                                     if FRONT_CAM.get_sign_x(1) > 140 and FRONT_CAM.get_sign_x(1) < 170:
                                         # Kill all motor power
                                         Motor_RPM(0,0,0,0)
-                                        # GRIP START DO NOT CHANGE
-                                        # prep the spinner and angle
-                                        GRIPPER_ANGLE.move_to(45, 50)
-                                        power_expand_board.set_power("DC5", 100)
                                         
-                                        # move forward until the block is in the gripper
-                                        while FRONT_L_RANGING.get_distance() > 5 and FRONT_R_RANGING.get_distance() > 5 : 
-                                            led_matrix_1.show(round(FRONT_L_RANGING.get_distance(), 1), wait=False)
-                                            power_expand_board.set_power("DC5", 100)
-                                            Auto_Maintain_Grip()
-                                            Move_FB(100)
-                                        
-                                        # stop the spinner
-                                        power_expand_board.set_power("DC5", 0) 
-
-                                        # move backward
-                                        while FRONT_L_RANGING.get_distance() < 20:
-                                            led_matrix_1.show(FRONT_L_RANGING.get_distance(), wait=False)
-                                            Auto_Maintain_Grip()
-                                            Move_FB(-100)
-                                        # GRIP END DO NOT CHANGE
+                                        Auto_Grip()
 
                                         done = True
                                         continue
@@ -239,27 +243,8 @@ def Auto_stage1():
                                     if FRONT_CAM.get_sign_x(1) > 140 and FRONT_CAM.get_sign_x(1) < 170:
                                         # Kill all motor power
                                         Motor_RPM(0,0,0,0)
-                                        # GRIP START DO NOT CHANGE
-                                        # prep the spinner and angle
-                                        GRIPPER_ANGLE.move_to(45, 50)
-                                        power_expand_board.set_power("DC5", 100)
-                                        
-                                        # move forward until the block is in the gripper
-                                        while FRONT_L_RANGING.get_distance() > 5 and FRONT_R_RANGING.get_distance() > 5 : 
-                                            led_matrix_1.show(round(FRONT_L_RANGING.get_distance(), 1), wait=False)
-                                            power_expand_board.set_power("DC5", 100)
-                                            Auto_Maintain_Grip()
-                                            Move_FB(100)
-                                        
-                                        # stop the spinner
-                                        power_expand_board.set_power("DC5", 0) 
 
-                                        # move backward
-                                        while FRONT_L_RANGING.get_distance() < 20:
-                                            led_matrix_1.show(FRONT_L_RANGING.get_distance(), wait=False)
-                                            Auto_Maintain_Grip()
-                                            Move_FB(-100)
-                                        # GRIP END DO NOT CHANGE
+                                        Auto_Grip()
 
                                         done = True
                                         continue
