@@ -292,9 +292,9 @@ def Auto_stage1():
                             Move_FB(-150)
                     else:
                         if RIGHT_RANGING.get_distance() < 10:
-                            Move_LR(100)
-                        elif RIGHT_RANGING.get_distance() > 30:
                             Move_LR(-100)
+                        elif RIGHT_RANGING.get_distance() > 30:
+                            Move_LR(100)
                         else:
                             Move_FB(-150)
                 Motor_RPM(0,0,0,0)
