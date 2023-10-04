@@ -1,7 +1,7 @@
 class led_matrix_class() :
     def __init__(self, PORT, INDEX):
         """
-        define the smart camera
+        define the led matrix
         PORT, the port the senor is connected to on the novapi
         INDEX, the sensor number in the chain INDEX<1-10>
         """
