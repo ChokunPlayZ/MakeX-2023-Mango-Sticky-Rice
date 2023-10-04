@@ -111,17 +111,17 @@ def Auto_Grip():
     
     # move forward until the block is in the gripper
     while FRONT_L_RANGING.get_distance() > 5 and FRONT_R_RANGING.get_distance() > 5 : 
-        led_matrix_1.show(round(FRONT_L_RANGING.get_distance(), 1), wait=False)
         power_expand_board.set_power("DC5", 100)
         Auto_Maintain_Grip()
         Move_FB(100)
+        time.sleep(0.001)
+    time.sleep(0.5)
     
     # stop the spinner
     power_expand_board.set_power("DC5", 0) 
 
     # move backward
     while FRONT_L_RANGING.get_distance() < 20:
-        led_matrix_1.show(FRONT_L_RANGING.get_distance(), wait=False)
         Auto_Maintain_Grip()
         Move_FB(-100)
     # GRIP END DO NOT CHANGE
