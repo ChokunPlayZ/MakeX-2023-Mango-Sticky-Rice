@@ -149,7 +149,7 @@ def Auto_stage1():
         RIGHT_CAM.set_mode("color")
         led_matrix_1.show('A W', wait=False)
 
-        GRIPPER_LOCK.set_angle(40)
+        GRIPPER_LOCK.set_angle(60)
 
         if LEFT_RANGING.get_distance() < RIGHT_RANGING.get_distance():
             AUTO_SIDE = 'R'
@@ -504,10 +504,11 @@ GRIPPER_LOCK.set_angle(0)
 
 while True:
     # led_matrix_1.show(round(FRONT_CAM.get_sign_x(1), 1))
-    # led_matrix_1.show(round(BRUSHLESS_SERVO.get_value("voltage"), 1))
-    led_matrix_1.show(FRONT_L_RANGING.get_distance(), wait=False)
+    led_matrix_1.show(round(BRUSHLESS_SERVO.get_value("voltage"), 1))
+    # led_matrix_1.show(FRONT_L_RANGING.get_distance(), wait=False)
     Motor_Safety_CTL()
     if button_1.is_pressed():
+        GRIPPER_LOCK.set_angle(60)
         FRONT_CAM.set_mode("color")
         LEFT_CAM.set_mode("color")
         RIGHT_CAM.set_mode("color")
@@ -519,6 +520,8 @@ while True:
         FRONT_CAM.close_light()
         LEFT_CAM.close_light()
         RIGHT_CAM.close_light()
+
+        GRIPPER_LOCK.set_angle(0)
 
     if power_manage_module.is_auto_mode():
         Auto_stage1()
