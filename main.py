@@ -1,4 +1,5 @@
-# code make you get less sleep
+# code make you sleepy
+# https://makex.ckl.moe/lol
 import novapi
 from mbuild import power_manage_module
 from mbuild.encoder_motor import encoder_motor_class
@@ -121,7 +122,9 @@ def Auto_Grip():
     power_expand_board.set_power("DC5", 0) 
 
     # move backward
-    while FRONT_L_RANGING.get_distance() < 20:
+    Move_FB(-100)
+    time.sleep(0.5)
+    while FRONT_L_RANGING.get_distance() < 25:
         Auto_Maintain_Grip()
         Move_FB(-100)
     # GRIP END DO NOT CHANGE
@@ -196,7 +199,20 @@ def Auto_stage1():
                         LEFT_CAM.open_light()
                         RIGHT_CAM.close_light()
                         if LEFT_CAM.detect_sign(1):
+                            # if LEFT_RANGING.get_distance() < 20:
+                            #     Move_LR(-150)
+                            #     continue
+                            # elif LEFT_RANGING.get_distance() > 30:
+                            #     Move_LR(150)
+                            #     continue
+
                             Auto_Turn(80)
+
+                            while FRONT_L_RANGING.get_distance() > 25:
+                                if FRONT_L_RANGING.get_distance() > 25 :
+                                    Move_FB(150)
+                                    time.sleep(0.001)
+                                    continue
                         
                             FRONT_CAM.open_light()
                             done = False
@@ -234,8 +250,20 @@ def Auto_stage1():
                         RIGHT_CAM.open_light()
                         LEFT_CAM.close_light()
                         if RIGHT_CAM.detect_sign(1):
+                            # if RIGHT_RANGING.get_distance() < 20:
+                            #     Move_LR(150)
+                            #     continue
+                            # elif RIGHT_RANGING.get_distance() > 30:
+                            #     Move_LR(-150)
+                            #     continue
+
                             Auto_Turn(-80)
                             # loop until the block isnt there
+                            if FRONT_L_RANGING.get_distance() > 25:
+                                while FRONT_L_RANGING.get_distance() > 25 :
+                                    Move_FB(150)
+                                    time.sleep(0.001)
+
                             FRONT_CAM.open_light()
                             done = False
                             if FRONT_CAM.detect_sign(1):
@@ -269,17 +297,17 @@ def Auto_stage1():
                             power_expand_board.set_power("DC5",0)
                             FRONT_CAM.close_light()
                     if LEFT_RANGING.get_distance() < RIGHT_RANGING.get_distance() and not RIGHT_RANGING.get_distance() == 200:
-                        if LEFT_RANGING.get_distance() < 10:
-                            Move_LR(100)
+                        if LEFT_RANGING.get_distance() < 20:
+                            Move_LR(-150)
                         elif LEFT_RANGING.get_distance() > 30:
-                            Move_LR(-100)
+                            Move_LR(150)
                         else: 
                             Move_FB(-150)
                     else:
-                        if RIGHT_RANGING.get_distance() < 10:
-                            Move_LR(-100)
+                        if RIGHT_RANGING.get_distance() < 20:
+                            Move_LR(150)
                         elif RIGHT_RANGING.get_distance() > 30:
-                            Move_LR(100)
+                            Move_LR(-150)
                         else:
                             Move_FB(-150)
                 Motor_RPM(0,0,0,0)
@@ -476,7 +504,8 @@ GRIPPER_LOCK.set_angle(0)
 
 while True:
     # led_matrix_1.show(round(FRONT_CAM.get_sign_x(1), 1))
-    led_matrix_1.show(round(BRUSHLESS_SERVO.get_value("voltage"), 1))
+    # led_matrix_1.show(round(BRUSHLESS_SERVO.get_value("voltage"), 1))
+    led_matrix_1.show(FRONT_L_RANGING.get_distance(), wait=False)
     Motor_Safety_CTL()
     if button_1.is_pressed():
         FRONT_CAM.set_mode("color")
