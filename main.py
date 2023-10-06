@@ -432,16 +432,16 @@ def S2_Keymap ():
 def S3_Keymap ():
     if gamepad.is_key_pressed("N1"):
         #Release
-        BUTTOM_GRIPPER.move_to(0, 50)
+        BUTTOM_GRIPPER.move_to(-77, 50)
     elif gamepad.is_key_pressed("N4"):
         #Grab Block
         BUTTOM_GRIPPER.move_to(-73, 50)
     elif gamepad.is_key_pressed("N2"):
         #Grab pin top
-        BUTTOM_GRIPPER.move_to(-94, 50)
+        BUTTOM_GRIPPER.move_to(-89, 50)
     elif gamepad.is_key_pressed("N3"):
         # Grab Pin Buttom
-        BUTTOM_GRIPPER.move_to(-85, 50)
+        BUTTOM_GRIPPER.move_to(-81, 50)
     elif gamepad.is_key_pressed("L1"):
         # Grab Block 2
         BUTTOM_GRIPPER.move_to(-75, 50)
@@ -452,7 +452,7 @@ def S3_Keymap ():
     if gamepad.is_key_pressed("Down"):
         BUTTOM_GRIPPER.move(3, 100)
     elif gamepad.is_key_pressed("Up"):
-            BUTTOM_GRIPPER.move(-3, 100)
+        BUTTOM_GRIPPER.move(-3, 100)
 
 def feeder_control ():
     if gamepad.is_key_pressed("N1"):
@@ -505,6 +505,7 @@ GRIPPER_LOCK.set_angle(0)
 while True:
     # led_matrix_1.show(round(FRONT_CAM.get_sign_x(1), 1))
     led_matrix_1.show(round(BRUSHLESS_SERVO.get_value("voltage"), 1))
+    # led_matrix_1.show(round(BUTTOM_GRIPPER.get_value("angle"), 1))
     # led_matrix_1.show(FRONT_L_RANGING.get_distance(), wait=False)
     Motor_Safety_CTL()
     if button_1.is_pressed():
