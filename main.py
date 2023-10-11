@@ -133,6 +133,7 @@ def Auto_stage1():
     """
     Automatic Stage 1, V5.5 (testing)
     Dsc: Get EVERYTHING
+    NI = No Intellengence
     """
     global ENABLE_AUTO, V_AUTO_STAGE
     if ENABLE_AUTO == 0:
@@ -208,8 +209,8 @@ def Auto_stage1():
 
                             Auto_Turn(80)
 
-                            while FRONT_L_RANGING.get_distance() > 25:
-                                if FRONT_L_RANGING.get_distance() > 25 :
+                            if FRONT_L_RANGING.get_distance() > 25:
+                                while FRONT_L_RANGING.get_distance() > 25 :
                                     Move_FB(150)
                                     time.sleep(0.001)
                                     continue
@@ -320,6 +321,60 @@ def Auto_stage1():
 
         led_matrix_1.show('A E', wait=False)
         return
+
+def Auto_stage2():
+    global ENABLE_AUTO, V_AUTO_STAGE
+    if ENABLE_AUTO == 0:
+        led_matrix_1.show('A D', wait=False)
+        return
+    if ENABLE_AUTO == 1:
+        led_matrix_1.show('A P', wait=False)
+        BR_ENCODE_M1.set_power(0)
+        FR_ENCODE_M2.set_power(0)
+        BL_ENCODE_M3.set_power(0)
+        FL_ENCODE_M4.set_power(0)
+        FRONT_CAM.set_mode("color")
+        LEFT_CAM.set_mode("color")
+        RIGHT_CAM.set_mode("color")
+        led_matrix_1.show('A W', wait=False)
+
+        GRIPPER_LOCK.set_angle(60)
+
+        if LEFT_RANGING.get_distance() < RIGHT_RANGING.get_distance():
+            AUTO_SIDE = 'R'
+        else:
+            AUTO_SIDE = 'L'
+
+        UPRIGHT_ANGLE = None
+
+        while power_manage_module.is_auto_mode():
+            led_matrix_1.show('A' + str(str(AUTO_SIDE) + str(V_AUTO_STAGE)), wait=False)
+
+            Auto_Maintain_Grip()
+
+            if V_AUTO_STAGE == 0:
+                while FRONT_L_RANGING.get_distance() > 30:
+                    time.sleep(0.001)
+                    Auto_Maintain_Grip()
+                    Move_FB(-150)
+                V_AUTO_STAGE = V_AUTO_STAGE + 1
+                
+            elif V_AUTO_STAGE == 1:
+                if FRONT_L_RANGING.get_distance() > 20:
+                    Move_FB(100)
+                elif FRONT_L_RANGING.get_distance() < 30:
+                    Move_FB(-100)
+                else:
+                    if AUTO_SIDE == "L":
+                        Move_LR(150)
+                    else:
+                        Move_LR(-150)
+
+                FRONT_CAM.open_light()
+                
+                if FRONT_CAM.detect_sign(1):
+                    #FUICK
+                    pass
 
 ## END
 ## END
