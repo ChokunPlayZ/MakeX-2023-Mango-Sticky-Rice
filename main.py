@@ -32,7 +32,7 @@ FRONT_R_RANGING = ranging_sensor_class("PORT5", "INDEX4")
 
 # Gripper
 GRIPPER_RANGING = ranging_sensor_class("PORT4", "INDEX1")
-GRIPPER_LOCK = servo_driver_class("PORT4", "INDEX1")
+# GRIPPER_LOCK = servo_driver_class("PORT4", "INDEX1")
 
 # Debugging Hardware
 led_matrix_1 = led_matrix_class("PORT4", "INDEX1")
@@ -150,7 +150,7 @@ def Auto_stage1():
         RIGHT_CAM.set_mode("color")
         led_matrix_1.show('A W', wait=False)
 
-        GRIPPER_LOCK.set_angle(60)
+        # GRIPPER_LOCK.set_angle(60)
 
         if LEFT_RANGING.get_distance() < RIGHT_RANGING.get_distance():
             AUTO_SIDE = 'R'
@@ -338,7 +338,7 @@ def Auto_stage2():
         RIGHT_CAM.set_mode("color")
         led_matrix_1.show('A W', wait=False)
 
-        GRIPPER_LOCK.set_angle(60)
+        # GRIPPER_LOCK.set_angle(60)
 
         if LEFT_RANGING.get_distance() < RIGHT_RANGING.get_distance():
             AUTO_SIDE = 'R'
@@ -582,7 +582,7 @@ BRUSHLESS_SERVO.move_to(0, 50)
 Motor_Control(0, 0, 0, 0)
 led_matrix_1.show('OK!', wait = False)
 power_expand_board.set_power("DC4", DC_LOCK_V)
-GRIPPER_LOCK.set_angle(0)
+# GRIPPER_LOCK.set_angle(0)
 
 while True:
     # led_matrix_1.show(round(FRONT_CAM.get_sign_x(1), 1))
@@ -591,7 +591,7 @@ while True:
     # led_matrix_1.show(FRONT_L_RANGING.get_distance(), wait=False)
     Motor_Safety_CTL()
     if button_1.is_pressed():
-        GRIPPER_LOCK.set_angle(60)
+        # GRIPPER_LOCK.set_angle(60)
         FRONT_CAM.set_mode("color")
         LEFT_CAM.set_mode("color")
         RIGHT_CAM.set_mode("color")
@@ -604,7 +604,7 @@ while True:
         LEFT_CAM.close_light()
         RIGHT_CAM.close_light()
 
-        GRIPPER_LOCK.set_angle(0)
+        # GRIPPER_LOCK.set_angle(0)
 
     if power_manage_module.is_auto_mode():
         Auto_stage1()
