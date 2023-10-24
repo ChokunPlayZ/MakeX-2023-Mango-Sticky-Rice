@@ -371,10 +371,37 @@ def Auto_stage2():
                         Move_LR(-150)
 
                 FRONT_CAM.open_light()
-                
+                done = False
                 if FRONT_CAM.detect_sign(1):
-                    #FUICK
-                    pass
+                    while not done:
+                        if FRONT_CAM.get_sign_x(1) > 140 and FRONT_CAM.get_sign_x(1) < 170:
+                            # Kill all motor power
+                            Motor_RPM(0,0,0,0)
+                            
+                            Auto_Grip()
+
+                            done = True
+                            continue
+                        # if the block is on the left slide to the left
+                        elif FRONT_CAM.get_sign_x(1) < 140:
+                            Move_LR(50)
+                        # if the block is on the right slide to the right
+                        elif FRONT_CAM.get_sign_x(1) > 170:
+                            Move_LR(-50)
+                        if not FRONT_CAM.detect_sign(1):
+                            done = True
+                            continue
+                    if LEFT_RANGING.get_distance() > 60:
+                        Auto_Turn(50)
+                        power_expand_board.set_power("DC5", -100)
+                        Auto_Turn(30)
+                    else :
+                        Auto_Turn(-45)
+                        power_expand_board.set_power("DC5", -100)
+                        Auto_Turn(-30)
+                
+                power_expand_board.set_power("DC5",0)
+                FRONT_CAM.close_light()
 
 ## END
 ## END
@@ -444,7 +471,7 @@ def S1_Keymap ():
 
     # Brushless Angle
     if gamepad.is_key_pressed("+"):
-        BRUSHLESS_SERVO.move_to(-9, 100)
+        BRUSHLESS_SERVO.move_to(-8, 100)
         # BRUSHLESS_SERVO.move(1, 50)
     elif gamepad.is_key_pressed("≡"):
         BRUSHLESS_SERVO.move_to(-3, 100)
