@@ -356,7 +356,7 @@ def Auto_stage2():
                 while FRONT_L_RANGING.get_distance() > 30:
                     time.sleep(0.001)
                     Auto_Maintain_Grip()
-                    Move_FB(-150)
+                    Move_FB(150)
                 V_AUTO_STAGE = V_AUTO_STAGE + 1
                 
             elif V_AUTO_STAGE == 1:
@@ -471,7 +471,7 @@ def S1_Keymap ():
 
     # Brushless Angle
     if gamepad.is_key_pressed("+"):
-        BRUSHLESS_SERVO.move_to(-8, 100)
+        BRUSHLESS_SERVO.move_to(-9, 100)
         # BRUSHLESS_SERVO.move(1, 50)
     elif gamepad.is_key_pressed("≡"):
         BRUSHLESS_SERVO.move_to(-3, 100)
@@ -514,16 +514,16 @@ def S2_Keymap ():
 def S3_Keymap ():
     if gamepad.is_key_pressed("N1"):
         #Release
-        BUTTOM_GRIPPER.move_to(-77, 50)
+        BUTTOM_GRIPPER.move_to(0, 50)
     elif gamepad.is_key_pressed("N4"):
         #Grab Block
-        BUTTOM_GRIPPER.move_to(-73, 50)
+        BUTTOM_GRIPPER.move_to(-75, 50)
     elif gamepad.is_key_pressed("N2"):
         #Grab pin top
-        BUTTOM_GRIPPER.move_to(-89, 50)
+        BUTTOM_GRIPPER.move_to(-92, 50)
     elif gamepad.is_key_pressed("N3"):
         # Grab Pin Buttom
-        BUTTOM_GRIPPER.move_to(-81, 50)
+        BUTTOM_GRIPPER.move_to(-84, 50)
     elif gamepad.is_key_pressed("L1"):
         # Grab Block 2
         BUTTOM_GRIPPER.move_to(-75, 50)
@@ -532,9 +532,9 @@ def S3_Keymap ():
         BUTTOM_GRIPPER.move_to(-86, 50)
 
     if gamepad.is_key_pressed("Down"):
-        BUTTOM_GRIPPER.move(3, 100)
+        BUTTOM_GRIPPER.move(5, 100)
     elif gamepad.is_key_pressed("Up"):
-        BUTTOM_GRIPPER.move(-3, 100)
+        BUTTOM_GRIPPER.move(-5, 100)
 
 def feeder_control ():
     if gamepad.is_key_pressed("N1"):
