@@ -134,11 +134,7 @@ def Auto_stage2():
         BL_ENCODE_M3.set_power(0)
         FL_ENCODE_M4.set_power(0)
         FRONT_TOP_CAM.set_mode("color")
-        LEFT_CAM.set_mode("color")
-        RIGHT_CAM.set_mode("color")
         led_matrix_1.show('A W', wait=False)
-
-        # GRIPPER_LOCK.set_angle(60)
 
         if LEFT_RANGING.get_distance() < RIGHT_RANGING.get_distance():
             AUTO_SIDE = 'R'
