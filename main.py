@@ -102,12 +102,12 @@ def Auto_Turn(degree:int):
 def Auto_Grip():
     # GRIP START DO NOT CHANGE
     # prep the spinner and angle
-    GRIPPER_ANGLE.move_to(45, 50)
+    GRIPPER_ANGLE.move_to(45, 200)
     power_expand_board.set_power("DC5", 100)
     
     # move forward until the block is in the gripper
     Move_FB(100)
-    while (FRONT_L_RANGING.get_distance() > 5 and FRONT_R_RANGING.get_distance() > 5) and not (FRONT_L_RANGING.get_distance() == 200 or FRONT_R_RANGING.get_distance() == 200) : 
+    while (FRONT_L_RANGING.get_distance() > 5 and FRONT_R_RANGING.get_distance() > 5): 
         power_expand_board.set_power("DC5", 100)
         Auto_Maintain_Grip()
         Move_FB(100)
@@ -118,8 +118,13 @@ def Auto_Grip():
 
     # move backward
     Move_FB(-200)
-    time.sleep(0.5)
+    time.sleep(0.2)
+    GRIPPER_ANGLE.move_to(0, 200)
+    time.sleep(0.2)
+    power_expand_board.set_power("DC5", -100)
+    time.sleep(0.2)
     Move_FB(0)
+    power_expand_board.set_power("DC5", 0)
     # while FRONT_L_RANGING.get_distance() < 25:
     #     Auto_Maintain_Grip()
     #     Move_FB(-100)
@@ -399,17 +404,6 @@ def Auto_stage2():
                         if not FRONT_CAM.detect_sign(1):
                             done = True
                             continue
-                    if LEFT_RANGING.get_distance() > 60:
-                        Auto_Turn(-45)
-                        power_expand_board.set_power("DC5", -100)
-                        Auto_Turn(-30)
-                        Auto_Turn(80)
-                    else :
-                        Auto_Turn(50)
-                        power_expand_board.set_power("DC5", -100)
-                        Auto_Turn(30)
-                        Auto_Turn(-80)
-                        
                 
                 power_expand_board.set_power("DC5",0)
                 FRONT_CAM.close_light()
@@ -576,24 +570,24 @@ power_expand_board.set_power("DC4", DC_LOCK_V)
 
 while True:
     # led_matrix_1.show(round(FRONT_CAM.get_sign_x(1), 1))
-    led_matrix_1.show(round(BRUSHLESS_SERVO.get_value("voltage"), 1))
+    # led_matrix_1.show(round(BRUSHLESS_SERVO.get_value("voltage"), 1))
     # led_matrix_1.show(round(BUTTOM_GRIPPER.get_value("angle"), 1))
-    # led_matrix_1.show(FRONT_L_RANGING.get_distance(), wait=False)
+    led_matrix_1.show(FRONT_L_RANGING.get_distance(), wait=False)
     Motor_Safety_CTL()
     if button_1.is_pressed():
         # GRIPPER_LOCK.set_angle(60)
-        # Auto_Grip()
-        FRONT_CAM.set_mode("color")
-        LEFT_CAM.set_mode("color")
-        RIGHT_CAM.set_mode("color")
+        Auto_Grip()
+        # FRONT_CAM.set_mode("color")
+        # LEFT_CAM.set_mode("color")
+        # RIGHT_CAM.set_mode("color")
 
-        FRONT_CAM.open_light()
-        LEFT_CAM.open_light()
-        RIGHT_CAM.open_light()
-        time.sleep(1)
-        FRONT_CAM.close_light()
-        LEFT_CAM.close_light()
-        RIGHT_CAM.close_light()
+        # FRONT_CAM.open_light()
+        # LEFT_CAM.open_light()
+        # RIGHT_CAM.open_light()
+        # time.sleep(1)
+        # FRONT_CAM.close_light()
+        # LEFT_CAM.close_light()
+        # RIGHT_CAM.close_light()
 
         # GRIPPER_LOCK.set_angle(0)
 
