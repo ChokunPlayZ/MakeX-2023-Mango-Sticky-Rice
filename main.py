@@ -91,6 +91,9 @@ def Auto_Correct_Angle():
         elif FRONT_L_RANGING.get_distance() < FRONT_R_RANGING.get_distance():
             Move_Turn(-25)
 
+def is_within_range(number, target, margin=5):
+    return target - margin <= number <= target + margin
+
 def Auto_Turn(degree:int):
     """Turn Left or Right (+degree for Left, -degree for Right)"""
     target_angle = novapi.get_yaw() + degree
@@ -111,19 +114,18 @@ def Auto_Grip():
     power_expand_board.set_power("DC5", 100)
     
     # move forward until the block is in the gripper
-    while FRONT_L_RANGING.get_distance() > 5 and FRONT_R_RANGING.get_distance() > 5 : 
+    Move_FB(100)
+    while (FRONT_L_RANGING.get_distance() > 5 and FRONT_R_RANGING.get_distance() > 5) or not (FRONT_L_RANGING.get_distance() == 200 and FRONT_R_RANGING.get_distance() == 200) : 
         power_expand_board.set_power("DC5", 100)
         Auto_Maintain_Grip()
         Move_FB(100)
         time.sleep(0.001)
-    time.sleep(0.5)
     
     # stop the spinner
-    power_expand_board.set_power("DC5", 0) 
+    power_expand_board.set_power("DC5", 0)
 
     # move backward
     Move_FB(-100)
-    time.sleep(0.5)
     while FRONT_L_RANGING.get_distance() < 25:
         Auto_Maintain_Grip()
         Move_FB(-100)
@@ -360,15 +362,23 @@ def Auto_stage2():
                 V_AUTO_STAGE = V_AUTO_STAGE + 1
                 
             elif V_AUTO_STAGE == 1:
-                if FRONT_L_RANGING.get_distance() > 20:
+
+                if LEFT_RANGING.get_distance() < 50:
+                    Move_FB(0)
+                    V_AUTO_STAGE = V_AUTO_STAGE + 1
+                    continue
+
+                if FRONT_L_RANGING.get_distance() > 35:
                     Move_FB(100)
-                elif FRONT_L_RANGING.get_distance() < 30:
+                elif FRONT_L_RANGING.get_distance() < 15:
                     Move_FB(-100)
                 else:
                     if AUTO_SIDE == "L":
                         Move_LR(150)
                     else:
                         Move_LR(-150)
+                
+                # if the robot rotate too much, correct it
 
                 FRONT_CAM.open_light()
                 done = False
@@ -392,13 +402,16 @@ def Auto_stage2():
                             done = True
                             continue
                     if LEFT_RANGING.get_distance() > 60:
-                        Auto_Turn(50)
-                        power_expand_board.set_power("DC5", -100)
-                        Auto_Turn(30)
-                    else :
                         Auto_Turn(-45)
                         power_expand_board.set_power("DC5", -100)
                         Auto_Turn(-30)
+                        Auto_Turn(80)
+                    else :
+                        Auto_Turn(50)
+                        power_expand_board.set_power("DC5", -100)
+                        Auto_Turn(30)
+                        Auto_Turn(-80)
+                        
                 
                 power_expand_board.set_power("DC5",0)
                 FRONT_CAM.close_light()
@@ -471,7 +484,7 @@ def S1_Keymap ():
 
     # Brushless Angle
     if gamepad.is_key_pressed("+"):
-        BRUSHLESS_SERVO.move_to(-9, 100)
+        BRUSHLESS_SERVO.move_to(-11, 100)
         # BRUSHLESS_SERVO.move(1, 50)
     elif gamepad.is_key_pressed("≡"):
         BRUSHLESS_SERVO.move_to(-3, 100)
@@ -510,7 +523,6 @@ def S2_Keymap ():
     elif gamepad.is_key_pressed("L1"):
         GRIPPER_ANGLE.move_to(45, 50)
         
-
 def S3_Keymap ():
     if gamepad.is_key_pressed("N1"):
         #Release
@@ -530,11 +542,14 @@ def S3_Keymap ():
     elif gamepad.is_key_pressed("R1"):
         # Grab Pin Buttom
         BUTTOM_GRIPPER.move_to(-86, 50)
-
-    if gamepad.is_key_pressed("Down"):
-        BUTTOM_GRIPPER.move(5, 100)
+    elif gamepad.is_key_pressed("Down"):
+        BUTTOM_GRIPPER.set_power(2)
+        # BUTTOM_GRIPPER.move(5, 100)
     elif gamepad.is_key_pressed("Up"):
-        BUTTOM_GRIPPER.move(-5, 100)
+        BUTTOM_GRIPPER.set_power(-2)
+        # BUTTOM_GRIPPER.move(-5, 100)
+    else:
+        BUTTOM_GRIPPER.set_power(0)
 
 def feeder_control ():
     if gamepad.is_key_pressed("N1"):
@@ -592,6 +607,7 @@ while True:
     Motor_Safety_CTL()
     if button_1.is_pressed():
         # GRIPPER_LOCK.set_angle(60)
+        # Auto_Grip()
         FRONT_CAM.set_mode("color")
         LEFT_CAM.set_mode("color")
         RIGHT_CAM.set_mode("color")
@@ -607,7 +623,7 @@ while True:
         # GRIPPER_LOCK.set_angle(0)
 
     if power_manage_module.is_auto_mode():
-        Auto_stage1()
+        Auto_stage2()
     else:
         if gamepad.is_key_pressed("L2") and gamepad.is_key_pressed("R2"):
             led_matrix_1.show('K1', wait = False)
