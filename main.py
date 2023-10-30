@@ -83,14 +83,6 @@ def Auto_Maintain_Grip():
     else:
         power_expand_board.set_power("DC4", DC_LOCK_V)
 
-def Auto_Correct_Angle():
-    tolerance = 2
-    while abs(FRONT_L_RANGING.get_distance() - FRONT_R_RANGING.get_distance()) > tolerance:
-        if FRONT_L_RANGING.get_distance() > FRONT_R_RANGING.get_distance():
-            Move_Turn(25)
-        elif FRONT_L_RANGING.get_distance() < FRONT_R_RANGING.get_distance():
-            Move_Turn(-25)
-
 def is_within_range(number, target, margin=5):
     return target - margin <= number <= target + margin
 
@@ -115,7 +107,7 @@ def Auto_Grip():
     
     # move forward until the block is in the gripper
     Move_FB(100)
-    while (FRONT_L_RANGING.get_distance() > 5 and FRONT_R_RANGING.get_distance() > 5) or not (FRONT_L_RANGING.get_distance() == 200 and FRONT_R_RANGING.get_distance() == 200) : 
+    while (FRONT_L_RANGING.get_distance() > 5 and FRONT_R_RANGING.get_distance() > 5) and not (FRONT_L_RANGING.get_distance() == 200 or FRONT_R_RANGING.get_distance() == 200) : 
         power_expand_board.set_power("DC5", 100)
         Auto_Maintain_Grip()
         Move_FB(100)
@@ -125,10 +117,12 @@ def Auto_Grip():
     power_expand_board.set_power("DC5", 0)
 
     # move backward
-    Move_FB(-100)
-    while FRONT_L_RANGING.get_distance() < 25:
-        Auto_Maintain_Grip()
-        Move_FB(-100)
+    Move_FB(-200)
+    time.sleep(0.5)
+    Move_FB(0)
+    # while FRONT_L_RANGING.get_distance() < 25:
+    #     Auto_Maintain_Grip()
+    #     Move_FB(-100)
     # GRIP END DO NOT CHANGE
 
 def Auto_stage1():
@@ -347,7 +341,7 @@ def Auto_stage2():
         else:
             AUTO_SIDE = 'L'
 
-        UPRIGHT_ANGLE = None
+        UPRIGHT_ANGLE = novapi.get_yaw()
 
         while power_manage_module.is_auto_mode():
             led_matrix_1.show('A' + str(str(AUTO_SIDE) + str(V_AUTO_STAGE)), wait=False)
@@ -377,6 +371,10 @@ def Auto_stage2():
                         Move_LR(150)
                     else:
                         Move_LR(-150)
+                
+                # led_matrix_1.show(novapi.get_yaw(), wait=False)
+                # if is_within_range(novapi.get_yaw(), UPRIGHT_ANGLE, margin=10):
+                #     Auto_Turn(UPRIGHT_ANGLE)
                 
                 # if the robot rotate too much, correct it
 
@@ -542,41 +540,18 @@ def S3_Keymap ():
     elif gamepad.is_key_pressed("R1"):
         # Grab Pin Buttom
         BUTTOM_GRIPPER.move_to(-86, 50)
-    elif gamepad.is_key_pressed("Down"):
-        BUTTOM_GRIPPER.set_power(2)
-        # BUTTOM_GRIPPER.move(5, 100)
-    elif gamepad.is_key_pressed("Up"):
-        BUTTOM_GRIPPER.set_power(-2)
-        # BUTTOM_GRIPPER.move(-5, 100)
-    else:
-        BUTTOM_GRIPPER.set_power(0)
 
-def feeder_control ():
-    if gamepad.is_key_pressed("N1"):
-        if B1_ST == 1:
-            power_expand_board.set_power("DC1", 100)
-            power_expand_board.set_power("DC2", 100)
-            B1_ST = 0
-        else:
-            power_expand_board.set_power("DC1", 0)
-            power_expand_board.set_power("DC2", 0)
-            B1_ST = 0
-        time.sleep(0.2)
-    if gamepad.is_key_pressed("L1"):
-        if L1_ST == 1:
-            power_expand_board.set_power("DC2", 100)
-            L1_ST = 0
-        else:
-            power_expand_board.set_power("DC2", 0)
-            L1_ST = 0
-        time.sleep(0.2)
+    if gamepad.is_key_pressed("Down"):
+        BUTTOM_GRIPPER.move(5, 100)
+    elif gamepad.is_key_pressed("Up"):
+        BUTTOM_GRIPPER.move(-5, 100)
 
 def Motor_Safety_CTL ():
     if BUTTOM_GRIPPER.get_value("current") > 500:
         BRUSHLESS_SERVO.set_power(0)
 
 # Control System Config
-Speed_Modifier = 1.6 # หารความเร็วด้วย
+Speed_Modifier = 1.6
 TURN_SPEED_MODIFIER = 1.3
 CTLMODE = 2
 DC_LOCK_V = -5
