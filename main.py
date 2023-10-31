@@ -38,7 +38,7 @@ button_1 = button_class("PORT4", "INDEX1")
 
 # Cameras
 FRONT_TOP_CAM = smart_camera_class("PORT4", "INDEX1")
-FRONT_MID_CAM = smart_camera_class("PORT5", "INDEX1")
+FRONT_MID_CAM = smart_camera_class("PORT5", "INDEX1") 
 
 def Motor_Control(M1, M2, M3, M4):
     BR_ENCODE_M1.set_power(M1)
@@ -134,6 +134,7 @@ def Auto_stage2():
         BL_ENCODE_M3.set_power(0)
         FL_ENCODE_M4.set_power(0)
         FRONT_TOP_CAM.set_mode("color")
+        FRONT_MID_CAM.set_mode("color")
         led_matrix_1.show('A W', wait=False)
 
         if LEFT_RANGING.get_distance() < RIGHT_RANGING.get_distance():
@@ -152,21 +153,31 @@ def Auto_stage2():
                 while FRONT_L_RANGING.get_distance() > 30:
                     time.sleep(0.001)
                     Auto_Maintain_Grip()
-                    Move_FB(150)
+                    Move_FB(200)
                 V_AUTO_STAGE = V_AUTO_STAGE + 1
                 
             elif V_AUTO_STAGE == 1:
 
-                if LEFT_RANGING.get_distance() < 50:
+                if LEFT_RANGING.get_distance() < 20:
                     Move_FB(0)
                     V_AUTO_STAGE = V_AUTO_STAGE + 1
                     continue
 
                 if FRONT_L_RANGING.get_distance() > 35:
-                    Move_FB(100)
+                    Move_FB(50)
                 elif FRONT_L_RANGING.get_distance() < 15:
-                    Move_FB(-100)
+                    Move_FB(-50)
                 else:
+                    if abs(novapi.get_yaw() - UPRIGHT_ANGLE) > 15:
+                        target_angle = UPRIGHT_ANGLE
+                        if novapi.get_yaw() < target_angle:
+                            while novapi.get_yaw() < target_angle:
+                                Auto_Maintain_Grip()
+                                Move_Turn(-100)
+                        elif novapi.get_yaw() > target_angle:
+                            while novapi.get_yaw() > target_angle:
+                                Auto_Maintain_Grip()
+                                Move_Turn(100)
                     if AUTO_SIDE == "L":
                         Move_LR(150)
                     else:
@@ -174,9 +185,9 @@ def Auto_stage2():
                 
                 # if the robot rotate too much, correct it
 
-                FRONT_TOP_CAM.open_light()
+                FRONT_TOP_CAM.close_light()
                 done = False
-                if FRONT_TOP_CAM.detect_sign(1):
+                if FRONT_TOP_CAM.detect_sign(1) and (FRONT_MID_CAM.get_sign_x(1) > 155):
                     while not done:
                         if FRONT_TOP_CAM.get_sign_x(1) > 140 and FRONT_TOP_CAM.get_sign_x(1) < 170:
                             # Kill all motor power
@@ -355,24 +366,28 @@ GRIPPER_ANGLE.move_to(45, 50)
 BUTTOM_GRIPPER.move_to(0, 50)
 BRUSHLESS_SERVO.move_to(0, 50)
 Motor_Control(0, 0, 0, 0)
+
+FRONT_TOP_CAM.set_mode("color")
+FRONT_MID_CAM.set_mode("color")
+
 led_matrix_1.show('OK!', wait = False)
 power_expand_board.set_power("DC4", DC_LOCK_V)
 # GRIPPER_LOCK.set_angle(0)
 
 while True:
-    # led_matrix_1.show(round(FRONT_TOP_CAM.get_sign_x(1), 1))
-    # led_matrix_1.show(round(BRUSHLESS_SERVO.get_value("voltage"), 1))
-    # led_matrix_1.show(round(BUTTOM_GRIPPER.get_value("angle"), 1))
-    led_matrix_1.show(FRONT_L_RANGING.get_distance(), wait=False)
+    led_matrix_1.show(round(BRUSHLESS_SERVO.get_value("voltage"), 1))
     Motor_Safety_CTL()
     if button_1.is_pressed():
         # GRIPPER_LOCK.set_angle(60)
-        Auto_Grip()
-        # FRONT_TOP_CAM.set_mode("color")
+        # Auto_Grip()
+        FRONT_TOP_CAM.set_mode("color")
+        FRONT_MID_CAM.set_mode("color")
 
-        # FRONT_TOP_CAM.open_light()
-        # time.sleep(1)
-        # FRONT_TOP_CAM.close_light()
+        FRONT_TOP_CAM.open_light()
+        FRONT_MID_CAM.open_light()
+        time.sleep(1)
+        FRONT_TOP_CAM.close_light()
+        FRONT_MID_CAM.close_light()
 
         # GRIPPER_LOCK.set_angle(0)
 
