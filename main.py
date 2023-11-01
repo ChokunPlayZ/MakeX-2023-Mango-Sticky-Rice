@@ -178,9 +178,9 @@ def Auto_stage2():
                             Move_Turn(-100)
                     else:
                         if AUTO_SIDE == "L":
-                            Move_LR(150)
+                            Move_LR(200)
                         else:
-                            Move_LR(-150)
+                            Move_LR(-200)
                 
                 # if the robot rotate too much, correct it
 
