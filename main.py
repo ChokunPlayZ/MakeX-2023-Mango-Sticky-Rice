@@ -147,7 +147,7 @@ def Auto_stage2():
         UPRIGHT_ANGLE = novapi.get_yaw()
 
         while power_manage_module.is_auto_mode():
-            led_matrix_1.show('A' + str(str(AUTO_SIDE) + str(V_AUTO_STAGE)), wait=False)
+            # led_matrix_1.show('A' + str(str(AUTO_SIDE) + str(V_AUTO_STAGE)), wait=False)
 
             Auto_Maintain_Grip()
 
@@ -160,7 +160,7 @@ def Auto_stage2():
                 
             elif V_AUTO_STAGE == 1:
 
-                if LEFT_RANGING.get_distance() < 20:
+                if LEFT_RANGING.get_distance() < 30:
                     Move_FB(0)
                     V_AUTO_STAGE = V_AUTO_STAGE + 1
                     continue
@@ -170,16 +170,17 @@ def Auto_stage2():
                 elif FRONT_L_RANGING.get_distance() < 15:
                     Move_FB(-50)
                 else:
-                    # Mango's NoDrift(tm) V2
+                    # Mango's NoDrift(tm) V3
                     if abs(FRONT_L_RANGING.get_distance() - FRONT_R_RANGING.get_distance()) > 5:
                         if FRONT_L_RANGING.get_distance() > FRONT_R_RANGING.get_distance():
-                            Move_Turn(-100)
-                        else:
                             Move_Turn(100)
-                    if AUTO_SIDE == "L":
-                        Move_LR(150)
+                        else:
+                            Move_Turn(-100)
                     else:
-                        Move_LR(-150)
+                        if AUTO_SIDE == "L":
+                            Move_LR(150)
+                        else:
+                            Move_LR(-150)
                 
                 # if the robot rotate too much, correct it
 
