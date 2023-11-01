@@ -18,6 +18,8 @@ BR_ENCODE_M1 = encoder_motor_class("M1", "INDEX1")
 FR_ENCODE_M2 = encoder_motor_class("M2", "INDEX1")
 BL_ENCODE_M3 = encoder_motor_class("M3", "INDEX1")
 FL_ENCODE_M4 = encoder_motor_class("M4", "INDEX1")
+
+# Servos
 BRUSHLESS_SERVO = smartservo_class("M5", "INDEX1")
 BUTTOM_GRIPPER = smartservo_class("M5", "INDEX2")
 GRIPPER_ANGLE = smartservo_class("M5", "INDEX3")
@@ -168,16 +170,12 @@ def Auto_stage2():
                 elif FRONT_L_RANGING.get_distance() < 15:
                     Move_FB(-50)
                 else:
-                    if abs(novapi.get_yaw() - UPRIGHT_ANGLE) > 15:
-                        target_angle = UPRIGHT_ANGLE
-                        if novapi.get_yaw() < target_angle:
-                            while novapi.get_yaw() < target_angle:
-                                Auto_Maintain_Grip()
-                                Move_Turn(-100)
-                        elif novapi.get_yaw() > target_angle:
-                            while novapi.get_yaw() > target_angle:
-                                Auto_Maintain_Grip()
-                                Move_Turn(100)
+                    # Mango's NoDrift(tm) V2
+                    if abs(FRONT_L_RANGING.get_distance() - FRONT_R_RANGING.get_distance()) > 5:
+                        if FRONT_L_RANGING.get_distance() > FRONT_R_RANGING.get_distance():
+                            Move_Turn(-100)
+                        else:
+                            Move_Turn(100)
                     if AUTO_SIDE == "L":
                         Move_LR(150)
                     else:
