@@ -294,10 +294,10 @@ def Auto_stage2():
                             continue
                         # if the block is on the left slide to the left
                         elif FRONT_TOP_CAM.get_sign_x(1) < 140:
-                            Move_LR(50)
+                            Move_LR(70)
                         # if the block is on the right slide to the right
                         elif FRONT_TOP_CAM.get_sign_x(1) > 170:
-                            Move_LR(-50)
+                            Move_LR(-70)
                         if not FRONT_TOP_CAM.detect_sign(1):
                             done = True
                             continue
