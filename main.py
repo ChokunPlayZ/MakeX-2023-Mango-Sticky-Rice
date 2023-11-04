@@ -455,10 +455,10 @@ def S3_Keymap ():
         BUTTOM_GRIPPER.move_to(-92, 50)
     elif gamepad.is_key_pressed("N3"):
         # Grab Pin Buttom
-        BUTTOM_GRIPPER.move_to(-84, 50)
+        BUTTOM_GRIPPER.move_to(-82, 50)
     elif gamepad.is_key_pressed("L1"):
         # Grab Block 2
-        BUTTOM_GRIPPER.move_to(-75, 50)
+        BUTTOM_GRIPPER.move_to(-77, 50)
     elif gamepad.is_key_pressed("R1"):
         # Grab Pin Buttom
         BUTTOM_GRIPPER.move_to(-86, 50)
@@ -501,7 +501,8 @@ power_expand_board.set_power("DC4", DC_LOCK_V)
 # GRIPPER_LOCK.set_angle(0)
 
 while True:
-    led_matrix_1.show(round(BRUSHLESS_SERVO.get_value("voltage"), 1))
+    # led_matrix_1.show(round(BRUSHLESS_SERVO.get_value("voltage"), 1))
+    led_matrix_1.show(BUTTOM_GRIPPER.get_value("angle"), wait=False)
     # led_matrix_1.show(FRONT_L_RANGING.get_distance(), wait=False)
     Motor_Safety_CTL()
     if button_1.is_pressed():
