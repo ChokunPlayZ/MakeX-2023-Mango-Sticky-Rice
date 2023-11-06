@@ -107,26 +107,25 @@ def Auto_Grip():
     Move_FB(100)
     while (FRONT_L_RANGING.get_distance() > 5 and FRONT_R_RANGING.get_distance() > 5): 
         Auto_Maintain_Grip()
-        if abs(FRONT_L_RANGING.get_distance() - FRONT_R_RANGING.get_distance()) > 3:
+        if abs(FRONT_L_RANGING.get_distance() - FRONT_R_RANGING.get_distance()) > 4:
             if FRONT_L_RANGING.get_distance() > FRONT_R_RANGING.get_distance():
                 Move_Turn(50)
             else:
                 Move_Turn(-50)
         else:
-            if FRONT_TOP_CAM.get_sign_x(1) > 140 and FRONT_TOP_CAM.get_sign_x(1) < 170:
+            if FRONT_TOP_CAM.get_sign_x(1) > 120 and FRONT_TOP_CAM.get_sign_x(1) < 180:
                 power_expand_board.set_power("DC5", 100)
                 Auto_Maintain_Grip()
                 Move_FB(100)
                 time.sleep(0.001)
             # if the block is on the left slide to the left
-            elif FRONT_TOP_CAM.get_sign_x(1) < 140:
+            elif FRONT_TOP_CAM.get_sign_x(1) < 120:
                 Move_LR(50)
             # if the block is on the right slide to the right
-            elif FRONT_TOP_CAM.get_sign_x(1) > 170:
+            elif FRONT_TOP_CAM.get_sign_x(1) > 180:
                 Move_LR(-50)
             if not FRONT_TOP_CAM.detect_sign(1):
-                break
-            
+                return
     
     # stop the spinner
     power_expand_board.set_power("DC5", 0)
@@ -283,17 +282,6 @@ def Auto_stage2():
                 
             elif V_AUTO_STAGE == 1:
 
-                if AUTO_SIDE == "L":
-                    if LEFT_RANGING.get_distance() < 35:
-                        Move_FB(0)
-                        V_AUTO_STAGE = V_AUTO_STAGE + 1
-                        continue
-                else:
-                    if RIGHT_RANGING.get_distance() < 35:
-                        Move_FB(0)
-                        V_AUTO_STAGE = V_AUTO_STAGE + 1
-                        continue
-
                 if FRONT_L_RANGING.get_distance() > 40:
                     Move_FB(60)
                 elif FRONT_L_RANGING.get_distance() < 15:
@@ -315,7 +303,7 @@ def Auto_stage2():
                 done = False
                 if FRONT_TOP_CAM.detect_sign(1) and (FRONT_MID_CAM.get_sign_x(1) > 155):
                     while not done:
-                        if FRONT_TOP_CAM.get_sign_x(1) > 140 and FRONT_TOP_CAM.get_sign_x(1) < 170:
+                        if FRONT_TOP_CAM.get_sign_x(1) > 135 and FRONT_TOP_CAM.get_sign_x(1) < 175:
                             # Kill all motor power
                             Motor_RPM(0,0,0,0)
                             
@@ -324,13 +312,24 @@ def Auto_stage2():
                             done = True
                             continue
                         # if the block is on the left slide to the left
-                        elif FRONT_TOP_CAM.get_sign_x(1) < 140:
-                            Move_LR(70)
+                        elif FRONT_TOP_CAM.get_sign_x(1) < 135:
+                            Move_LR(50)
                         # if the block is on the right slide to the right
-                        elif FRONT_TOP_CAM.get_sign_x(1) > 170:
-                            Move_LR(-70)
+                        elif FRONT_TOP_CAM.get_sign_x(1) > 175:
+                            Move_LR(-50)
                         if not FRONT_TOP_CAM.detect_sign(1):
                             done = True
+                            continue
+                else:
+                    if AUTO_SIDE == "L":
+                        if LEFT_RANGING.get_distance() < 35:
+                            Move_FB(0)
+                            V_AUTO_STAGE = V_AUTO_STAGE + 1
+                            continue
+                    else:
+                        if RIGHT_RANGING.get_distance() < 35:
+                            Move_FB(0)
+                            V_AUTO_STAGE = V_AUTO_STAGE + 1
                             continue
                 
                 power_expand_board.set_power("DC5",0)
@@ -404,7 +403,7 @@ def S1_Keymap ():
 
     # Brushless Angle
     if gamepad.is_key_pressed("+"):
-        BRUSHLESS_SERVO.move_to(-11, 100)
+        BRUSHLESS_SERVO.move_to(-13, 100)
         # BRUSHLESS_SERVO.move(1, 50)
     elif gamepad.is_key_pressed("≡"):
         BRUSHLESS_SERVO.move_to(-3, 100)
@@ -458,7 +457,7 @@ def S3_Keymap ():
         BUTTOM_GRIPPER.move_to(-82, 50)
     elif gamepad.is_key_pressed("L1"):
         # Grab Block 2
-        BUTTOM_GRIPPER.move_to(-77, 50)
+        BUTTOM_GRIPPER.move_to(-75, 50)
     elif gamepad.is_key_pressed("R1"):
         # Grab Pin Buttom
         BUTTOM_GRIPPER.move_to(-86, 50)
@@ -502,8 +501,8 @@ power_expand_board.set_power("DC4", DC_LOCK_V)
 
 while True:
     # led_matrix_1.show(round(BRUSHLESS_SERVO.get_value("voltage"), 1))
-    led_matrix_1.show(BUTTOM_GRIPPER.get_value("angle"), wait=False)
-    # led_matrix_1.show(FRONT_L_RANGING.get_distance(), wait=False)
+    # led_matrix_1.show(BUTTOM_GRIPPER.get_value("angle"), wait=False)
+    led_matrix_1.show(FRONT_TOP_CAM.get_sign_x(1), wait=False)
     Motor_Safety_CTL()
     if button_1.is_pressed():
         # GRIPPER_LOCK.set_angle(60)
@@ -524,16 +523,25 @@ while True:
     else:
         if gamepad.is_key_pressed("L2") and gamepad.is_key_pressed("R2"):
             led_matrix_1.show('K1', wait = False)
+            power_expand_board.set_power("DC4", DC_LOCK_V)
+            power_expand_board.set_power("DC5", 0)
             CTLMODE = 1
         elif gamepad.is_key_pressed("L1") and gamepad.is_key_pressed("R1"):
             led_matrix_1.show('K2', wait = False)
+            power_expand_board.set_power("DC4", DC_LOCK_V)
             CTLMODE = 2
         elif gamepad.is_key_pressed("+") and gamepad.is_key_pressed("≡"):
             led_matrix_1.show('K3', wait = False)
+            power_expand_board.set_power("DC4", DC_LOCK_V)
+            power_expand_board.set_power("DC5", 0)
             CTLMODE = 3
 
         if CTLMODE == 1:
             BUTTOM_GRIPPER.move_to(0, 50)
+            if GRIPPER_RANGING.get_distance() < 40:
+                power_expand_board.set_power("DC4", 50)
+            else:
+                power_expand_board.set_power("DC4", DC_LOCK_V)
             Movement()
             S1_Keymap()
         elif CTLMODE == 2:
@@ -541,5 +549,12 @@ while True:
             Reverse_movement()
             S2_Keymap()
         elif CTLMODE == 3:
+            BUTTOM_GRIPPER.move_to(0, 50)
+            if GRIPPER_RANGING.get_distance() > 30:
+                power_expand_board.set_power("DC4", -50)
+            elif GRIPPER_RANGING.get_distance() < 25:
+                power_expand_board.set_power("DC4", 50)
+            else:
+                power_expand_board.set_power("DC4", DC_LOCK_V)
             Reverse_movement()
             S3_Keymap()
