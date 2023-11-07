@@ -590,10 +590,10 @@ while True:
             else:
                 AUTO_SIDE = 'R'
             # avoid ball 2 blocks
-            # Auto_stage1()
+            Auto_stage1()
 
             # avoid ball 3 blocks
-            Auto_stage2()
+            # Auto_stage2()
 
             # ULTIMATE TOOL
             # Auto_stage99()
@@ -615,7 +615,7 @@ while True:
 
         if CTLMODE == 1:
             BUTTOM_GRIPPER.move_to(0, 50)
-            if GRIPPER_RANGING.get_distance() < 40:
+            if GRIPPER_RANGING.get_distance() < 35:
                 power_expand_board.set_power("DC4", 50)
             else:
                 power_expand_board.set_power("DC4", DC_LOCK_V)
@@ -626,11 +626,10 @@ while True:
             Reverse_movement()
             S2_Keymap()
         elif CTLMODE == 3:
-            BUTTOM_GRIPPER.move_to(0, 50)
-            if GRIPPER_RANGING.get_distance() > 30:
-                power_expand_board.set_power("DC4", -50)
-            elif GRIPPER_RANGING.get_distance() < 25:
-                power_expand_board.set_power("DC4", 50)
+            if GRIPPER_RANGING.get_distance() > 20:
+                power_expand_board.set_power("DC4", -100)
+            elif GRIPPER_RANGING.get_distance() < 15:
+                power_expand_board.set_power("DC4", 10)
             else:
                 power_expand_board.set_power("DC4", DC_LOCK_V)
             Reverse_movement()
