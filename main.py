@@ -188,10 +188,16 @@ def Auto_stage1():
             
         elif V_AUTO_STAGE == 4:
 
-            if RIGHT_RANGING.get_distance() < 35:
-                Move_FB(0)
-                V_AUTO_STAGE = V_AUTO_STAGE + 1
-                continue
+            if AUTO_SIDE == "L":
+                if LEFT_RANGING.get_distance() < 35:
+                    Move_FB(0)
+                    V_AUTO_STAGE = V_AUTO_STAGE + 1
+                    continue
+            else:
+                if RIGHT_RANGING.get_distance() < 35:
+                    Move_FB(0)
+                    V_AUTO_STAGE = V_AUTO_STAGE + 1
+                    continue
 
             if FRONT_L_RANGING.get_distance() > 35:
                 Move_FB(50)
@@ -276,9 +282,9 @@ def Auto_stage2():
                     continue
             else:
                 if RIGHT_RANGING.get_distance() < 35:
-                        Move_FB(0)
-                        V_AUTO_STAGE = V_AUTO_STAGE + 1
-                        continue
+                    Move_FB(0)
+                    V_AUTO_STAGE = V_AUTO_STAGE + 1
+                    continue
 
             if FRONT_L_RANGING.get_distance() > 35:
                 Move_FB(50)
