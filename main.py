@@ -98,48 +98,6 @@ def Auto_Turn(degree:int):
             Move_Turn(100)
     Motor_RPM(0, 0, 0, 0)
 
-def Auto_Grip():
-    # prep the spinner and angle
-    GRIPPER_ANGLE.move_to(45, 200)
-    power_expand_board.set_power("DC5", 100)
-    
-    # move forward until the block is in the gripper
-    Move_FB(100)
-    while (FRONT_L_RANGING.get_distance() > 5 and FRONT_R_RANGING.get_distance() > 5): 
-        Auto_Maintain_Grip()
-        if abs(FRONT_L_RANGING.get_distance() - FRONT_R_RANGING.get_distance()) > 4:
-            if FRONT_L_RANGING.get_distance() > FRONT_R_RANGING.get_distance():
-                Move_Turn(50)
-            else:
-                Move_Turn(-50)
-        else:
-            if FRONT_TOP_CAM.get_sign_x(1) > 120 and FRONT_TOP_CAM.get_sign_x(1) < 180:
-                power_expand_board.set_power("DC5", 100)
-                Auto_Maintain_Grip()
-                Move_FB(100)
-                time.sleep(0.001)
-            # if the block is on the left slide to the left
-            elif FRONT_TOP_CAM.get_sign_x(1) < 120:
-                Move_LR(50)
-            # if the block is on the right slide to the right
-            elif FRONT_TOP_CAM.get_sign_x(1) > 180:
-                Move_LR(-50)
-            if not FRONT_TOP_CAM.detect_sign(1):
-                return
-    
-    # stop the spinner
-    power_expand_board.set_power("DC5", 0)
-
-    # move backward
-    Move_FB(-200)
-    time.sleep(0.2)
-    GRIPPER_ANGLE.move_to(0, 200)
-    time.sleep(0.2)
-    power_expand_board.set_power("DC5", -100)
-    time.sleep(0.2)
-    Move_FB(0)
-    # power_expand_board.set_power("DC5", 0)
-
 def No_Drift():
     """run the nodrift code and sends back weather or not the code is executed"""
     # Mango's NoDrift(tm) V3
@@ -151,6 +109,76 @@ def No_Drift():
         return False
     else:
         return True
+    
+def maintain_disatnace():
+    if FRONT_L_RANGING.get_distance() > 40:
+        Move_FB(50)
+        return False
+    elif FRONT_L_RANGING.get_distance() < 15:
+        Move_FB(-50)
+        return False
+    else:
+        return True
+    
+def auto_align_and_grip():
+    done = False
+    if FRONT_TOP_CAM.detect_sign(1) and (FRONT_MID_CAM.get_sign_x(1) > 155):
+        while not done:
+            if FRONT_TOP_CAM.get_sign_x(1) > 140 and FRONT_TOP_CAM.get_sign_x(1) < 170:
+                # Kill all motor power
+                Motor_RPM(0,0,0,0)
+                
+                # prep the spinner and angle
+                GRIPPER_ANGLE.move_to(45, 200)
+                power_expand_board.set_power("DC5", 100)
+                
+                # move forward until the block is in the gripper
+                Move_FB(100)
+                while (FRONT_L_RANGING.get_distance() > 5 and FRONT_R_RANGING.get_distance() > 5): 
+                    Auto_Maintain_Grip()
+                    if abs(FRONT_L_RANGING.get_distance() - FRONT_R_RANGING.get_distance()) > 4:
+                        if FRONT_L_RANGING.get_distance() > FRONT_R_RANGING.get_distance():
+                            Move_Turn(50)
+                        else:
+                            Move_Turn(-50)
+                    else:
+                        if FRONT_TOP_CAM.get_sign_x(1) > 120 and FRONT_TOP_CAM.get_sign_x(1) < 180:
+                            power_expand_board.set_power("DC5", 100)
+                            Auto_Maintain_Grip()
+                            Move_FB(100)
+                            time.sleep(0.001)
+                        # if the block is on the left slide to the left
+                        elif FRONT_TOP_CAM.get_sign_x(1) < 120:
+                            Move_LR(50)
+                        # if the block is on the right slide to the right
+                        elif FRONT_TOP_CAM.get_sign_x(1) > 180:
+                            Move_LR(-50)
+                        if not FRONT_TOP_CAM.detect_sign(1):
+                            return
+                
+                # stop the spinner
+                power_expand_board.set_power("DC5", 0)
+
+                # move backward
+                Move_FB(-200)
+                time.sleep(0.2)
+                GRIPPER_ANGLE.move_to(0, 200)
+                time.sleep(0.2)
+                power_expand_board.set_power("DC5", -100)
+                time.sleep(0.2)
+                Move_FB(0)
+
+                done = True
+                return
+            # if the block is on the left slide to the left
+            elif FRONT_TOP_CAM.get_sign_x(1) < 140:
+                Move_LR(50)
+            # if the block is on the right slide to the right
+            elif FRONT_TOP_CAM.get_sign_x(1) > 170:
+                Move_LR(-50)
+            if not FRONT_TOP_CAM.detect_sign(1):
+                done = True
+                return True
 
 def Auto_stage1():
     "avoid ball, 2 blocks"
@@ -212,26 +240,34 @@ def Auto_stage1():
                         Move_LR(200)
 
             FRONT_TOP_CAM.close_light()
-            done = False
             if FRONT_TOP_CAM.detect_sign(1) and (FRONT_MID_CAM.get_sign_x(1) > 155):
-                while not done:
-                    if FRONT_TOP_CAM.get_sign_x(1) > 140 and FRONT_TOP_CAM.get_sign_x(1) < 170:
-                        # Kill all motor power
-                        Motor_RPM(0,0,0,0)
-                        
-                        Auto_Grip()
+                auto_align_and_grip()
+            
+            power_expand_board.set_power("DC5",0)
+            FRONT_TOP_CAM.close_light()
 
-                        done = True
-                        continue
-                    # if the block is on the left slide to the left
-                    elif FRONT_TOP_CAM.get_sign_x(1) < 140:
-                        Move_LR(50)
-                    # if the block is on the right slide to the right
-                    elif FRONT_TOP_CAM.get_sign_x(1) > 170:
-                        Move_LR(-50)
-                    if not FRONT_TOP_CAM.detect_sign(1):
-                        done = True
-                        continue
+        elif V_AUTO_STAGE == 5:
+            if AUTO_SIDE == "L":
+                if RIGHT_RANGING.get_distance() < 35:
+                    Move_FB(0)
+                    V_AUTO_STAGE = V_AUTO_STAGE + 1
+                    continue
+            else:
+                if LEFT_RANGING.get_distance() < 35:
+                    Move_FB(0)
+                    V_AUTO_STAGE = V_AUTO_STAGE + 1
+                    continue
+
+            if maintain_disatnace():
+                # Mango's NoDrift(tm) V3
+                if No_Drift():
+                    if AUTO_SIDE == "R":
+                        Move_LR(200)
+                    else:
+                        Move_LR(-200)
+
+            FRONT_TOP_CAM.close_light()
+            auto_align_and_grip()
             
             power_expand_board.set_power("DC5",0)
             FRONT_TOP_CAM.close_light()
@@ -271,7 +307,7 @@ def Auto_stage2():
 
         elif V_AUTO_STAGE == 3:
             if FRONT_TOP_CAM.get_sign_x(1) < 170:
-                Auto_Grip()
+                auto_align_and_grip()
             V_AUTO_STAGE = V_AUTO_STAGE + 1
             
         elif V_AUTO_STAGE == 4:
@@ -286,11 +322,7 @@ def Auto_stage2():
                     V_AUTO_STAGE = V_AUTO_STAGE + 1
                     continue
 
-            if FRONT_L_RANGING.get_distance() > 35:
-                Move_FB(50)
-            elif FRONT_L_RANGING.get_distance() < 15:
-                Move_FB(-50)
-            else:
+            if maintain_disatnace():
                 # Mango's NoDrift(tm) V3
                 if No_Drift():
                     if AUTO_SIDE == "R":
@@ -299,26 +331,35 @@ def Auto_stage2():
                         Move_LR(200)
 
             FRONT_TOP_CAM.close_light()
-            done = False
             if FRONT_TOP_CAM.detect_sign(1) and (FRONT_MID_CAM.get_sign_x(1) > 155):
-                while not done:
-                    if FRONT_TOP_CAM.get_sign_x(1) > 140 and FRONT_TOP_CAM.get_sign_x(1) < 170:
-                        # Kill all motor power
-                        Motor_RPM(0,0,0,0)
-                        
-                        Auto_Grip()
+                auto_align_and_grip()
+            
+            power_expand_board.set_power("DC5",0)
+            FRONT_TOP_CAM.close_light()
 
-                        done = True
-                        continue
-                    # if the block is on the left slide to the left
-                    elif FRONT_TOP_CAM.get_sign_x(1) < 140:
-                        Move_LR(50)
-                    # if the block is on the right slide to the right
-                    elif FRONT_TOP_CAM.get_sign_x(1) > 170:
-                        Move_LR(-50)
-                    if not FRONT_TOP_CAM.detect_sign(1):
-                        done = True
-                        continue
+        elif V_AUTO_STAGE == 5:
+            if AUTO_SIDE == "L":
+                if RIGHT_RANGING.get_distance() < 35:
+                    Move_FB(0)
+                    V_AUTO_STAGE = V_AUTO_STAGE + 1
+                    continue
+            else:
+                if LEFT_RANGING.get_distance() < 35:
+                    Move_FB(0)
+                    V_AUTO_STAGE = V_AUTO_STAGE + 1
+                    continue
+
+            if maintain_disatnace():
+                # Mango's NoDrift(tm) V3
+                if No_Drift():
+                    if AUTO_SIDE == "R":
+                        Move_LR(200)
+                    else:
+                        Move_LR(-200)
+
+            FRONT_TOP_CAM.close_light()
+            if FRONT_TOP_CAM.detect_sign(1) and (FRONT_MID_CAM.get_sign_x(1) > 155):
+                auto_align_and_grip()
             
             power_expand_board.set_power("DC5",0)
             FRONT_TOP_CAM.close_light()
@@ -340,11 +381,7 @@ def Auto_stage99():
             
         elif V_AUTO_STAGE == 1:
 
-            if FRONT_L_RANGING.get_distance() > 40:
-                Move_FB(60)
-            elif FRONT_L_RANGING.get_distance() < 15:
-                Move_FB(-60)
-            else:
+            if maintain_disatnace():
                 # Mango's NoDrift(tm) V3
                 if No_Drift():
                     if AUTO_SIDE == "L":
@@ -353,26 +390,8 @@ def Auto_stage99():
                         Move_LR(-250)
 
             FRONT_TOP_CAM.close_light()
-            done = False
             if FRONT_TOP_CAM.detect_sign(1) and (FRONT_MID_CAM.get_sign_x(1) > 155):
-                while not done:
-                    if FRONT_TOP_CAM.get_sign_x(1) > 135 and FRONT_TOP_CAM.get_sign_x(1) < 175:
-                        # Kill all motor power
-                        Motor_RPM(0,0,0,0)
-                        
-                        Auto_Grip()
-
-                        done = True
-                        continue
-                    # if the block is on the left slide to the left
-                    elif FRONT_TOP_CAM.get_sign_x(1) < 135:
-                        Move_LR(50)
-                    # if the block is on the right slide to the right
-                    elif FRONT_TOP_CAM.get_sign_x(1) > 175:
-                        Move_LR(-50)
-                    if not FRONT_TOP_CAM.detect_sign(1):
-                        done = True
-                        continue
+                auto_align_and_grip()
             else:
                 if AUTO_SIDE == "R":
                     if LEFT_RANGING.get_distance() < 35:
@@ -553,10 +572,8 @@ power_expand_board.set_power("DC4", DC_LOCK_V)
 # GRIPPER_LOCK.set_angle(0)
 
 while True:
-    # led_matrix_1.show(round(BRUSHLESS_SERVO.get_value("voltage"), 1))
-    led_matrix_1.show(BUTTOM_GRIPPER.get_value("angle"), wait=False)
-    # led_matrix_1.show(FRONT_TOP_CAM.get_sign_x(1), wait=False)
-    # led_matrix_1.show(FRONT_R_RANGING.get_distance(), wait=False)
+    led_matrix_1.show(round(BRUSHLESS_SERVO.get_value("voltage"), 1))
+    # led_matrix_1.show(BUTTOM_GRIPPER.get_value("angle"), wait=False)
     Motor_Safety_CTL()
     if button_1.is_pressed():
         # GRIPPER_LOCK.set_angle(60)
