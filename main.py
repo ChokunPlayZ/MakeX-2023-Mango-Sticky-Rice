@@ -237,7 +237,7 @@ def Auto_stage1():
             FRONT_TOP_CAM.close_light()
 
 def Auto_stage2():
-    "avoid ball, 3 blocks, DO NOT USE ON RIGHT SIDE"
+    "avoid ball, 3 blocks, DO NOT USE ON LEFT SIDE"
     global ENABLE_AUTO, V_AUTO_STAGE, AUTO_SIDE
 
     while power_manage_module.is_auto_mode():
@@ -501,24 +501,24 @@ def S3_Keymap ():
         BUTTOM_GRIPPER.move_to(0, 50)
     elif gamepad.is_key_pressed("N4"):
         #Grab Block
-        BUTTOM_GRIPPER.move_to(-75, 50)
+        BUTTOM_GRIPPER.move_to(80, 50)
     elif gamepad.is_key_pressed("N2"):
         #Grab pin top
-        BUTTOM_GRIPPER.move_to(-92, 50)
+        BUTTOM_GRIPPER.move_to(95, 50)
     elif gamepad.is_key_pressed("N3"):
         # Grab Pin Buttom
-        BUTTOM_GRIPPER.move_to(-82, 50)
+        BUTTOM_GRIPPER.move_to(82, 86)
     elif gamepad.is_key_pressed("L1"):
         # Grab Block 2
-        BUTTOM_GRIPPER.move_to(-75, 50)
+        BUTTOM_GRIPPER.move_to(80, 50)
     elif gamepad.is_key_pressed("R1"):
-        # Grab Pin Buttom
-        BUTTOM_GRIPPER.move_to(-86, 50)
+        # Grab Standing Pin Buttom
+        BUTTOM_GRIPPER.move_to(88, 86)
 
     if gamepad.is_key_pressed("Down"):
-        BUTTOM_GRIPPER.move(5, 100)
+        BUTTOM_GRIPPER.move(1, 100)
     elif gamepad.is_key_pressed("Up"):
-        BUTTOM_GRIPPER.move(-5, 100)
+        BUTTOM_GRIPPER.move(-1, 100)
 
 def Motor_Safety_CTL ():
     if BUTTOM_GRIPPER.get_value("current") > 500:
@@ -553,8 +553,8 @@ power_expand_board.set_power("DC4", DC_LOCK_V)
 # GRIPPER_LOCK.set_angle(0)
 
 while True:
-    led_matrix_1.show(round(BRUSHLESS_SERVO.get_value("voltage"), 1))
-    # led_matrix_1.show(BUTTOM_GRIPPER.get_value("angle"), wait=False)
+    # led_matrix_1.show(round(BRUSHLESS_SERVO.get_value("voltage"), 1))
+    led_matrix_1.show(BUTTOM_GRIPPER.get_value("angle"), wait=False)
     # led_matrix_1.show(FRONT_TOP_CAM.get_sign_x(1), wait=False)
     # led_matrix_1.show(FRONT_R_RANGING.get_distance(), wait=False)
     Motor_Safety_CTL()
@@ -592,7 +592,7 @@ while True:
             # avoid ball 2 blocks
             Auto_stage1()
 
-            # avoid ball 3 blocks
+            # avoid ball 3 blocks (only deploy on left right)
             # Auto_stage2()
 
             # ULTIMATE TOOL
