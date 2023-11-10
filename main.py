@@ -211,7 +211,7 @@ def Auto_stage1():
 
         elif V_AUTO_STAGE == 3:
             if FRONT_TOP_CAM.get_sign_x(1) < 170:
-                Auto_Grip()
+                auto_align_and_grip()
             V_AUTO_STAGE = V_AUTO_STAGE + 1
             
         elif V_AUTO_STAGE == 4:
