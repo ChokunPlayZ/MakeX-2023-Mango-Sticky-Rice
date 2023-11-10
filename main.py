@@ -507,7 +507,7 @@ def S3_Keymap ():
         BUTTOM_GRIPPER.move_to(95, 50)
     elif gamepad.is_key_pressed("N3"):
         # Grab Pin Buttom
-        BUTTOM_GRIPPER.move_to(82, 86)
+        BUTTOM_GRIPPER.move_to(87, 86)
     elif gamepad.is_key_pressed("L1"):
         # Grab Block 2
         BUTTOM_GRIPPER.move_to(80, 50)
@@ -516,9 +516,9 @@ def S3_Keymap ():
         BUTTOM_GRIPPER.move_to(88, 86)
 
     if gamepad.is_key_pressed("Down"):
-        BUTTOM_GRIPPER.move(1, 100)
+        BUTTOM_GRIPPER.move(-5, 100)
     elif gamepad.is_key_pressed("Up"):
-        BUTTOM_GRIPPER.move(-1, 100)
+        BUTTOM_GRIPPER.move(5, 100)
 
 def Motor_Safety_CTL ():
     if BUTTOM_GRIPPER.get_value("current") > 500:
@@ -626,9 +626,9 @@ while True:
             Reverse_movement()
             S2_Keymap()
         elif CTLMODE == 3:
-            if GRIPPER_RANGING.get_distance() > 20:
+            if GRIPPER_RANGING.get_distance() > 15:
                 power_expand_board.set_power("DC4", -100)
-            elif GRIPPER_RANGING.get_distance() < 15:
+            elif GRIPPER_RANGING.get_distance() < 10:
                 power_expand_board.set_power("DC4", 10)
             else:
                 power_expand_board.set_power("DC4", DC_LOCK_V)
