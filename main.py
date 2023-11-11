@@ -111,10 +111,10 @@ def No_Drift():
         return True
     
 def maintain_disatnace():
-    if FRONT_L_RANGING.get_distance() > 40:
+    if FRONT_L_RANGING.get_distance() > 30:
         Move_FB(50)
         return False
-    elif FRONT_L_RANGING.get_distance() < 15:
+    elif FRONT_L_RANGING.get_distance() < 20:
         Move_FB(-50)
         return False
     else:
@@ -124,43 +124,34 @@ def auto_align_and_grip():
     done = False
     if FRONT_TOP_CAM.detect_sign(1) and (FRONT_MID_CAM.get_sign_x(1) > 155):
         while not done:
-            if FRONT_TOP_CAM.get_sign_x(1) > 140 and FRONT_TOP_CAM.get_sign_x(1) < 170:
-                # Kill all motor power
-                Motor_RPM(0,0,0,0)
-                
+            Auto_Maintain_Grip()
+            if FRONT_TOP_CAM.get_sign_x(1) > MIN_X_POS and FRONT_TOP_CAM.get_sign_x(1) < MAX_X_POS:
                 # prep the spinner and angle
                 GRIPPER_ANGLE.move_to(45, 200)
                 power_expand_board.set_power("DC5", 100)
                 
                 # move forward until the block is in the gripper
-                Move_FB(100)
-                while (FRONT_L_RANGING.get_distance() > 5 and FRONT_R_RANGING.get_distance() > 5): 
+                Move_FB(AUTO_RPM)
+                while FRONT_L_RANGING.get_distance() > 5: 
+                    led_matrix_1.show(FRONT_L_RANGING.get_distance(), wait=False)
                     Auto_Maintain_Grip()
-                    if abs(FRONT_L_RANGING.get_distance() - FRONT_R_RANGING.get_distance()) > 4:
-                        if FRONT_L_RANGING.get_distance() > FRONT_R_RANGING.get_distance():
-                            Move_Turn(50)
-                        else:
-                            Move_Turn(-50)
-                    else:
-                        if FRONT_TOP_CAM.get_sign_x(1) > 120 and FRONT_TOP_CAM.get_sign_x(1) < 180:
+                    if No_Drift():
+                        if FRONT_TOP_CAM.get_sign_x(1) > MIN_X_POS and FRONT_TOP_CAM.get_sign_x(1) < MAX_X_POS:
                             power_expand_board.set_power("DC5", 100)
                             Auto_Maintain_Grip()
-                            Move_FB(100)
+                            Move_FB(AUTO_RPM)
                             time.sleep(0.001)
                         # if the block is on the left slide to the left
-                        elif FRONT_TOP_CAM.get_sign_x(1) < 120:
+                        elif FRONT_TOP_CAM.get_sign_x(1) < MIN_X_POS:
                             Move_LR(50)
                         # if the block is on the right slide to the right
-                        elif FRONT_TOP_CAM.get_sign_x(1) > 180:
+                        elif FRONT_TOP_CAM.get_sign_x(1) > MAX_X_POS:
                             Move_LR(-50)
                         if not FRONT_TOP_CAM.detect_sign(1):
                             return
-                
-                # stop the spinner
-                power_expand_board.set_power("DC5", 0)
-
+                        
                 # move backward
-                Move_FB(-200)
+                Move_FB(NEG_AUTO_RPM)
                 time.sleep(0.2)
                 GRIPPER_ANGLE.move_to(0, 200)
                 time.sleep(0.2)
@@ -171,14 +162,14 @@ def auto_align_and_grip():
                 done = True
                 return
             # if the block is on the left slide to the left
-            elif FRONT_TOP_CAM.get_sign_x(1) < 140:
+            elif FRONT_TOP_CAM.get_sign_x(1) < MIN_X_POS:
                 Move_LR(50)
             # if the block is on the right slide to the right
-            elif FRONT_TOP_CAM.get_sign_x(1) > 170:
+            elif FRONT_TOP_CAM.get_sign_x(1) > MAX_X_POS:
                 Move_LR(-50)
             if not FRONT_TOP_CAM.detect_sign(1):
                 done = True
-                return True
+                return
 
 def Auto_stage1():
     "avoid ball, 2 blocks"
@@ -190,27 +181,27 @@ def Auto_stage1():
 
         if V_AUTO_STAGE == 0:
             if AUTO_SIDE == "R":
-                Auto_Turn(20)
+                Auto_Turn(15)
             else:
-                Auto_Turn(-20)
+                Auto_Turn(-15)
             V_AUTO_STAGE = V_AUTO_STAGE + 1
 
         elif V_AUTO_STAGE == 1:
             while BACK_RANGING.get_distance() < 199:
                 time.sleep(0.001)
                 Auto_Maintain_Grip()
-                Move_FB(200)
+                Move_FB(AUTO_RPM)
             V_AUTO_STAGE = V_AUTO_STAGE + 1
 
         elif V_AUTO_STAGE == 2:
             if AUTO_SIDE == "R":
-                Auto_Turn(-20)
+                Auto_Turn(-15)
             else:
-                Auto_Turn(20)
+                Auto_Turn(15)
             V_AUTO_STAGE = V_AUTO_STAGE + 1
 
         elif V_AUTO_STAGE == 3:
-            if FRONT_TOP_CAM.get_sign_x(1) < 170:
+            if FRONT_TOP_CAM.get_sign_x(1) < MAX_X_POS:
                 auto_align_and_grip()
             V_AUTO_STAGE = V_AUTO_STAGE + 1
             
@@ -227,26 +218,20 @@ def Auto_stage1():
                     V_AUTO_STAGE = V_AUTO_STAGE + 1
                     continue
 
-            if FRONT_L_RANGING.get_distance() > 35:
-                Move_FB(50)
-            elif FRONT_L_RANGING.get_distance() < 15:
-                Move_FB(-50)
-            else:
+            if maintain_disatnace():
                 # Mango's NoDrift(tm) V3
                 if No_Drift():
                     if AUTO_SIDE == "R":
-                        Move_LR(-200)
+                        Move_LR(NEG_AUTO_RPM)
                     else:
-                        Move_LR(200)
+                        Move_LR(AUTO_RPM)
 
             FRONT_TOP_CAM.close_light()
             if FRONT_TOP_CAM.detect_sign(1) and (FRONT_MID_CAM.get_sign_x(1) > 155):
                 auto_align_and_grip()
-            
-            power_expand_board.set_power("DC5",0)
             FRONT_TOP_CAM.close_light()
 
-        elif V_AUTO_STAGE == 5:
+        elif V_AUTO_STAGE == 6:
             if AUTO_SIDE == "L":
                 if RIGHT_RANGING.get_distance() < 35:
                     Move_FB(0)
@@ -262,14 +247,12 @@ def Auto_stage1():
                 # Mango's NoDrift(tm) V3
                 if No_Drift():
                     if AUTO_SIDE == "R":
-                        Move_LR(200)
+                        Move_LR(AUTO_RPM)
                     else:
-                        Move_LR(-200)
+                        Move_LR(NEG_AUTO_RPM)
 
             FRONT_TOP_CAM.close_light()
             auto_align_and_grip()
-            
-            power_expand_board.set_power("DC5",0)
             FRONT_TOP_CAM.close_light()
 
 def Auto_stage2():
@@ -295,7 +278,7 @@ def Auto_stage2():
                 while FRONT_L_RANGING.get_distance() > 50:
                     time.sleep(0.001)
                     Auto_Maintain_Grip()
-                    Move_FB(200)
+                    Move_FB(AUTO_RPM)
                 V_AUTO_STAGE = V_AUTO_STAGE + 1
 
         elif V_AUTO_STAGE == 2:
@@ -306,7 +289,7 @@ def Auto_stage2():
             V_AUTO_STAGE = V_AUTO_STAGE + 1
 
         elif V_AUTO_STAGE == 3:
-            if FRONT_TOP_CAM.get_sign_x(1) < 170:
+            if FRONT_TOP_CAM.get_sign_x(1) < MAX_X_POS:
                 auto_align_and_grip()
             V_AUTO_STAGE = V_AUTO_STAGE + 1
             
@@ -326,15 +309,13 @@ def Auto_stage2():
                 # Mango's NoDrift(tm) V3
                 if No_Drift():
                     if AUTO_SIDE == "R":
-                        Move_LR(-200)
+                        Move_LR(NEG_AUTO_RPM)
                     else:
-                        Move_LR(200)
+                        Move_LR(AUTO_RPM)
 
             FRONT_TOP_CAM.close_light()
             if FRONT_TOP_CAM.detect_sign(1) and (FRONT_MID_CAM.get_sign_x(1) > 155):
                 auto_align_and_grip()
-            
-            power_expand_board.set_power("DC5",0)
             FRONT_TOP_CAM.close_light()
 
         elif V_AUTO_STAGE == 5:
@@ -353,15 +334,13 @@ def Auto_stage2():
                 # Mango's NoDrift(tm) V3
                 if No_Drift():
                     if AUTO_SIDE == "R":
-                        Move_LR(200)
+                        Move_LR(AUTO_RPM)
                     else:
-                        Move_LR(-200)
+                        Move_LR(NEG_AUTO_RPM)
 
             FRONT_TOP_CAM.close_light()
             if FRONT_TOP_CAM.detect_sign(1) and (FRONT_MID_CAM.get_sign_x(1) > 155):
                 auto_align_and_grip()
-            
-            power_expand_board.set_power("DC5",0)
             FRONT_TOP_CAM.close_light()
 
 def Auto_stage99():
@@ -376,7 +355,7 @@ def Auto_stage99():
             while FRONT_L_RANGING.get_distance() > 30:
                 time.sleep(0.001)
                 Auto_Maintain_Grip()
-                Move_FB(200)
+                Move_FB(AUTO_RPM)
             V_AUTO_STAGE = V_AUTO_STAGE + 1
             
         elif V_AUTO_STAGE == 1:
@@ -403,8 +382,6 @@ def Auto_stage99():
                         Move_FB(0)
                         V_AUTO_STAGE = V_AUTO_STAGE + 1
                         continue
-            
-            power_expand_board.set_power("DC5",0)
             FRONT_TOP_CAM.close_light()
 
 ## END
@@ -526,7 +503,7 @@ def S3_Keymap ():
         BUTTOM_GRIPPER.move_to(95, 50)
     elif gamepad.is_key_pressed("N3"):
         # Grab Pin Buttom
-        BUTTOM_GRIPPER.move_to(87, 86)
+        BUTTOM_GRIPPER.move_to(90, 86)
     elif gamepad.is_key_pressed("L1"):
         # Grab Block 2
         BUTTOM_GRIPPER.move_to(80, 50)
@@ -552,8 +529,12 @@ DC_LOCK_V = -5
 # Automatic Stage Config
 ENABLE_AUTO = 1
 V_AUTO_STAGE = 0
-AUTO_RPM = 150
-NEG_AUTO_RPM = -150
+AUTO_RPM = 200
+NEG_AUTO_RPM = -200
+
+#AUTO CAM CONFIG
+MIN_X_POS = 130
+MAX_X_POS = 175
 
 AUTO_SIDE = None
 
@@ -572,20 +553,23 @@ power_expand_board.set_power("DC4", DC_LOCK_V)
 # GRIPPER_LOCK.set_angle(0)
 
 while True:
-    led_matrix_1.show(round(BRUSHLESS_SERVO.get_value("voltage"), 1))
-    # led_matrix_1.show(BUTTOM_GRIPPER.get_value("angle"), wait=False)
+    if not power_manage_module.is_auto_mode():
+        # led_matrix_1.show(round(BRUSHLESS_SERVO.get_value("voltage"), 1))
+        # led_matrix_1.show(BUTTOM_GRIPPER.get_value("angle"), wait=False)
+        # led_matrix_1.show(button_1.is_pressed(), wait=False)
+        led_matrix_1.show(FRONT_L_RANGING.get_distance(), wait=False)
     Motor_Safety_CTL()
     if button_1.is_pressed():
         # GRIPPER_LOCK.set_angle(60)
-        # Auto_Grip()
-        FRONT_TOP_CAM.set_mode("color")
-        FRONT_MID_CAM.set_mode("color")
+        auto_align_and_grip()
+        # FRONT_TOP_CAM.set_mode("color")
+        # FRONT_MID_CAM.set_mode("color")
 
-        FRONT_TOP_CAM.open_light()
-        FRONT_MID_CAM.open_light()
-        time.sleep(1)
-        FRONT_TOP_CAM.close_light()
-        FRONT_MID_CAM.close_light()
+        # FRONT_TOP_CAM.open_light()
+        # FRONT_MID_CAM.open_light()
+        # time.sleep(1)
+        # FRONT_TOP_CAM.close_light()
+        # FRONT_MID_CAM.close_light()
 
         # GRIPPER_LOCK.set_angle(0)
 
