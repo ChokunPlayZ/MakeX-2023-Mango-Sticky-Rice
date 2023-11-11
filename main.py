@@ -463,7 +463,6 @@ def S1_Keymap ():
         power_expand_board.set_power("DC1", 0)
     elif gamepad.is_key_pressed("L2"):
         power_expand_board.set_power("DC1", 0)
-        power_expand_board.set_power("DC2", 0)
 
 def S2_Keymap ():
     if gamepad.is_key_pressed("N1"):
