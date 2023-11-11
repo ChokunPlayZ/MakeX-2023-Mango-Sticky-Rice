@@ -131,7 +131,7 @@ def auto_align_and_grip():
                 power_expand_board.set_power("DC5", 100)
                 
                 # move forward until the block is in the gripper
-                Move_FB(AUTO_RPM)
+                Move_FB(200)
                 while FRONT_L_RANGING.get_distance() > 5: 
                     led_matrix_1.show(FRONT_L_RANGING.get_distance(), wait=False)
                     Auto_Maintain_Grip()
@@ -139,7 +139,7 @@ def auto_align_and_grip():
                         if FRONT_TOP_CAM.get_sign_x(1) > MIN_X_POS and FRONT_TOP_CAM.get_sign_x(1) < MAX_X_POS:
                             power_expand_board.set_power("DC5", 100)
                             Auto_Maintain_Grip()
-                            Move_FB(AUTO_RPM)
+                            Move_FB(200)
                             time.sleep(0.001)
                         # if the block is on the left slide to the left
                         elif FRONT_TOP_CAM.get_sign_x(1) < MIN_X_POS:
@@ -151,7 +151,7 @@ def auto_align_and_grip():
                             return
                         
                 # move backward
-                Move_FB(NEG_AUTO_RPM)
+                Move_FB(-200)
                 time.sleep(0.2)
                 GRIPPER_ANGLE.move_to(0, 200)
                 time.sleep(0.2)
@@ -364,9 +364,9 @@ def Auto_stage99():
                 # Mango's NoDrift(tm) V3
                 if No_Drift():
                     if AUTO_SIDE == "L":
-                        Move_LR(250)
-                    else:
                         Move_LR(-250)
+                    else:
+                        Move_LR(250)
 
             FRONT_TOP_CAM.close_light()
             if FRONT_TOP_CAM.detect_sign(1) and (FRONT_MID_CAM.get_sign_x(1) > 155):
@@ -497,23 +497,25 @@ def S3_Keymap ():
         BUTTOM_GRIPPER.move_to(0, 50)
     elif gamepad.is_key_pressed("N4"):
         #Grab Block
-        BUTTOM_GRIPPER.move_to(80, 50)
+        BUTTOM_GRIPPER.move_to(71, 50)
     elif gamepad.is_key_pressed("N2"):
         #Grab pin top
-        BUTTOM_GRIPPER.move_to(95, 50)
+        BUTTOM_GRIPPER.move_to(86, 50)
     elif gamepad.is_key_pressed("N3"):
         # Grab Pin Buttom
-        BUTTOM_GRIPPER.move_to(90, 86)
+        BUTTOM_GRIPPER.move_to(81, 86)
     elif gamepad.is_key_pressed("L1"):
         # Grab Block 2
-        BUTTOM_GRIPPER.move_to(80, 50)
+        BUTTOM_GRIPPER.move_to(74, 50)
     elif gamepad.is_key_pressed("R1"):
         # Grab Standing Pin Buttom
-        BUTTOM_GRIPPER.move_to(88, 86)
+        BUTTOM_GRIPPER.move_to(81, 86)
 
     if gamepad.is_key_pressed("Down"):
+        # BUTTOM_GRIPPER.move(-1, 100)
         BUTTOM_GRIPPER.move(-5, 100)
     elif gamepad.is_key_pressed("Up"):
+        # BUTTOM_GRIPPER.move(1, 100)
         BUTTOM_GRIPPER.move(5, 100)
 
 def Motor_Safety_CTL ():
