@@ -1,5 +1,5 @@
 # Mango Engine
-a not so simple sub 600 lines python script that powers the mango robot  
+a not so simple 600 lines python script that powers the mango robot  
 
 altought we didnt win, me, myself has learnt a lot from building this  
 I can confiedently say that the issue was the aliance matching system not us  
