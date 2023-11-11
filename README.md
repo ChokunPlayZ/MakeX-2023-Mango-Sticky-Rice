@@ -1,4 +1,4 @@
-# Mango Engine (previously Hope Crusher)
+# Mango Engine
 a not so simple sub 600 lines python script that powers the mango robot  
 
 altought we didnt win, me, myself has learnt a lot from building this  
