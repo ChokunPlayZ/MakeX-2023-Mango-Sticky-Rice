@@ -13,6 +13,26 @@ from mbuild.button import button_class
 import mbuild
 import time
 
+# Control System Config
+Speed_Modifier = 1.5
+TURN_SPEED_MODIFIER = 1.3
+CTLMODE = 2
+DC_LOCK_V = -8
+
+# Automatic Stage Config
+ENABLE_AUTO = True
+V_AUTO_STAGE = 0
+AUTO_RPM = 200
+NEG_AUTO_RPM = -200
+
+#AUTO CAM CONFIG
+MIN_X_POS = 130
+MAX_X_POS = 175
+
+AUTO_SIDE = None
+
+SPIN_TIG = False
+
 # stuff
 BR_ENCODE_M1 = encoder_motor_class("M1", "INDEX1")
 FR_ENCODE_M2 = encoder_motor_class("M2", "INDEX1")
@@ -446,9 +466,11 @@ def S1_Keymap ():
     if gamepad.is_key_pressed("N4"):
         power_expand_board.set_power("BL1", 100)
         power_expand_board.set_power("BL2", 100)
+        power_expand_board.set_power("DC8", 100)
     elif gamepad.is_key_pressed("R1"):
-            power_expand_board.stop("BL1")
-            power_expand_board.stop("BL2")
+        power_expand_board.stop("BL1")
+        power_expand_board.stop("BL2")
+        power_expand_board.stop("DC8")
 
     # Brushless Angle
     if gamepad.is_key_pressed("+"):
@@ -465,17 +487,26 @@ def S1_Keymap ():
         power_expand_board.set_power("DC1", 0)
 
 def S2_Keymap ():
-    if gamepad.is_key_pressed("N1"):
-        power_expand_board.set_power("DC5", 100)
-    elif gamepad.is_key_pressed("N4"):
-        power_expand_board.set_power("DC5", -100)
-    elif gamepad.is_key_pressed("R1"):
-        power_expand_board.set_power("DC5", 100)
-    elif gamepad.is_key_pressed("R2"):
-        GRIPPER_ANGLE.move_to(45, 50)
-        power_expand_board.set_power("DC5", -100)
+    global SPIN_TIG
+    if SPIN_TIG:
+        if gamepad.is_key_pressed("≡"):
+            SPIN_TIG = False
+            power_expand_board.set_power("DC5", 0)
     else:
-        power_expand_board.set_power("DC5", 0)
+        if gamepad.is_key_pressed("N1"):
+            power_expand_board.set_power("DC5", 100)
+        elif gamepad.is_key_pressed("N4"):
+            power_expand_board.set_power("DC5", -100)
+        elif gamepad.is_key_pressed("R1"):
+            power_expand_board.set_power("DC5", 100)
+        elif gamepad.is_key_pressed("R2"):
+            GRIPPER_ANGLE.move_to(45, 50)
+            power_expand_board.set_power("DC5", -100)
+        elif gamepad.is_key_pressed("L1"):
+            SPIN_TIG = True
+            power_expand_board.set_power("DC5", -100)
+        else:
+            power_expand_board.set_power("DC5", 0)
 
     if gamepad.is_key_pressed("Up"):
         power_expand_board.set_power("DC4", -100)
@@ -522,24 +553,6 @@ def Motor_Safety_CTL ():
     if BUTTOM_GRIPPER.get_value("current") > 500:
         BRUSHLESS_SERVO.set_power(0)
 
-# Control System Config
-Speed_Modifier = 1.6
-TURN_SPEED_MODIFIER = 1.3
-CTLMODE = 2
-DC_LOCK_V = -5
-
-# Automatic Stage Config
-ENABLE_AUTO = 1
-V_AUTO_STAGE = 0
-AUTO_RPM = 200
-NEG_AUTO_RPM = -200
-
-#AUTO CAM CONFIG
-MIN_X_POS = 130
-MAX_X_POS = 175
-
-AUTO_SIDE = None
-
 power_expand_board.set_power("DC4", -100)
 led_matrix_1.show('S0', wait = False)
 GRIPPER_ANGLE.move_to(45, 50)
@@ -556,29 +569,29 @@ power_expand_board.set_power("DC4", DC_LOCK_V)
 
 while True:
     if not power_manage_module.is_auto_mode():
-        # led_matrix_1.show(round(BRUSHLESS_SERVO.get_value("voltage"), 1))
+        led_matrix_1.show(round(BRUSHLESS_SERVO.get_value("voltage"), 1))
         # led_matrix_1.show(BUTTOM_GRIPPER.get_value("angle"), wait=False)
         # led_matrix_1.show(button_1.is_pressed(), wait=False)
-        led_matrix_1.show(FRONT_L_RANGING.get_distance(), wait=False)
+        # led_matrix_1.show(FRONT_L_RANGING.get_distance(), wait=False)
     Motor_Safety_CTL()
     if button_1.is_pressed():
         # GRIPPER_LOCK.set_angle(60)
-        auto_align_and_grip()
+        # auto_align_and_grip()
         # FRONT_TOP_CAM.set_mode("color")
         # FRONT_MID_CAM.set_mode("color")
 
-        # FRONT_TOP_CAM.open_light()
-        # FRONT_MID_CAM.open_light()
-        # time.sleep(1)
-        # FRONT_TOP_CAM.close_light()
-        # FRONT_MID_CAM.close_light()
+        FRONT_TOP_CAM.open_light()
+        FRONT_MID_CAM.open_light()
+        time.sleep(1)
+        FRONT_TOP_CAM.close_light()
+        FRONT_MID_CAM.close_light()
 
         # GRIPPER_LOCK.set_angle(0)
 
     if power_manage_module.is_auto_mode():
-        if ENABLE_AUTO == 0:
+        if not ENABLE_AUTO:
             led_matrix_1.show('A D', wait=False)
-        elif ENABLE_AUTO == 1:
+        else:
             led_matrix_1.show('A P', wait=False)
             BR_ENCODE_M1.set_power(0)
             FR_ENCODE_M2.set_power(0)
