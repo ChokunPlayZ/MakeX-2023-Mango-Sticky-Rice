@@ -415,7 +415,7 @@ def Movement ():
     RXp = gamepad.get_joystick("Rx") / Speed_Modifier
     RXn = RXp * -1
     TURN_SPEED = RXn / TURN_SPEED_MODIFIER
-    if LYp > 5 or LYp < -5:
+    if (LYp > 5 or LYp < -5)  or (LXp > 5 or LXp < -5) :
         Motor_Control(LYn, LYp, LYn, LYp)
     elif RXp > 5 or RXp < -5:
         Motor_Control(TURN_SPEED, TURN_SPEED, TURN_SPEED, TURN_SPEED)
@@ -430,7 +430,7 @@ def Reverse_movement ():
     RXp = gamepad.get_joystick("Rx") / Speed_Modifier
     RXn = RXp * -1
     TURN_SPEED = RXn / TURN_SPEED_MODIFIER
-    if LYp > 5 or LYp < -5:
+    if (LYp > 5 or LYp < -5) or (LXp > 5 or LXp < -5):
         Motor_Control(LYp, LYn, LYp, LYn)
     elif RXp > 5 or RXp < -5:
         Motor_Control(TURN_SPEED, TURN_SPEED, TURN_SPEED, TURN_SPEED)
