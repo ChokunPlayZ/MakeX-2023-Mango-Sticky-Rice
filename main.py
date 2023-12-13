@@ -412,13 +412,6 @@ while True:
             else:
                 AUTO_SIDE = 'R'
             # avoid ball 2 blocks
-            Auto_stage1()
-
-            # avoid ball 3 blocks (only deploy on left right)
-            # Auto_stage2()
-
-            # ULTIMATE TOOL
-            # Auto_stage99()
     else:
         if gamepad.is_key_pressed("L2") and gamepad.is_key_pressed("R2"):
             led_matrix_1.show('K1', wait = False)
