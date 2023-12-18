@@ -474,10 +474,10 @@ def S1_Keymap ():
 
     # Brushless Angle
     if gamepad.is_key_pressed("+"):
-        BRUSHLESS_SERVO.move_to(-13, 100)
+        BRUSHLESS_SERVO.move_to(-23, 100)
         # BRUSHLESS_SERVO.move(1, 50)
     elif gamepad.is_key_pressed("≡"):
-        BRUSHLESS_SERVO.move_to(-3, 100)
+        BRUSHLESS_SERVO.move_to(-8, 100)
         # BRUSHLESS_SERVO.move(-1, 50)
 
     if gamepad.is_key_pressed("R_Thumb"):
@@ -502,7 +502,7 @@ def S2_Keymap ():
         elif gamepad.is_key_pressed("R2"):
             GRIPPER_ANGLE.move_to(45, 50)
             power_expand_board.set_power("DC5", -100)
-        elif gamepad.is_key_pressed("L1"):
+        elif gamepad.is_key_pressed("L2"):
             SPIN_TIG = True
             power_expand_board.set_power("DC5", -100)
         else:
