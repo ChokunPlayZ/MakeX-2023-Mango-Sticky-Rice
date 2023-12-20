@@ -17,7 +17,7 @@ import time
 Speed_Modifier = 1.5
 TURN_SPEED_MODIFIER = 1.3
 CTLMODE = 2
-DC_LOCK_V = -8
+DC_LOCK_V = 0
 
 # Automatic Stage Config
 ENABLE_AUTO = True
@@ -34,10 +34,10 @@ AUTO_SIDE = None
 SPIN_TIG = False
 
 # stuff
-BR_ENCODE_M1 = encoder_motor_class("M1", "INDEX1")
-FR_ENCODE_M2 = encoder_motor_class("M2", "INDEX1")
-BL_ENCODE_M3 = encoder_motor_class("M3", "INDEX1")
-FL_ENCODE_M4 = encoder_motor_class("M4", "INDEX1")
+FR_ENCODE_M1 = encoder_motor_class("M1", "INDEX1")
+BR_ENCODE_M2 = encoder_motor_class("M2", "INDEX1")
+FL_ENCODE_M3 = encoder_motor_class("M3", "INDEX1")
+BL_ENCODE_M4 = encoder_motor_class("M4", "INDEX1")
 
 # Servos
 BRUSHLESS_SERVO = smartservo_class("M5", "INDEX1")
@@ -63,16 +63,16 @@ FRONT_TOP_CAM = smart_camera_class("PORT4", "INDEX1")
 FRONT_MID_CAM = smart_camera_class("PORT5", "INDEX1") 
 
 def Motor_Control(M1, M2, M3, M4):
-    BR_ENCODE_M1.set_power(M1)
-    FR_ENCODE_M2.set_power(M2)
-    BL_ENCODE_M3.set_power(M3)
-    FL_ENCODE_M4.set_power(M4)
+    FR_ENCODE_M1.set_power(M1)
+    BR_ENCODE_M2.set_power(M2)
+    FL_ENCODE_M3.set_power(M3)
+    BL_ENCODE_M4.set_power(M4)
 
 def Motor_RPM(M1, M2, M3, M4):
-    BR_ENCODE_M1.set_speed(M1)
-    FR_ENCODE_M2.set_speed(M2)
-    BL_ENCODE_M3.set_speed(M3)
-    FL_ENCODE_M4.set_speed(M4)
+    FR_ENCODE_M1.set_speed(M1)
+    BR_ENCODE_M2.set_speed(M2)
+    FL_ENCODE_M3.set_speed(M3)
+    BL_ENCODE_M4.set_speed(M4)
 
 def Move_FB(rpm):
     """Move Forward and Backward (+rpm for Forward, -rpm for Backward)"""
@@ -96,9 +96,9 @@ def Move_Turn(rpm):
 
 def Auto_Maintain_Grip():
     if GRIPPER_RANGING.get_distance() > 17:
-        power_expand_board.set_power("DC4", -100)
+        power_expand_board.set_power("DC4", 100)
     elif GRIPPER_RANGING.get_distance() < 15:
-        power_expand_board.set_power("DC4", 10)
+        power_expand_board.set_power("DC4", -10)
     else:
         power_expand_board.set_power("DC4", DC_LOCK_V)
 
@@ -191,180 +191,8 @@ def auto_align_and_grip():
                 done = True
                 return
 
-def Auto_stage1():
-    "avoid ball, 2 blocks"
-    global ENABLE_AUTO, V_AUTO_STAGE, AUTO_SIDE
-    while power_manage_module.is_auto_mode():
-        led_matrix_1.show('A' + str(str(AUTO_SIDE) + str(V_AUTO_STAGE)), wait=False)
-
-        Auto_Maintain_Grip()
-
-        if V_AUTO_STAGE == 0:
-            if AUTO_SIDE == "R":
-                Auto_Turn(15)
-            else:
-                Auto_Turn(-15)
-            V_AUTO_STAGE = V_AUTO_STAGE + 1
-
-        elif V_AUTO_STAGE == 1:
-            while BACK_RANGING.get_distance() < 199:
-                time.sleep(0.001)
-                Auto_Maintain_Grip()
-                Move_FB(AUTO_RPM)
-            V_AUTO_STAGE = V_AUTO_STAGE + 1
-
-        elif V_AUTO_STAGE == 2:
-            if AUTO_SIDE == "R":
-                Auto_Turn(-15)
-            else:
-                Auto_Turn(15)
-            V_AUTO_STAGE = V_AUTO_STAGE + 1
-
-        elif V_AUTO_STAGE == 3:
-            if FRONT_TOP_CAM.get_sign_x(1) < MAX_X_POS:
-                auto_align_and_grip()
-            V_AUTO_STAGE = V_AUTO_STAGE + 1
-            
-        elif V_AUTO_STAGE == 4:
-
-            if AUTO_SIDE == "L":
-                if LEFT_RANGING.get_distance() < 35:
-                    Move_FB(0)
-                    V_AUTO_STAGE = V_AUTO_STAGE + 1
-                    continue
-            else:
-                if RIGHT_RANGING.get_distance() < 35:
-                    Move_FB(0)
-                    V_AUTO_STAGE = V_AUTO_STAGE + 1
-                    continue
-
-            if maintain_disatnace():
-                # Mango's NoDrift(tm) V3
-                if No_Drift():
-                    if AUTO_SIDE == "R":
-                        Move_LR(NEG_AUTO_RPM)
-                    else:
-                        Move_LR(AUTO_RPM)
-
-            FRONT_TOP_CAM.close_light()
-            if FRONT_TOP_CAM.detect_sign(1) and (FRONT_MID_CAM.get_sign_x(1) > 155):
-                auto_align_and_grip()
-            FRONT_TOP_CAM.close_light()
-
-        elif V_AUTO_STAGE == 6:
-            if AUTO_SIDE == "L":
-                if RIGHT_RANGING.get_distance() < 35:
-                    Move_FB(0)
-                    V_AUTO_STAGE = V_AUTO_STAGE + 1
-                    continue
-            else:
-                if LEFT_RANGING.get_distance() < 35:
-                    Move_FB(0)
-                    V_AUTO_STAGE = V_AUTO_STAGE + 1
-                    continue
-
-            if maintain_disatnace():
-                # Mango's NoDrift(tm) V3
-                if No_Drift():
-                    if AUTO_SIDE == "R":
-                        Move_LR(AUTO_RPM)
-                    else:
-                        Move_LR(NEG_AUTO_RPM)
-
-            FRONT_TOP_CAM.close_light()
-            auto_align_and_grip()
-            FRONT_TOP_CAM.close_light()
-
-def Auto_stage2():
-    "avoid ball, 3 blocks, DO NOT USE ON LEFT SIDE"
-    global ENABLE_AUTO, V_AUTO_STAGE, AUTO_SIDE
-
-    while power_manage_module.is_auto_mode():
-        led_matrix_1.show('A' + str(str(AUTO_SIDE) + str(V_AUTO_STAGE)), wait=False)
-
-        Auto_Maintain_Grip()
-
-        if V_AUTO_STAGE == 0:
-            if AUTO_SIDE == "R":
-                Auto_Turn(27)
-            else:
-                Auto_Turn(-27)
-            V_AUTO_STAGE = V_AUTO_STAGE + 1
-
-        elif V_AUTO_STAGE == 1:
-            if AUTO_SIDE == "R":
-                led_matrix_1.show('ADE', wait=False)
-            else:
-                while FRONT_L_RANGING.get_distance() > 50:
-                    time.sleep(0.001)
-                    Auto_Maintain_Grip()
-                    Move_FB(AUTO_RPM)
-                V_AUTO_STAGE = V_AUTO_STAGE + 1
-
-        elif V_AUTO_STAGE == 2:
-            if AUTO_SIDE == "R":
-                Auto_Turn(-27)
-            else:
-                Auto_Turn(27)
-            V_AUTO_STAGE = V_AUTO_STAGE + 1
-
-        elif V_AUTO_STAGE == 3:
-            if FRONT_TOP_CAM.get_sign_x(1) < MAX_X_POS:
-                auto_align_and_grip()
-            V_AUTO_STAGE = V_AUTO_STAGE + 1
-            
-        elif V_AUTO_STAGE == 4:
-            if AUTO_SIDE == "L":
-                if LEFT_RANGING.get_distance() < 35:
-                    Move_FB(0)
-                    V_AUTO_STAGE = V_AUTO_STAGE + 1
-                    continue
-            else:
-                if RIGHT_RANGING.get_distance() < 35:
-                    Move_FB(0)
-                    V_AUTO_STAGE = V_AUTO_STAGE + 1
-                    continue
-
-            if maintain_disatnace():
-                # Mango's NoDrift(tm) V3
-                if No_Drift():
-                    if AUTO_SIDE == "R":
-                        Move_LR(NEG_AUTO_RPM)
-                    else:
-                        Move_LR(AUTO_RPM)
-
-            FRONT_TOP_CAM.close_light()
-            if FRONT_TOP_CAM.detect_sign(1) and (FRONT_MID_CAM.get_sign_x(1) > 155):
-                auto_align_and_grip()
-            FRONT_TOP_CAM.close_light()
-
-        elif V_AUTO_STAGE == 5:
-            if AUTO_SIDE == "L":
-                if RIGHT_RANGING.get_distance() < 35:
-                    Move_FB(0)
-                    V_AUTO_STAGE = V_AUTO_STAGE + 1
-                    continue
-            else:
-                if LEFT_RANGING.get_distance() < 35:
-                    Move_FB(0)
-                    V_AUTO_STAGE = V_AUTO_STAGE + 1
-                    continue
-
-            if maintain_disatnace():
-                # Mango's NoDrift(tm) V3
-                if No_Drift():
-                    if AUTO_SIDE == "R":
-                        Move_LR(AUTO_RPM)
-                    else:
-                        Move_LR(NEG_AUTO_RPM)
-
-            FRONT_TOP_CAM.close_light()
-            if FRONT_TOP_CAM.detect_sign(1) and (FRONT_MID_CAM.get_sign_x(1) > 155):
-                auto_align_and_grip()
-            FRONT_TOP_CAM.close_light()
-
-def Auto_stage99():
-    """Ultimate Plan"""
+def Auto_stage_old_1():
+    """Old gripper based code"""
     global ENABLE_AUTO, V_AUTO_STAGE, AUTO_SIDE
     while power_manage_module.is_auto_mode():
         led_matrix_1.show('A' + str(str(AUTO_SIDE) + str(V_AUTO_STAGE)), wait=False)
@@ -404,6 +232,46 @@ def Auto_stage99():
                         continue
             FRONT_TOP_CAM.close_light()
 
+def Auto_stage_new_1():
+    """new spinner auto"""
+    global ENABLE_AUTO, V_AUTO_STAGE, AUTO_SIDE
+    while power_manage_module.is_auto_mode():
+        led_matrix_1.show('A' + str(str(AUTO_SIDE) + str(V_AUTO_STAGE)), wait=False)
+
+        Auto_Maintain_Grip()
+
+        if V_AUTO_STAGE == 0:
+            while FRONT_L_RANGING.get_distance() > 30:
+                time.sleep(0.001)
+                Auto_Maintain_Grip()
+                Move_FB(AUTO_RPM)
+            V_AUTO_STAGE = V_AUTO_STAGE + 1
+            
+        elif V_AUTO_STAGE == 1:
+
+            if maintain_disatnace():
+                # Mango's NoDrift(tm) V3
+                if No_Drift():
+                    if AUTO_SIDE == "L":
+                        Move_LR(-250)
+                    else:
+                        Move_LR(250)
+
+            FRONT_TOP_CAM.close_light()
+            if FRONT_TOP_CAM.detect_sign(1) and (FRONT_MID_CAM.get_sign_x(1) > 155):
+                auto_align_and_grip()
+            else:
+                if AUTO_SIDE == "R":
+                    if LEFT_RANGING.get_distance() < 35:
+                        Move_FB(0)
+                        V_AUTO_STAGE = V_AUTO_STAGE + 1
+                        continue
+                else:
+                    if RIGHT_RANGING.get_distance() < 35:
+                        Move_FB(0)
+                        V_AUTO_STAGE = V_AUTO_STAGE + 1
+                        continue
+            FRONT_TOP_CAM.close_light()
 ## END
 ## END
 ## END
@@ -509,9 +377,9 @@ def S2_Keymap ():
             power_expand_board.set_power("DC5", 0)
 
     if gamepad.is_key_pressed("Up"):
-        power_expand_board.set_power("DC4", -100)
-    elif gamepad.is_key_pressed("Down") or gamepad.is_key_pressed("N1"):
         power_expand_board.set_power("DC4", 100)
+    elif gamepad.is_key_pressed("Down") or gamepad.is_key_pressed("N1"):
+        power_expand_board.set_power("DC4", -100)
     else:
         power_expand_board.set_power("DC4", DC_LOCK_V)
         
@@ -553,7 +421,7 @@ def Motor_Safety_CTL ():
     if BUTTOM_GRIPPER.get_value("current") > 500:
         BRUSHLESS_SERVO.set_power(0)
 
-power_expand_board.set_power("DC4", -100)
+power_expand_board.set_power("DC4", 100)
 led_matrix_1.show('S0', wait = False)
 GRIPPER_ANGLE.move_to(45, 50)
 BUTTOM_GRIPPER.move_to(0, 50)
@@ -583,6 +451,21 @@ while True:
         FRONT_TOP_CAM.open_light()
         FRONT_MID_CAM.open_light()
         time.sleep(1)
+        FR_ENCODE_M1.set_power(100)
+        time.sleep(1)
+        FR_ENCODE_M1.set_power(0)
+        time.sleep(1)
+        BR_ENCODE_M2.set_power(100)
+        time.sleep(1)
+        BR_ENCODE_M2.set_power(0)
+        time.sleep(1)
+        FL_ENCODE_M3.set_power(100)
+        time.sleep(1)
+        FL_ENCODE_M3.set_power(0)
+        time.sleep(1)
+        BL_ENCODE_M4.set_power(100)
+        time.sleep(1)
+        BL_ENCODE_M4.set_power(0)
         FRONT_TOP_CAM.close_light()
         FRONT_MID_CAM.close_light()
 
@@ -593,10 +476,10 @@ while True:
             led_matrix_1.show('A D', wait=False)
         else:
             led_matrix_1.show('A P', wait=False)
-            BR_ENCODE_M1.set_power(0)
-            FR_ENCODE_M2.set_power(0)
-            BL_ENCODE_M3.set_power(0)
-            FL_ENCODE_M4.set_power(0)
+            FR_ENCODE_M1.set_power(0)
+            BR_ENCODE_M2.set_power(0)
+            FL_ENCODE_M3.set_power(0)
+            BL_ENCODE_M4.set_power(0)
             FRONT_TOP_CAM.set_mode("color")
             FRONT_MID_CAM.set_mode("color")
             led_matrix_1.show('A W', wait=False)
@@ -632,7 +515,7 @@ while True:
         if CTLMODE == 1:
             BUTTOM_GRIPPER.move_to(0, 50)
             if GRIPPER_RANGING.get_distance() < 35:
-                power_expand_board.set_power("DC4", 50)
+                power_expand_board.set_power("DC4", -50)
             else:
                 power_expand_board.set_power("DC4", DC_LOCK_V)
             Movement()
@@ -643,9 +526,9 @@ while True:
             S2_Keymap()
         elif CTLMODE == 3:
             if GRIPPER_RANGING.get_distance() > 15:
-                power_expand_board.set_power("DC4", -100)
+                power_expand_board.set_power("DC4", 100)
             elif GRIPPER_RANGING.get_distance() < 10:
-                power_expand_board.set_power("DC4", 10)
+                power_expand_board.set_power("DC4", -10)
             else:
                 power_expand_board.set_power("DC4", DC_LOCK_V)
             Reverse_movement()
