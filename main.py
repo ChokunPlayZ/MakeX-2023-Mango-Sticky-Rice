@@ -17,7 +17,7 @@ import time
 Speed_Modifier = 1.5
 TURN_SPEED_MODIFIER = 1.3
 CTLMODE = 2
-DC_LOCK_V = 0
+DC_LOCK_V = 3
 
 # Automatic Stage Config
 ENABLE_AUTO = True
