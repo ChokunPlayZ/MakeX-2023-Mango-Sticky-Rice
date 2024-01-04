@@ -236,42 +236,35 @@ def Auto_stage_new_1():
     """new spinner auto"""
     global ENABLE_AUTO, V_AUTO_STAGE, AUTO_SIDE
     while power_manage_module.is_auto_mode():
+
+        # power_expand_board.set_power("DC5", -100)
         led_matrix_1.show('A' + str(str(AUTO_SIDE) + str(V_AUTO_STAGE)), wait=False)
 
         Auto_Maintain_Grip()
 
         if V_AUTO_STAGE == 0:
-            while FRONT_L_RANGING.get_distance() > 30:
+            while FRONT_L_RANGING.get_distance() > 20:
                 time.sleep(0.001)
                 Auto_Maintain_Grip()
                 Move_FB(AUTO_RPM)
             V_AUTO_STAGE = V_AUTO_STAGE + 1
             
-        elif V_AUTO_STAGE == 1:
-
-            if maintain_disatnace():
-                # Mango's NoDrift(tm) V3
-                if No_Drift():
-                    if AUTO_SIDE == "L":
-                        Move_LR(-250)
-                    else:
-                        Move_LR(250)
-
-            FRONT_TOP_CAM.close_light()
-            if FRONT_TOP_CAM.detect_sign(1) and (FRONT_MID_CAM.get_sign_x(1) > 155):
-                auto_align_and_grip()
-            else:
-                if AUTO_SIDE == "R":
-                    if LEFT_RANGING.get_distance() < 35:
-                        Move_FB(0)
-                        V_AUTO_STAGE = V_AUTO_STAGE + 1
-                        continue
+        elif V_AUTO_STAGE == 2:
+            if AUTO_SIDE == "R": 
+                if LEFT_RANGING.get_distance() < 35:
+                    Move_FB(0)
+                    V_AUTO_STAGE = V_AUTO_STAGE + 1
+                    continue
                 else:
-                    if RIGHT_RANGING.get_distance() < 35:
-                        Move_FB(0)
-                        V_AUTO_STAGE = V_AUTO_STAGE + 1
-                        continue
-            FRONT_TOP_CAM.close_light()
+                    Motor_Control(100, -100, 100, -100)
+            else:
+                if RIGHT_RANGING.get_distance() < 35:
+                    Move_FB(0)
+                    V_AUTO_STAGE = V_AUTO_STAGE + 1
+                    continue
+                else:
+                    Motor_Control(-100, 100, -100, 100)
+
 ## END
 ## END
 ## END
@@ -437,10 +430,10 @@ power_expand_board.set_power("DC4", DC_LOCK_V)
 
 while True:
     if not power_manage_module.is_auto_mode():
-        led_matrix_1.show(round(BRUSHLESS_SERVO.get_value("voltage"), 1))
+        # led_matrix_1.show(round(BRUSHLESS_SERVO.get_value("voltage"), 1))
         # led_matrix_1.show(BUTTOM_GRIPPER.get_value("angle"), wait=False)
         # led_matrix_1.show(button_1.is_pressed(), wait=False)
-        # led_matrix_1.show(FRONT_L_RANGING.get_distance(), wait=False)
+        led_matrix_1.show(FRONT_L_RANGING.get_distance(), wait=False)
     Motor_Safety_CTL()
     if button_1.is_pressed():
         # GRIPPER_LOCK.set_angle(60)
@@ -489,7 +482,7 @@ while True:
             else:
                 AUTO_SIDE = 'R'
             # avoid ball 2 blocks
-            Auto_stage1()
+            Auto_stage_new_1()
 
             # avoid ball 3 blocks (only deploy on left right)
             # Auto_stage2()
