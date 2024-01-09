@@ -25,7 +25,8 @@ FEEDER_POWER = 50
 # Automatic Stage Config
 ENABLE_AUTO = True
 V_AUTO_STAGE = 0
-AUTO_RPM = 200
+AUTO_RPM = 250
+AUTO_SLIDE_RPM = 80
 NEG_AUTO_RPM = -200
 
 #AUTO CAM CONFIG
@@ -107,7 +108,6 @@ def Auto_Maintain_Grip(t_distance=16):
         power_expand_board.set_power("DC4", -power)
     else:
         power_expand_board.set_power("DC4", DC_LOCK_V)
-
 
 def is_within_range(number, target, margin=5):
     return target - margin <= number <= target + margin
@@ -263,6 +263,7 @@ def S1_Keymap ():
 def S2_Keymap ():
     global SPIN_TIG
     if SPIN_TIG:
+        Auto_Maintain_Grip()
         if gamepad.is_key_pressed("≡"):
             SPIN_TIG = False
             power_expand_board.set_power("DC5", 0)
