@@ -10,7 +10,6 @@ from mbuild.ranging_sensor import ranging_sensor_class
 from mbuild.smart_camera import smart_camera_class
 from mbuild.led_matrix import led_matrix_class
 from mbuild.button import button_class
-from mbuild.servo_driver import servo_driver_class
 import mbuild
 import time
 
@@ -57,7 +56,6 @@ FRONT_R_RANGING = ranging_sensor_class("PORT5", "INDEX4")
 
 # Gripper
 GRIPPER_RANGING = ranging_sensor_class("PORT4", "INDEX1")
-APACHE = servo_driver_class("PORT4", "INDEX1")
 
 # Debugging Hardware
 led_matrix_1 = led_matrix_class("PORT4", "INDEX1")
@@ -440,7 +438,6 @@ GRIPPER_ANGLE.move_to(45, 50)
 BUTTOM_GRIPPER.move_to(0, 50)
 BRUSHLESS_SERVO.move_to(0, 50)
 Motor_Control(0, 0, 0, 0)
-APACHE.set_angle(0)
 
 FRONT_TOP_CAM.set_mode("color")
 FRONT_MID_CAM.set_mode("color")
@@ -493,7 +490,6 @@ while True:
             Auto_Maintain_Grip()
         else:
             led_matrix_1.show('A P', wait=False)
-            APACHE.set_angle(100)
             FR_ENCODE_M1.set_power(0)
             BR_ENCODE_M2.set_power(0)
             FL_ENCODE_M3.set_power(0)
