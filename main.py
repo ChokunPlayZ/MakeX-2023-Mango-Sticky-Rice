@@ -14,10 +14,13 @@ import mbuild
 import time
 
 # Control System Config
-Speed_Modifier = 1.5
-TURN_SPEED_MODIFIER = 1.3
+Speed_Modifier = 2.5
+Speed_Modifier2 = 1.2
+TURN_SPEED_MODIFIER = 1.5
 CTLMODE = 2
-DC_LOCK_V = 3
+DC_LOCK_V = 4
+
+FEEDER_POWER = 50
 
 # Automatic Stage Config
 ENABLE_AUTO = True
@@ -236,9 +239,7 @@ def Auto_stage_new_1():
     """new spinner auto"""
     global ENABLE_AUTO, V_AUTO_STAGE, AUTO_SIDE
     while power_manage_module.is_auto_mode():
-
-        # power_expand_board.set_power("DC5", -100)
-        led_matrix_1.show('A' + str(str(AUTO_SIDE) + str(V_AUTO_STAGE)), wait=False)
+        # led_matrix_1.show('A' + str(str(AUTO_SIDE) + str(V_AUTO_STAGE)), wait=False)
 
         Auto_Maintain_Grip()
 
@@ -246,61 +247,73 @@ def Auto_stage_new_1():
             while FRONT_L_RANGING.get_distance() > 20:
                 time.sleep(0.001)
                 Auto_Maintain_Grip()
+                power_expand_board.set_power("DC5", -100)
                 Move_FB(AUTO_RPM)
             V_AUTO_STAGE = V_AUTO_STAGE + 1
             
+        elif V_AUTO_STAGE == 1:
+            power_expand_board.set_power("DC5", -100)
+            if FRONT_L_RANGING.get_distance() > 7:
+                Move_FB(100)
+            elif No_Drift():
+                if AUTO_SIDE == "R": 
+                    if LEFT_RANGING.get_distance() < 20:
+                        led_matrix_1.show(LEFT_RANGING.get_distance(), wait=False)
+                        Move_FB(0)
+                        V_AUTO_STAGE = V_AUTO_STAGE + 1
+                        continue
+                    else:
+                        Motor_Control(-85, 80, -85, 80)
+                else:
+                    if RIGHT_RANGING.get_distance() < 20:
+                        led_matrix_1.show(RIGHT_RANGING.get_distance(), wait=False)
+                        Move_FB(0)
+                        V_AUTO_STAGE = V_AUTO_STAGE + 1
+                        continue
+                    else:
+                        Motor_Control(85, -80, 85, -80)
         elif V_AUTO_STAGE == 2:
-            if AUTO_SIDE == "R": 
-                if LEFT_RANGING.get_distance() < 35:
-                    Move_FB(0)
-                    V_AUTO_STAGE = V_AUTO_STAGE + 1
-                    continue
-                else:
-                    Motor_Control(100, -100, 100, -100)
-            else:
-                if RIGHT_RANGING.get_distance() < 35:
-                    Move_FB(0)
-                    V_AUTO_STAGE = V_AUTO_STAGE + 1
-                    continue
-                else:
-                    Motor_Control(-100, 100, -100, 100)
+            Move_FB(0)
+            power_expand_board.set_power("DC5", 0)
+            V_AUTO_STAGE = V_AUTO_STAGE + 1
+            continue
 
 ## END
 ## END
 ## END
 def Movement ():
-    LYp = gamepad.get_joystick("Ly") / Speed_Modifier
+    LYp = gamepad.get_joystick("Ly") * Speed_Modifier
     LYn = LYp * -1
-    LXp = gamepad.get_joystick("Lx") / Speed_Modifier
+    LXp = gamepad.get_joystick("Lx") * Speed_Modifier2
     LXn = LXp * -1
-    RXp = gamepad.get_joystick("Rx") / Speed_Modifier
+    RXp = gamepad.get_joystick("Rx") * Speed_Modifier
     RXn = RXp * -1
-    TURN_SPEED = RXn / TURN_SPEED_MODIFIER
+    TURN_SPEED = RXn * TURN_SPEED_MODIFIER
     if LYp > 5 or LYp < -5:
-        Motor_Control(LYn, LYn, LYp, LYp)
+        Motor_RPM(LYn, LYn, LYp, LYp)
     elif LXp > 5 or LXp < -5:
-        Motor_Control(LXp, LXn, LXp, LXn)
+        Motor_RPM(LXp, LXn, LXp, LXn)
     elif RXp > 5 or RXp < -5:
-        Motor_Control(TURN_SPEED, TURN_SPEED, TURN_SPEED, TURN_SPEED)
+        Motor_RPM(TURN_SPEED, TURN_SPEED, TURN_SPEED, TURN_SPEED)
     else:
-        Motor_Control(0, 0, 0, 0)
+        Motor_RPM(0, 0, 0, 0)
 
 def Reverse_movement ():
-    LYp = gamepad.get_joystick("Ly") / Speed_Modifier
+    LYp = gamepad.get_joystick("Ly") * Speed_Modifier
     LYn = LYp * -1
-    LXp = gamepad.get_joystick("Lx") / Speed_Modifier
+    LXp = gamepad.get_joystick("Lx") * Speed_Modifier2
     LXn = LXp * -1
-    RXp = gamepad.get_joystick("Rx") / Speed_Modifier
+    RXp = gamepad.get_joystick("Rx") * Speed_Modifier
     RXn = RXp * -1
-    TURN_SPEED = RXn / TURN_SPEED_MODIFIER
+    TURN_SPEED = RXn * TURN_SPEED_MODIFIER
     if LYp > 5 or LYp < -5:
-        Motor_Control(LYp, LYp, LYn, LYn)
+        Motor_RPM(LYp, LYp, LYn, LYn)
     elif LXp > 5 or LXp < -5:
-        Motor_Control(LXn, LXp, LXn, LXp)
+        Motor_RPM(LXn, LXp, LXn, LXp)
     elif RXp > 5 or RXp < -5:
-        Motor_Control(TURN_SPEED, TURN_SPEED, TURN_SPEED, TURN_SPEED)
+        Motor_RPM(TURN_SPEED, TURN_SPEED, TURN_SPEED, TURN_SPEED)
     else:
-        Motor_Control(0, 0, 0, 0)
+        Motor_RPM(0, 0, 0, 0)
 
 def S1_Keymap ():
     # main loading system controls
@@ -317,9 +330,9 @@ def S1_Keymap ():
 
     # conveyor control
     if gamepad.is_key_pressed("N2"):
-        power_expand_board.set_power("DC3", 100)
+        power_expand_board.set_power("DC3", FEEDER_POWER)
     elif gamepad.is_key_pressed("N3"):
-        power_expand_board.set_power("DC3", -100)
+        power_expand_board.set_power("DC3", FEEDER_POWER * -1)
     else:
         power_expand_board.set_power("DC3", 0)
 
@@ -338,7 +351,7 @@ def S1_Keymap ():
         BRUSHLESS_SERVO.move_to(-23, 100)
         # BRUSHLESS_SERVO.move(1, 50)
     elif gamepad.is_key_pressed("≡"):
-        BRUSHLESS_SERVO.move_to(-8, 100)
+        BRUSHLESS_SERVO.move_to(2, 100)
         # BRUSHLESS_SERVO.move(-1, 50)
 
     if gamepad.is_key_pressed("R_Thumb"):
@@ -392,7 +405,7 @@ def S3_Keymap ():
         BUTTOM_GRIPPER.move_to(71, 50)
     elif gamepad.is_key_pressed("N2"):
         #Grab pin top
-        BUTTOM_GRIPPER.move_to(86, 50)
+        BUTTOM_GRIPPER.move_to(88, 50)
     elif gamepad.is_key_pressed("N3"):
         # Grab Pin Buttom
         BUTTOM_GRIPPER.move_to(81, 86)
@@ -430,10 +443,10 @@ power_expand_board.set_power("DC4", DC_LOCK_V)
 
 while True:
     if not power_manage_module.is_auto_mode():
-        # led_matrix_1.show(round(BRUSHLESS_SERVO.get_value("voltage"), 1))
+        led_matrix_1.show(round(BRUSHLESS_SERVO.get_value("voltage"), 1))
         # led_matrix_1.show(BUTTOM_GRIPPER.get_value("angle"), wait=False)
         # led_matrix_1.show(button_1.is_pressed(), wait=False)
-        led_matrix_1.show(FRONT_L_RANGING.get_distance(), wait=False)
+        # led_matrix_1.show(FRONT_L_RANGING.get_distance(), wait=False)
     Motor_Safety_CTL()
     if button_1.is_pressed():
         # GRIPPER_LOCK.set_angle(60)
@@ -467,6 +480,8 @@ while True:
     if power_manage_module.is_auto_mode():
         if not ENABLE_AUTO:
             led_matrix_1.show('A D', wait=False)
+        elif FRONT_L_RANGING.get_distance() == 0:
+            led_matrix_1.show('ASE', wait=False)
         else:
             led_matrix_1.show('A P', wait=False)
             FR_ENCODE_M1.set_power(0)
