@@ -138,113 +138,11 @@ def No_Drift():
     else:
         return True
     
-def maintain_disatnace():
-    if FRONT_L_RANGING.get_distance() > 30:
-        Move_FB(50)
-        return False
-    elif FRONT_L_RANGING.get_distance() < 20:
-        Move_FB(-50)
-        return False
-    else:
-        return True
-    
-def auto_align_and_grip():
-    done = False
-    if FRONT_TOP_CAM.detect_sign(1) and (FRONT_MID_CAM.get_sign_x(1) > 155):
-        while not done:
-            Auto_Maintain_Grip()
-            if FRONT_TOP_CAM.get_sign_x(1) > MIN_X_POS and FRONT_TOP_CAM.get_sign_x(1) < MAX_X_POS:
-                # prep the spinner and angle
-                GRIPPER_ANGLE.move_to(45, 200)
-                power_expand_board.set_power("DC5", 100)
-                
-                # move forward until the block is in the gripper
-                Move_FB(200)
-                while FRONT_L_RANGING.get_distance() > 5: 
-                    led_matrix_1.show(FRONT_L_RANGING.get_distance(), wait=False)
-                    Auto_Maintain_Grip()
-                    if No_Drift():
-                        if FRONT_TOP_CAM.get_sign_x(1) > MIN_X_POS and FRONT_TOP_CAM.get_sign_x(1) < MAX_X_POS:
-                            power_expand_board.set_power("DC5", 100)
-                            Auto_Maintain_Grip()
-                            Move_FB(200)
-                            time.sleep(0.001)
-                        # if the block is on the left slide to the left
-                        elif FRONT_TOP_CAM.get_sign_x(1) < MIN_X_POS:
-                            Move_LR(50)
-                        # if the block is on the right slide to the right
-                        elif FRONT_TOP_CAM.get_sign_x(1) > MAX_X_POS:
-                            Move_LR(-50)
-                        if not FRONT_TOP_CAM.detect_sign(1):
-                            return
-                        
-                # move backward
-                Move_FB(-200)
-                time.sleep(0.2)
-                GRIPPER_ANGLE.move_to(0, 200)
-                time.sleep(0.2)
-                power_expand_board.set_power("DC5", -100)
-                time.sleep(0.2)
-                Move_FB(0)
-
-                done = True
-                return
-            # if the block is on the left slide to the left
-            elif FRONT_TOP_CAM.get_sign_x(1) < MIN_X_POS:
-                Move_LR(50)
-            # if the block is on the right slide to the right
-            elif FRONT_TOP_CAM.get_sign_x(1) > MAX_X_POS:
-                Move_LR(-50)
-            if not FRONT_TOP_CAM.detect_sign(1):
-                done = True
-                return
-
-def Auto_stage_old_1():
-    """Old gripper based code"""
-    global ENABLE_AUTO, V_AUTO_STAGE, AUTO_SIDE
-    while power_manage_module.is_auto_mode():
-        led_matrix_1.show('A' + str(str(AUTO_SIDE) + str(V_AUTO_STAGE)), wait=False)
-
-        Auto_Maintain_Grip()
-
-        if V_AUTO_STAGE == 0:
-            while FRONT_L_RANGING.get_distance() > 30:
-                time.sleep(0.001)
-                Auto_Maintain_Grip()
-                Move_FB(AUTO_RPM)
-            V_AUTO_STAGE = V_AUTO_STAGE + 1
-            
-        elif V_AUTO_STAGE == 1:
-
-            if maintain_disatnace():
-                # Mango's NoDrift(tm) V3
-                if No_Drift():
-                    if AUTO_SIDE == "L":
-                        Move_LR(-250)
-                    else:
-                        Move_LR(250)
-
-            FRONT_TOP_CAM.close_light()
-            if FRONT_TOP_CAM.detect_sign(1) and (FRONT_MID_CAM.get_sign_x(1) > 155):
-                auto_align_and_grip()
-            else:
-                if AUTO_SIDE == "R":
-                    if LEFT_RANGING.get_distance() < 35:
-                        Move_FB(0)
-                        V_AUTO_STAGE = V_AUTO_STAGE + 1
-                        continue
-                else:
-                    if RIGHT_RANGING.get_distance() < 35:
-                        Move_FB(0)
-                        V_AUTO_STAGE = V_AUTO_STAGE + 1
-                        continue
-            FRONT_TOP_CAM.close_light()
-
 def Auto_stage_new_1():
     """new spinner auto"""
     global ENABLE_AUTO, V_AUTO_STAGE, AUTO_SIDE
     while power_manage_module.is_auto_mode():
-        # led_matrix_1.show('A' + str(str(AUTO_SIDE) + str(V_AUTO_STAGE)), wait=False)
+        led_matrix_1.show('A' + str(str(AUTO_SIDE) + str(V_AUTO_STAGE)), wait=False)
 
         Auto_Maintain_Grip()
 
