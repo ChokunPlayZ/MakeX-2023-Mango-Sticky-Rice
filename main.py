@@ -161,7 +161,6 @@ def Auto_stage_new_1():
             elif No_Drift():
                 if AUTO_SIDE == "R": 
                     if LEFT_RANGING.get_distance() < 20:
-                        led_matrix_1.show(LEFT_RANGING.get_distance(), wait=False)
                         Move_FB(0)
                         V_AUTO_STAGE = V_AUTO_STAGE + 1
                         continue
@@ -169,7 +168,6 @@ def Auto_stage_new_1():
                         Motor_Control(-85, 80, -85, 80)
                 else:
                     if RIGHT_RANGING.get_distance() < 20:
-                        led_matrix_1.show(RIGHT_RANGING.get_distance(), wait=False)
                         Move_FB(0)
                         V_AUTO_STAGE = V_AUTO_STAGE + 1
                         continue
