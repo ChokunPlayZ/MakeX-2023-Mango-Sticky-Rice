@@ -63,7 +63,6 @@ button_1 = button_class("PORT4", "INDEX1")
 
 # Cameras
 FRONT_TOP_CAM = smart_camera_class("PORT4", "INDEX1")
-FRONT_MID_CAM = smart_camera_class("PORT5", "INDEX1") 
 
 def Motor_Control(M1, M2, M3, M4):
     FR_ENCODE_M1.set_power(M1)
@@ -336,7 +335,6 @@ BRUSHLESS_SERVO.move_to(0, 50)
 Motor_Control(0, 0, 0, 0)
 
 FRONT_TOP_CAM.set_mode("color")
-FRONT_MID_CAM.set_mode("color")
 
 led_matrix_1.show('OK!', wait = False)
 power_expand_board.set_power("DC4", DC_LOCK_V)
@@ -356,7 +354,6 @@ while True:
         # FRONT_MID_CAM.set_mode("color")
 
         FRONT_TOP_CAM.open_light()
-        FRONT_MID_CAM.open_light()
         time.sleep(1)
         FR_ENCODE_M1.set_power(100)
         time.sleep(1)
@@ -374,7 +371,6 @@ while True:
         time.sleep(1)
         BL_ENCODE_M4.set_power(0)
         FRONT_TOP_CAM.close_light()
-        FRONT_MID_CAM.close_light()
 
         # GRIPPER_LOCK.set_angle(0)
 
@@ -391,7 +387,6 @@ while True:
             FL_ENCODE_M3.set_power(0)
             BL_ENCODE_M4.set_power(0)
             FRONT_TOP_CAM.set_mode("color")
-            FRONT_MID_CAM.set_mode("color")
             led_matrix_1.show('A W', wait=False)
 
             if LEFT_RANGING.get_distance() < RIGHT_RANGING.get_distance():
