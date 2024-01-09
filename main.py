@@ -10,6 +10,7 @@ from mbuild.ranging_sensor import ranging_sensor_class
 from mbuild.smart_camera import smart_camera_class
 from mbuild.led_matrix import led_matrix_class
 from mbuild.button import button_class
+from mbuild.servo_driver import servo_driver_class
 import mbuild
 import time
 
@@ -18,7 +19,7 @@ Speed_Modifier = 2.5
 Speed_Modifier2 = 1.2
 TURN_SPEED_MODIFIER = 1.5
 CTLMODE = 2
-DC_LOCK_V = 4
+DC_LOCK_V = 6
 
 FEEDER_POWER = 50
 
@@ -56,6 +57,7 @@ FRONT_R_RANGING = ranging_sensor_class("PORT5", "INDEX4")
 
 # Gripper
 GRIPPER_RANGING = ranging_sensor_class("PORT4", "INDEX1")
+APACHE = servo_driver_class("PORT4", "INDEX1")
 
 # Debugging Hardware
 led_matrix_1 = led_matrix_class("PORT4", "INDEX1")
@@ -97,13 +99,18 @@ def Move_Turn(rpm):
     """Turn Left or Right (+rpm for Left, -rpm for Right)"""
     Motor_RPM(rpm, rpm, rpm, rpm)
 
-def Auto_Maintain_Grip():
-    if GRIPPER_RANGING.get_distance() > 17:
-        power_expand_board.set_power("DC4", 100)
-    elif GRIPPER_RANGING.get_distance() < 15:
-        power_expand_board.set_power("DC4", -10)
+def Auto_Maintain_Grip(t_distance=16):
+    distance = GRIPPER_RANGING.get_distance()
+
+    power = abs(distance - t_distance) * 4  # Calculate power based on distance from target
+
+    if distance > t_distance:
+        power_expand_board.set_power("DC4", power)
+    elif distance < t_distance:
+        power_expand_board.set_power("DC4", -power)
     else:
         power_expand_board.set_power("DC4", DC_LOCK_V)
+
 
 def is_within_range(number, target, margin=5):
     return target - margin <= number <= target + margin
@@ -433,6 +440,7 @@ GRIPPER_ANGLE.move_to(45, 50)
 BUTTOM_GRIPPER.move_to(0, 50)
 BRUSHLESS_SERVO.move_to(0, 50)
 Motor_Control(0, 0, 0, 0)
+APACHE.set_angle(0)
 
 FRONT_TOP_CAM.set_mode("color")
 FRONT_MID_CAM.set_mode("color")
@@ -446,7 +454,7 @@ while True:
         led_matrix_1.show(round(BRUSHLESS_SERVO.get_value("voltage"), 1))
         # led_matrix_1.show(BUTTOM_GRIPPER.get_value("angle"), wait=False)
         # led_matrix_1.show(button_1.is_pressed(), wait=False)
-        # led_matrix_1.show(FRONT_L_RANGING.get_distance(), wait=False)
+        # led_matrix_1.show(RIGHT_RANGING.get_distance(), wait=False)
     Motor_Safety_CTL()
     if button_1.is_pressed():
         # GRIPPER_LOCK.set_angle(60)
@@ -482,8 +490,10 @@ while True:
             led_matrix_1.show('A D', wait=False)
         elif FRONT_L_RANGING.get_distance() == 0:
             led_matrix_1.show('ASE', wait=False)
+            Auto_Maintain_Grip()
         else:
             led_matrix_1.show('A P', wait=False)
+            APACHE.set_angle(100)
             FR_ENCODE_M1.set_power(0)
             BR_ENCODE_M2.set_power(0)
             FL_ENCODE_M3.set_power(0)
@@ -522,10 +532,7 @@ while True:
 
         if CTLMODE == 1:
             BUTTOM_GRIPPER.move_to(0, 50)
-            if GRIPPER_RANGING.get_distance() < 35:
-                power_expand_board.set_power("DC4", -50)
-            else:
-                power_expand_board.set_power("DC4", DC_LOCK_V)
+            Auto_Maintain_Grip(t_distance=35)
             Movement()
             S1_Keymap()
         elif CTLMODE == 2:
@@ -533,11 +540,6 @@ while True:
             Reverse_movement()
             S2_Keymap()
         elif CTLMODE == 3:
-            if GRIPPER_RANGING.get_distance() > 15:
-                power_expand_board.set_power("DC4", 100)
-            elif GRIPPER_RANGING.get_distance() < 10:
-                power_expand_board.set_power("DC4", -10)
-            else:
-                power_expand_board.set_power("DC4", DC_LOCK_V)
+            Auto_Maintain_Grip(t_distance=10)
             Reverse_movement()
             S3_Keymap()
