@@ -263,7 +263,6 @@ def S1_Keymap ():
 def S2_Keymap ():
     global SPIN_TIG
     if SPIN_TIG:
-        Auto_Maintain_Grip()
         if gamepad.is_key_pressed("≡"):
             SPIN_TIG = False
             power_expand_board.set_power("DC5", 0)
@@ -283,7 +282,9 @@ def S2_Keymap ():
         else:
             power_expand_board.set_power("DC5", 0)
 
-    if gamepad.is_key_pressed("Up"):
+    if SPIN_TIG:
+        Auto_Maintain_Grip()
+    elif gamepad.is_key_pressed("Up"):
         power_expand_board.set_power("DC4", 100)
     elif gamepad.is_key_pressed("Down") or gamepad.is_key_pressed("N1"):
         power_expand_board.set_power("DC4", -100)
