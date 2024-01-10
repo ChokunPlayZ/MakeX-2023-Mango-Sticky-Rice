@@ -263,6 +263,7 @@ def S1_Keymap ():
 def S2_Keymap ():
     global SPIN_TIG
     if SPIN_TIG:
+        Auto_Maintain_Grip()
         if gamepad.is_key_pressed("≡"):
             SPIN_TIG = False
             power_expand_board.set_power("DC5", 0)
@@ -278,25 +279,24 @@ def S2_Keymap ():
             power_expand_board.set_power("DC5", -100)
         elif gamepad.is_key_pressed("L2"):
             SPIN_TIG = True
+            GRIPPER_ANGLE.move_to(45, 50)
             power_expand_board.set_power("DC5", -100)
         else:
             power_expand_board.set_power("DC5", 0)
 
-    if SPIN_TIG:
-        Auto_Maintain_Grip()
-    elif gamepad.is_key_pressed("Up"):
-        power_expand_board.set_power("DC4", 100)
-    elif gamepad.is_key_pressed("Down") or gamepad.is_key_pressed("N1"):
-        power_expand_board.set_power("DC4", -100)
-    else:
-        power_expand_board.set_power("DC4", DC_LOCK_V)
+        if gamepad.is_key_pressed("Up"):
+            power_expand_board.set_power("DC4", 100)
+        elif gamepad.is_key_pressed("Down") or gamepad.is_key_pressed("N1"):
+            power_expand_board.set_power("DC4", -100)
+        else:
+            power_expand_board.set_power("DC4", DC_LOCK_V)
         
-    if gamepad.is_key_pressed("N2"):
-        GRIPPER_ANGLE.move_to(90, 50)
-    elif gamepad.is_key_pressed("N3"):
-        GRIPPER_ANGLE.move_to(0, 50)
-    elif gamepad.is_key_pressed("L1"):
-        GRIPPER_ANGLE.move_to(45, 50)
+        if gamepad.is_key_pressed("N2"):
+            GRIPPER_ANGLE.move_to(90, 50)
+        elif gamepad.is_key_pressed("N3"):
+            GRIPPER_ANGLE.move_to(0, 50)
+        elif gamepad.is_key_pressed("L1"):
+            GRIPPER_ANGLE.move_to(45, 50)
         
 def S3_Keymap ():
     if gamepad.is_key_pressed("N1"):
@@ -429,6 +429,6 @@ while True:
             Reverse_movement()
             S2_Keymap()
         elif CTLMODE == 3:
-            Auto_Maintain_Grip(t_distance=10)
+            Auto_Maintain_Grip(t_distance=5)
             Reverse_movement()
             S3_Keymap()
