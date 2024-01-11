@@ -97,7 +97,8 @@ def Move_Turn(rpm):
     """Turn Left or Right (+rpm for Left, -rpm for Right)"""
     Motor_RPM(rpm, rpm, rpm, rpm)
 
-def Auto_Maintain_Grip(t_distance=16):
+# def Auto_Maintain_Grip(t_distance=16):
+def Auto_Maintain_Grip(t_distance=14):
     distance = GRIPPER_RANGING.get_distance()
 
     power = abs(distance - t_distance) * 4  # Calculate power based on distance from target
