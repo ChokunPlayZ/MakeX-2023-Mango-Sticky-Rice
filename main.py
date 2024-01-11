@@ -97,7 +97,7 @@ def Move_Turn(rpm):
     """Turn Left or Right (+rpm for Left, -rpm for Right)"""
     Motor_RPM(rpm, rpm, rpm, rpm)
 
-def Auto_Maintain_Grip(t_distance=16):
+def Auto_Maintain_Grip(t_distance=14):
     distance = GRIPPER_RANGING.get_distance()
 
     power = abs(distance - t_distance) * 4  # Calculate power based on distance from target
@@ -301,22 +301,22 @@ def S2_Keymap ():
 def S3_Keymap ():
     if gamepad.is_key_pressed("N1"):
         #Release
-        BUTTOM_GRIPPER.move_to(0, 50)
+        BUTTOM_GRIPPER.move_to(2, 50)
     elif gamepad.is_key_pressed("N4"):
         #Grab Block
         BUTTOM_GRIPPER.move_to(71, 50)
     elif gamepad.is_key_pressed("N2"):
         #Grab pin top
-        BUTTOM_GRIPPER.move_to(88, 50)
+        BUTTOM_GRIPPER.move_to(85, 50)
     elif gamepad.is_key_pressed("N3"):
         # Grab Pin Buttom
-        BUTTOM_GRIPPER.move_to(81, 86)
+        BUTTOM_GRIPPER.move_to(79, 50)
     elif gamepad.is_key_pressed("L1"):
         # Grab Block 2
-        BUTTOM_GRIPPER.move_to(74, 50)
+        BUTTOM_GRIPPER.move_to(72, 50)
     elif gamepad.is_key_pressed("R1"):
         # Grab Standing Pin Buttom
-        BUTTOM_GRIPPER.move_to(81, 86)
+        BUTTOM_GRIPPER.move_to(81, 50)
 
     if gamepad.is_key_pressed("Down"):
         # BUTTOM_GRIPPER.move(-1, 100)
@@ -332,7 +332,7 @@ def Motor_Safety_CTL ():
 power_expand_board.set_power("DC4", 100)
 led_matrix_1.show('S0', wait = False)
 GRIPPER_ANGLE.move_to(45, 50)
-BUTTOM_GRIPPER.move_to(0, 50)
+BUTTOM_GRIPPER.move_to(2, 50)
 BRUSHLESS_SERVO.move_to(0, 50)
 Motor_Control(0, 0, 0, 0)
 
@@ -420,12 +420,12 @@ while True:
             CTLMODE = 3
 
         if CTLMODE == 1:
-            BUTTOM_GRIPPER.move_to(0, 50)
+            BUTTOM_GRIPPER.move_to(2, 50)
             Auto_Maintain_Grip(t_distance=35)
             Movement()
             S1_Keymap()
         elif CTLMODE == 2:
-            BUTTOM_GRIPPER.move_to(0, 50)
+            BUTTOM_GRIPPER.move_to(2, 50)
             Reverse_movement()
             S2_Keymap()
         elif CTLMODE == 3:
