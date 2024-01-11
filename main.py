@@ -97,7 +97,7 @@ def Move_Turn(rpm):
     """Turn Left or Right (+rpm for Left, -rpm for Right)"""
     Motor_RPM(rpm, rpm, rpm, rpm)
 
-def Auto_Maintain_Grip(t_distance=14):
+def Auto_Maintain_Grip(t_distance=16):
     distance = GRIPPER_RANGING.get_distance()
 
     power = abs(distance - t_distance) * 4  # Calculate power based on distance from target
@@ -118,7 +118,7 @@ def Auto_Turn(degree:int):
     if target_angle > novapi.get_yaw():
         while novapi.get_yaw() < target_angle :
             Auto_Maintain_Grip()
-            Move_Turn(-100)
+            Move_Turn(-100) 
     elif target_angle < novapi.get_yaw():
         while novapi.get_yaw() > target_angle :
             Auto_Maintain_Grip()
@@ -347,7 +347,7 @@ while True:
         led_matrix_1.show(round(BRUSHLESS_SERVO.get_value("voltage"), 1))
         # led_matrix_1.show(BUTTOM_GRIPPER.get_value("angle"), wait=False)
         # led_matrix_1.show(button_1.is_pressed(), wait=False)
-        # led_matrix_1.show(RIGHT_RANGING.get_distance(), wait=False)
+        # led_matrix_1.show(GRIPPER_RANGING.get_distance(), wait=False)
     Motor_Safety_CTL()
     if button_1.is_pressed():
         # GRIPPER_LOCK.set_angle(60)
@@ -421,7 +421,7 @@ while True:
 
         if CTLMODE == 1:
             BUTTOM_GRIPPER.move_to(2, 50)
-            Auto_Maintain_Grip(t_distance=35)
+            Auto_Maintain_Grip(t_distance=34)
             Movement()
             S1_Keymap()
         elif CTLMODE == 2:
@@ -429,6 +429,6 @@ while True:
             Reverse_movement()
             S2_Keymap()
         elif CTLMODE == 3:
-            Auto_Maintain_Grip(t_distance=5)
+            Auto_Maintain_Grip(t_distance=25.6)
             Reverse_movement()
             S3_Keymap()
