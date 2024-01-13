@@ -147,14 +147,20 @@ def Auto_stage_new_1():
         Auto_Maintain_Grip()
 
         if V_AUTO_STAGE == 0:
+            if AUTO_SIDE == "L":
+                Auto_Turn(0.01)
+            else:
+                Auto_Turn(-0.01)
+            V_AUTO_STAGE = V_AUTO_STAGE + 1
+        if V_AUTO_STAGE == 1:
             while FRONT_L_RANGING.get_distance() > 20:
                 time.sleep(0.001)
                 Auto_Maintain_Grip()
                 power_expand_board.set_power("DC5", -100)
-                Move_FB(AUTO_RPM)
+                Move_FB(300)
             V_AUTO_STAGE = V_AUTO_STAGE + 1
             
-        elif V_AUTO_STAGE == 1:
+        elif V_AUTO_STAGE == 2:
             power_expand_board.set_power("DC5", -100)
             if FRONT_L_RANGING.get_distance() > 7:
                 Move_FB(100)
@@ -173,7 +179,8 @@ def Auto_stage_new_1():
                         continue
                     else:
                         Motor_Control(85, -80, 85, -80)
-        elif V_AUTO_STAGE == 2:
+
+        elif V_AUTO_STAGE == 3:
             Move_FB(0)
             power_expand_board.set_power("DC5", 0)
             V_AUTO_STAGE = V_AUTO_STAGE + 1
@@ -252,7 +259,7 @@ def S1_Keymap ():
         BRUSHLESS_SERVO.move_to(-23, 100)
         # BRUSHLESS_SERVO.move(1, 50)
     elif gamepad.is_key_pressed("≡"):
-        BRUSHLESS_SERVO.move_to(2, 100)
+        BRUSHLESS_SERVO.move_to(-5, 100)
         # BRUSHLESS_SERVO.move(-1, 50)
 
     if gamepad.is_key_pressed("R_Thumb"):
@@ -302,7 +309,7 @@ def S2_Keymap ():
 def S3_Keymap ():
     if gamepad.is_key_pressed("N1"):
         #Release
-        BUTTOM_GRIPPER.move_to(2, 50)
+        BUTTOM_GRIPPER.move_to(6, 50)
     elif gamepad.is_key_pressed("N4"):
         #Grab Block
         BUTTOM_GRIPPER.move_to(71, 50)
@@ -324,7 +331,7 @@ def S3_Keymap ():
         BUTTOM_GRIPPER.move(-5, 100)
     elif gamepad.is_key_pressed("Up"):
         # BUTTOM_GRIPPER.move(1, 100)
-        BUTTOM_GRIPPER.move(5, 100)
+        BUTTOM_GRIPPER.move(5, 100) 
 
 def Motor_Safety_CTL ():
     if BUTTOM_GRIPPER.get_value("current") > 500:
@@ -421,15 +428,15 @@ while True:
             CTLMODE = 3
 
         if CTLMODE == 1:
-            BUTTOM_GRIPPER.move_to(2, 50)
+            BUTTOM_GRIPPER.move_to(6, 50)
             Auto_Maintain_Grip(t_distance=34)
             Movement()
             S1_Keymap()
         elif CTLMODE == 2:
-            BUTTOM_GRIPPER.move_to(2, 50)
+            BUTTOM_GRIPPER.move_to(6, 50)
             Reverse_movement()
             S2_Keymap()
         elif CTLMODE == 3:
-            Auto_Maintain_Grip(t_distance=25.6)
+            Auto_Maintain_Grip(t_distance=3)
             Reverse_movement()
             S3_Keymap()
