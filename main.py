@@ -63,7 +63,7 @@ led_matrix_1 = led_matrix_class("PORT4", "INDEX1")
 button_1 = button_class("PORT4", "INDEX1")
 
 # Cameras
-FRONT_TOP_CAM = smart_camera_class("PORT4", "INDEX1")
+# FRONT_TOP_CAM = smart_camera_class("PORT4", "INDEX1")
 
 def Motor_Control(M1, M2, M3, M4):
     FR_ENCODE_M1.set_power(M1)
@@ -85,13 +85,22 @@ def Move_LR(rpm):
     """Move Side Left and Right (+rpm for Left, -rpm for Right)"""
     Motor_RPM(rpm*-1, rpm, rpm*-1, rpm)
 
-def Move_Dia_LR(rpm):
-    """Move Diagonal Left and Right (+rpm for Right, -rpm for Left)"""
-    Motor_RPM(rpm * -1, 0, 0, rpm)
+def Move_Diag(direction, rpm):
+    """
+    Moves the robot diagonally in the specified direction.  
+    FL, FR, BL, BR  
+    """
 
-def Move_Dia_FB(rpm):
-    """Move Diagonal Forward and Backward (+rpm for Forward, -rpm for Backward)"""
-    Motor_RPM(rpm, 0, 0, rpm * -1)
+    if direction == "FL":
+        Motor_RPM(0, rpm, -rpm, 0)
+    elif direction == "FR":
+       Motor_RPM(rpm, 0, 0, -rpm)
+    elif direction == "BL":
+       Motor_RPM(-rpm, 0, 0, rpm)
+    elif direction == "BR":
+        Motor_RPM(0, -rpm, rpm, 0)
+    else:
+        Motor_RPM(0,0,0,0)
 
 def Move_Turn(rpm):
     """Turn Left or Right (+rpm for Left, -rpm for Right)"""
@@ -163,7 +172,11 @@ def Auto_stage_new_1():
         elif V_AUTO_STAGE == 2:
             power_expand_board.set_power("DC5", -100)
             if FRONT_L_RANGING.get_distance() > 7:
-                Move_FB(100)
+                # Move_FB(100)
+                if AUTO_SIDE == "L":
+                    Move_Diag("FL", 200)
+                else:
+                    Move_Diag("FR", 200)
             elif No_Drift():
                 if AUTO_SIDE == "R": 
                     if LEFT_RANGING.get_distance() < 20:
@@ -315,7 +328,7 @@ def S3_Keymap ():
         BUTTOM_GRIPPER.move_to(71, 50)
     elif gamepad.is_key_pressed("N2"):
         #Grab pin top
-        BUTTOM_GRIPPER.move_to(85, 50)
+        BUTTOM_GRIPPER.move_to(87, 50)
     elif gamepad.is_key_pressed("N3"):
         # Grab Pin Buttom
         BUTTOM_GRIPPER.move_to(79, 50)
@@ -344,7 +357,7 @@ BUTTOM_GRIPPER.move_to(2, 50)
 BRUSHLESS_SERVO.move_to(0, 50)
 Motor_Control(0, 0, 0, 0)
 
-FRONT_TOP_CAM.set_mode("color")
+# FRONT_TOP_CAM.set_mode("color")
 
 led_matrix_1.show('OK!', wait = False)
 power_expand_board.set_power("DC4", DC_LOCK_V)
@@ -363,7 +376,7 @@ while True:
         # FRONT_TOP_CAM.set_mode("color")
         # FRONT_MID_CAM.set_mode("color")
 
-        FRONT_TOP_CAM.open_light()
+        # FRONT_TOP_CAM.open_light()
         time.sleep(1)
         FR_ENCODE_M1.set_power(100)
         time.sleep(1)
@@ -380,7 +393,7 @@ while True:
         BL_ENCODE_M4.set_power(100)
         time.sleep(1)
         BL_ENCODE_M4.set_power(0)
-        FRONT_TOP_CAM.close_light()
+        # FRONT_TOP_CAM.close_light()
 
         # GRIPPER_LOCK.set_angle(0)
 
@@ -396,7 +409,7 @@ while True:
             BR_ENCODE_M2.set_power(0)
             FL_ENCODE_M3.set_power(0)
             BL_ENCODE_M4.set_power(0)
-            FRONT_TOP_CAM.set_mode("color")
+            # FRONT_TOP_CAM.set_mode("color")
             led_matrix_1.show('A W', wait=False)
 
             if LEFT_RANGING.get_distance() < RIGHT_RANGING.get_distance():
@@ -429,7 +442,7 @@ while True:
 
         if CTLMODE == 1:
             BUTTOM_GRIPPER.move_to(6, 50)
-            Auto_Maintain_Grip(t_distance=34)
+            Auto_Maintain_Grip(t_distance=30)
             Movement()
             S1_Keymap()
         elif CTLMODE == 2:
