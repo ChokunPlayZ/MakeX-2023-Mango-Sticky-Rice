@@ -21,6 +21,7 @@ CTLMODE = 2
 DC_LOCK_V = 6
 
 FEEDER_POWER = 50
+# FEEDER_POWER = 80
 
 # Automatic Stage Config
 ENABLE_AUTO = True
@@ -107,17 +108,19 @@ def Move_Turn(rpm):
     Motor_RPM(rpm, rpm, rpm, rpm)
 
 # def Auto_Maintain_Grip(t_distance=16):
-def Auto_Maintain_Grip(t_distance=14):
-    distance = GRIPPER_RANGING.get_distance()
+def Auto_Maintain_Grip(t_distance=15):
+    distance = GRIPPER_RANGING.get_distance()  # Get current distance
 
-    power = abs(distance - t_distance) * 4  # Calculate power based on distance from target
+    # Calculate power based on distance from target, ensuring a minimum of 10
+    power = max(10, abs(distance - t_distance) * 4)
 
     if distance > t_distance:
-        power_expand_board.set_power("DC4", power)
+        power_expand_board.set_power("DC4", power)  # Close gripper
     elif distance < t_distance:
-        power_expand_board.set_power("DC4", -power)
+        power_expand_board.set_power("DC4", -power)  # Open gripper
     else:
-        power_expand_board.set_power("DC4", DC_LOCK_V)
+        power_expand_board.set_power("DC4", DC_LOCK_V)  # Maintain grip
+
 
 def is_within_range(number, target, margin=5):
     return target - margin <= number <= target + margin
@@ -156,10 +159,10 @@ def Auto_stage_new_1():
         Auto_Maintain_Grip()
 
         if V_AUTO_STAGE == 0:
-            if AUTO_SIDE == "L":
-                Auto_Turn(0.01)
-            else:
-                Auto_Turn(-0.01)
+            # if AUTO_SIDE == "L":
+            #     Auto_Turn(0.01)
+            # else:
+            #     Auto_Turn(-0.01)
             V_AUTO_STAGE = V_AUTO_STAGE + 1
         if V_AUTO_STAGE == 1:
             while FRONT_L_RANGING.get_distance() > 20:
@@ -270,9 +273,11 @@ def S1_Keymap ():
     # Brushless Angle
     if gamepad.is_key_pressed("+"):
         BRUSHLESS_SERVO.move_to(-23, 100)
+        # FEEDER_POWER = 80
         # BRUSHLESS_SERVO.move(1, 50)
     elif gamepad.is_key_pressed("≡"):
         BRUSHLESS_SERVO.move_to(-5, 100)
+        # FEEDER_POWER = 50
         # BRUSHLESS_SERVO.move(-1, 50)
 
     if gamepad.is_key_pressed("R_Thumb"):
@@ -442,7 +447,7 @@ while True:
 
         if CTLMODE == 1:
             BUTTOM_GRIPPER.move_to(6, 50)
-            Auto_Maintain_Grip(t_distance=30)
+            Auto_Maintain_Grip(t_distance=32)
             Movement()
             S1_Keymap()
         elif CTLMODE == 2:
