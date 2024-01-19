@@ -187,14 +187,14 @@ def Auto_stage_new_1():
                         V_AUTO_STAGE = V_AUTO_STAGE + 1
                         continue
                     else:
-                        Motor_Control(-150, 170, -150, 170)
+                        Motor_Control(-100, 120, -100, 120)
                 else:
                     if RIGHT_RANGING.get_distance() < 20:
                         Move_FB(0)
                         V_AUTO_STAGE = V_AUTO_STAGE + 1
                         continue
                     else:
-                        Motor_Control(170, -150, 170, -150)
+                        Motor_Control(120, -100, 120, -100)
 
         elif V_AUTO_STAGE == 3:
             Move_FB(0)
