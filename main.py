@@ -165,21 +165,21 @@ def Auto_stage_new_1():
             #     Auto_Turn(-0.01)
             V_AUTO_STAGE = V_AUTO_STAGE + 1
         if V_AUTO_STAGE == 1:
+            power_expand_board.set_power("DC5", -100)
+            Move_FB(200)
             while FRONT_L_RANGING.get_distance() > 20:
                 time.sleep(0.001)
                 Auto_Maintain_Grip()
-                power_expand_board.set_power("DC5", -100)
-                Move_FB(300)
             V_AUTO_STAGE = V_AUTO_STAGE + 1
             
         elif V_AUTO_STAGE == 2:
             power_expand_board.set_power("DC5", -100)
-            if FRONT_L_RANGING.get_distance() > 7:
-                # Move_FB(100)
-                if AUTO_SIDE == "L":
-                    Move_Diag("FL", 200)
-                else:
-                    Move_Diag("FR", 200)
+            if FRONT_L_RANGING.get_distance() > 8:
+                Move_FB(100)
+                # if AUTO_SIDE == "L":
+                #     Move_Diag("FL", 200)
+                # else:
+                #     Move_Diag("FR", 200)
             elif No_Drift():
                 if AUTO_SIDE == "R": 
                     if LEFT_RANGING.get_distance() < 20:
@@ -187,20 +187,22 @@ def Auto_stage_new_1():
                         V_AUTO_STAGE = V_AUTO_STAGE + 1
                         continue
                     else:
-                        Motor_Control(-85, 80, -85, 80)
+                        Motor_Control(-150, 170, -150, 170)
                 else:
                     if RIGHT_RANGING.get_distance() < 20:
                         Move_FB(0)
                         V_AUTO_STAGE = V_AUTO_STAGE + 1
                         continue
                     else:
-                        Motor_Control(85, -80, 85, -80)
+                        Motor_Control(170, -150, 170, -150)
 
         elif V_AUTO_STAGE == 3:
             Move_FB(0)
             power_expand_board.set_power("DC5", 0)
             V_AUTO_STAGE = V_AUTO_STAGE + 1
             continue
+
+        time.sleep(0.001)
 
 ## END
 ## END
