@@ -121,6 +121,23 @@ def Auto_Maintain_Grip(t_distance=15):
     else:
         power_expand_board.set_power("DC4", DC_LOCK_V)  # Maintain grip
 
+def Auto_Maintain_Grip_Range(max_d, min_d):
+    """Maintains the gripper within a specified distance range.
+
+    Args:
+        max_d (int): The maximum distance allowed for the gripper.
+        min_d (int): The minimum distance allowed for the gripper.
+    """
+
+    distance = GRIPPER_RANGING.get_distance()  # Get current distance
+
+    if distance > max_d:  # Gripper is too far, pull it up
+        power_expand_board.set_power("DC4", -abs(distance - max_d) * 4)
+    elif distance < min_d:  # Gripper is too close, push it down
+        power_expand_board.set_power("DC4", abs(distance - min_d) * 4)
+    else:  # Gripper is within range, maintain grip with minimal power
+        power_expand_board.set_power("DC4", 1)  # Just enough to maintain grip
+
 
 def is_within_range(number, target, margin=5):
     return target - margin <= number <= target + margin
@@ -156,7 +173,7 @@ def Auto_stage_new_1():
     while power_manage_module.is_auto_mode():
         led_matrix_1.show('A' + str(str(AUTO_SIDE) + str(V_AUTO_STAGE)), wait=False)
 
-        Auto_Maintain_Grip()
+        # Auto_Maintain_Grip()
 
         if V_AUTO_STAGE == 0:
             # if AUTO_SIDE == "L":
@@ -173,6 +190,7 @@ def Auto_stage_new_1():
             V_AUTO_STAGE = V_AUTO_STAGE + 1
             
         elif V_AUTO_STAGE == 2:
+            Auto_Maintain_Grip_Range(15, 12)
             power_expand_board.set_power("DC5", -100)
             if FRONT_L_RANGING.get_distance() > 8:
                 Move_FB(100)
@@ -198,6 +216,7 @@ def Auto_stage_new_1():
 
         elif V_AUTO_STAGE == 3:
             Move_FB(0)
+            Auto_Maintain_Grip()
             power_expand_board.set_power("DC5", 0)
             V_AUTO_STAGE = V_AUTO_STAGE + 1
             continue
