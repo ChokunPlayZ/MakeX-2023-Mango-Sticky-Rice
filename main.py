@@ -38,6 +38,8 @@ AUTO_SIDE = None
 
 SPIN_TIG = False
 
+SPINNER_PORT = "DC8"
+
 # stuff
 FR_ENCODE_M1 = encoder_motor_class("M1", "INDEX1")
 BR_ENCODE_M2 = encoder_motor_class("M2", "INDEX1")
@@ -164,7 +166,7 @@ def Auto_stage_new_1():
             #     Auto_Turn(-0.01)
             V_AUTO_STAGE = V_AUTO_STAGE + 1
         if V_AUTO_STAGE == 1:
-            power_expand_board.set_power("DC5", -100)
+            power_expand_board.set_power(SPINNER_PORT, -100)
             Move_FB(200)
             while FRONT_L_RANGING.get_distance() > 20:
                 time.sleep(0.001)
@@ -172,7 +174,7 @@ def Auto_stage_new_1():
             V_AUTO_STAGE = V_AUTO_STAGE + 1
             
         elif V_AUTO_STAGE == 2:
-            power_expand_board.set_power("DC5", -100)
+            power_expand_board.set_power(SPINNER_PORT, -100)
             if FRONT_L_RANGING.get_distance() > 8:
                 Move_FB(100)
                 # if AUTO_SIDE == "L":
@@ -198,7 +200,7 @@ def Auto_stage_new_1():
         elif V_AUTO_STAGE == 3:
             Move_FB(0)
             Auto_Maintain_Grip()
-            power_expand_board.set_power("DC5", 0)
+            power_expand_board.set_power(SPINNER_PORT, 0)
             V_AUTO_STAGE = V_AUTO_STAGE + 1
             continue
 
@@ -266,11 +268,11 @@ def S1_Keymap ():
     if gamepad.is_key_pressed("N4"):
         power_expand_board.set_power("BL1", 100)
         power_expand_board.set_power("BL2", 100)
-        power_expand_board.set_power("DC8", 100)
+        power_expand_board.set_power(SPINNER_PORT, 100)
     elif gamepad.is_key_pressed("R1"):
         power_expand_board.stop("BL1")
         power_expand_board.stop("BL2")
-        power_expand_board.stop("DC8")
+        power_expand_board.stop(SPINNER_PORT)
 
     # Brushless Angle
     if gamepad.is_key_pressed("+"):
@@ -294,23 +296,23 @@ def S2_Keymap ():
         Auto_Maintain_Grip()
         if gamepad.is_key_pressed("≡"):
             SPIN_TIG = False
-            power_expand_board.set_power("DC5", 0)
+            power_expand_board.set_power(SPINNER_PORT, 0)
     else:
         if gamepad.is_key_pressed("N1"):
-            power_expand_board.set_power("DC5", 100)
+            power_expand_board.set_power(SPINNER_PORT, 100)
         elif gamepad.is_key_pressed("N4"):
-            power_expand_board.set_power("DC5", -100)
+            power_expand_board.set_power(SPINNER_PORT, -100)
         elif gamepad.is_key_pressed("R1"):
-            power_expand_board.set_power("DC5", 100)
+            power_expand_board.set_power(SPINNER_PORT, 100)
         elif gamepad.is_key_pressed("R2"):
             GRIPPER_ANGLE.move_to(45, 50)
-            power_expand_board.set_power("DC5", -100)
+            power_expand_board.set_power(SPINNER_PORT, -100)
         elif gamepad.is_key_pressed("L2"):
             SPIN_TIG = True
             GRIPPER_ANGLE.move_to(45, 50)
-            power_expand_board.set_power("DC5", -100)
+            power_expand_board.set_power(SPINNER_PORT, -100)
         else:
-            power_expand_board.set_power("DC5", 0)
+            power_expand_board.set_power(SPINNER_PORT, 0)
 
         if gamepad.is_key_pressed("Up"):
             power_expand_board.set_power("DC4", 100)
@@ -435,7 +437,7 @@ while True:
         if gamepad.is_key_pressed("L2") and gamepad.is_key_pressed("R2"):
             led_matrix_1.show('K1', wait = False)
             power_expand_board.set_power("DC4", DC_LOCK_V)
-            power_expand_board.set_power("DC5", 0)
+            power_expand_board.set_power(SPINNER_PORT, 0)
             CTLMODE = 1
         elif gamepad.is_key_pressed("L1") and gamepad.is_key_pressed("R1"):
             led_matrix_1.show('K2', wait = False)
@@ -444,7 +446,7 @@ while True:
         elif gamepad.is_key_pressed("+") and gamepad.is_key_pressed("≡"):
             led_matrix_1.show('K3', wait = False)
             power_expand_board.set_power("DC4", DC_LOCK_V)
-            power_expand_board.set_power("DC5", 0)
+            power_expand_board.set_power(SPINNER_PORT, 0)
             CTLMODE = 3
 
         if CTLMODE == 1:
