@@ -206,6 +206,64 @@ def Auto_stage_new_1():
 
         time.sleep(0.001)
 
+def Auto_stage_new_2():
+    """new spinner auto, w/sinsare"""
+    global ENABLE_AUTO, V_AUTO_STAGE, AUTO_SIDE
+    while power_manage_module.is_auto_mode():
+        led_matrix_1.show('A' + str(str(AUTO_SIDE) + str(V_AUTO_STAGE)), wait=False)
+
+        Auto_Maintain_Grip()
+
+        if V_AUTO_STAGE == 0:
+            # if AUTO_SIDE == "L":
+            #     Auto_Turn(0.01)
+            # else:
+            #     Auto_Turn(-0.01)
+            V_AUTO_STAGE = V_AUTO_STAGE + 1
+        if V_AUTO_STAGE == 1:
+            power_expand_board.set_power(SPINNER_PORT, -100)
+            Move_FB(200)
+            while FRONT_L_RANGING.get_distance() > 20:
+                time.sleep(0.001)
+                Auto_Maintain_Grip()
+            V_AUTO_STAGE = V_AUTO_STAGE + 1
+            
+        elif V_AUTO_STAGE == 2:
+            power_expand_board.set_power(SPINNER_PORT, -100)
+            if FRONT_L_RANGING.get_distance() > 8:
+                Move_FB(100)
+                # if AUTO_SIDE == "L":
+                #     Move_Diag("FL", 200)
+                # else:
+                #     Move_Diag("FR", 200)
+            elif No_Drift():
+                if AUTO_SIDE == "R": 
+                    if LEFT_RANGING.get_distance() < 20:
+                        Move_FB(0)
+                        V_AUTO_STAGE = V_AUTO_STAGE + 1
+                        continue
+                    else:
+                        Motor_Control(-90, 120, -90, 120)
+                else:
+                    if RIGHT_RANGING.get_distance() < 20:
+                        Move_FB(0)
+                        V_AUTO_STAGE = V_AUTO_STAGE + 1
+                        continue
+                    else:
+                        Motor_Control(120, -90, 120, -90)
+
+        elif V_AUTO_STAGE == 3:
+            Move_FB(0)
+            Auto_Maintain_Grip()
+            power_expand_board.set_power(SPINNER_PORT, 0)
+            V_AUTO_STAGE = V_AUTO_STAGE + 1
+            Move_FB(-200)
+            time.sleep(2)
+            Move_FB(0)
+            continue
+
+        time.sleep(0.001)
+
 ## END
 ## END
 ## END
@@ -268,12 +326,10 @@ def S1_Keymap ():
     if gamepad.is_key_pressed("N4"):
         power_expand_board.set_power("BL1", 100)
         power_expand_board.set_power("BL2", 100)
-        power_expand_board.set_power(SPINNER_PORT, 100)
     elif gamepad.is_key_pressed("R1"):
         power_expand_board.stop("BL1")
         power_expand_board.stop("BL2")
-        power_expand_board.stop(SPINNER_PORT)
-
+        
     # Brushless Angle
     if gamepad.is_key_pressed("+"):
         BRUSHLESS_SERVO.move_to(-23, 100)
