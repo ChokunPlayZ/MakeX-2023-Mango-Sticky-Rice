@@ -22,9 +22,11 @@ and CAD/STLs for the part we 3D printed and I have the copy off,
 the custom mag assembly and the bottom gripper is out of the question because I did not have copy of it  
 
 Here's a picture of the bot
-![Eatsuki Surping Starbucks](https://github.com/ChokunPlayZ/MakeX-2023-Mango-on-Sticky-Rice/blob/main/assets/1025769196648411206.png?raw=true "")
-![Eatsuki Surping Starbucks](https://github.com/ChokunPlayZ/MakeX-2023-Mango-on-Sticky-Rice/blob/main/assets/1025769196648411206.png?raw=true "")
-![Eatsuki Surping Starbucks](https://github.com/ChokunPlayZ/MakeX-2023-Mango-on-Sticky-Rice/blob/main/assets/1025769196648411206.png?raw=true "")
+![Overall](https://github.com/ChokunPlayZ/MakeX-2023-Mango-Sticky-Rice/blob/main/assets/IMG_5876.jpg?raw=true "")
+![Electronics](https://github.com/ChokunPlayZ/MakeX-2023-Mango-Sticky-Rice/blob/main/assets/IMG_5882.jpg?raw=true "")
+![Main Gripper](https://github.com/ChokunPlayZ/MakeX-2023-Mango-Sticky-Rice/blob/main/assets/IMG_5896.jpg?raw=true "")
+![Secondary Gripper](https://github.com/ChokunPlayZ/MakeX-2023-Mango-Sticky-Rice/blob/main/assets/IMG_5883.jpg?raw=true "")
+![Shotter](https://github.com/ChokunPlayZ/MakeX-2023-Mango-Sticky-Rice/blob/main/assets/IMG_5892.jpg?raw=true "")
 
 PYTHON GO BRRR  
 #Eatsuki No1  
