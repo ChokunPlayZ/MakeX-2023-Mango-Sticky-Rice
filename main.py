@@ -38,7 +38,7 @@ AUTO_SIDE = None
 
 SPIN_TIG = False
 
-SPINNER_PORT = "DC8"
+SPINNER_PORT = "DC7"
 
 # stuff
 FR_ENCODE_M1 = encoder_motor_class("M1", "INDEX1")
@@ -62,7 +62,7 @@ FRONT_R_RANGING = ranging_sensor_class("PORT5", "INDEX4")
 GRIPPER_RANGING = ranging_sensor_class("PORT4", "INDEX1")
 
 # Debugging Hardware
-led_matrix_1 = led_matrix_class("PORT4", "INDEX1")
+debug = led_matrix_class("PORT4", "INDEX1")
 button_1 = button_class("PORT4", "INDEX1")
 
 # Cameras
@@ -155,7 +155,7 @@ def Auto_stage_new_1():
     """new spinner auto"""
     global ENABLE_AUTO, V_AUTO_STAGE, AUTO_SIDE
     while power_manage_module.is_auto_mode():
-        led_matrix_1.show('A' + str(str(AUTO_SIDE) + str(V_AUTO_STAGE)), wait=False)
+        debug.show('A' + str(str(AUTO_SIDE) + str(V_AUTO_STAGE)), wait=False)
 
         Auto_Maintain_Grip()
 
@@ -167,7 +167,7 @@ def Auto_stage_new_1():
             V_AUTO_STAGE = V_AUTO_STAGE + 1
         if V_AUTO_STAGE == 1:
             power_expand_board.set_power(SPINNER_PORT, -100)
-            Move_FB(200)
+            Move_FB(250)
             while FRONT_L_RANGING.get_distance() > 20:
                 time.sleep(0.001)
                 Auto_Maintain_Grip()
@@ -195,7 +195,7 @@ def Auto_stage_new_1():
                         V_AUTO_STAGE = V_AUTO_STAGE + 1
                         continue
                     else:
-                        Motor_Control(120, -90, 120, -90)
+                        Motor_Control(130, -90, 130, -90)
 
         elif V_AUTO_STAGE == 3:
             Move_FB(0)
@@ -210,7 +210,7 @@ def Auto_stage_new_2():
     """new spinner auto, w/sinsare"""
     global ENABLE_AUTO, V_AUTO_STAGE, AUTO_SIDE
     while power_manage_module.is_auto_mode():
-        led_matrix_1.show('A' + str(str(AUTO_SIDE) + str(V_AUTO_STAGE)), wait=False)
+        debug.show('A' + str(str(AUTO_SIDE) + str(V_AUTO_STAGE)), wait=False)
 
         Auto_Maintain_Grip()
 
@@ -222,7 +222,7 @@ def Auto_stage_new_2():
             V_AUTO_STAGE = V_AUTO_STAGE + 1
         if V_AUTO_STAGE == 1:
             power_expand_board.set_power(SPINNER_PORT, -100)
-            Move_FB(200)
+            Move_FB(250)
             while FRONT_L_RANGING.get_distance() > 20:
                 time.sleep(0.001)
                 Auto_Maintain_Grip()
@@ -238,28 +238,28 @@ def Auto_stage_new_2():
                 #     Move_Diag("FR", 200)
             elif No_Drift():
                 if AUTO_SIDE == "R": 
-                    if LEFT_RANGING.get_distance() < 20:
+                    if LEFT_RANGING.get_distance() < 30:
                         Move_FB(0)
                         V_AUTO_STAGE = V_AUTO_STAGE + 1
                         continue
                     else:
                         Motor_Control(-90, 120, -90, 120)
                 else:
-                    if RIGHT_RANGING.get_distance() < 20:
+                    if RIGHT_RANGING.get_distance() < 30:
                         Move_FB(0)
                         V_AUTO_STAGE = V_AUTO_STAGE + 1
                         continue
                     else:
-                        Motor_Control(120, -90, 120, -90)
+                        Motor_Control(130, -90, 130, -90)
 
         elif V_AUTO_STAGE == 3:
             Move_FB(0)
             Auto_Maintain_Grip()
             power_expand_board.set_power(SPINNER_PORT, 0)
-            V_AUTO_STAGE = V_AUTO_STAGE + 1
-            Move_FB(-200)
-            time.sleep(2)
+            Move_FB(-250)
+            time.sleep(0.5)
             Move_FB(0)
+            V_AUTO_STAGE = V_AUTO_STAGE + 1
             continue
 
         time.sleep(0.001)
@@ -329,7 +329,7 @@ def S1_Keymap ():
     elif gamepad.is_key_pressed("R1"):
         power_expand_board.stop("BL1")
         power_expand_board.stop("BL2")
-        
+
     # Brushless Angle
     if gamepad.is_key_pressed("+"):
         BRUSHLESS_SERVO.move_to(-23, 100)
@@ -416,7 +416,7 @@ def Motor_Safety_CTL ():
         BRUSHLESS_SERVO.set_power(0)
 
 power_expand_board.set_power("DC4", 100)
-led_matrix_1.show('S0', wait = False)
+debug.show('S0', wait = False)
 GRIPPER_ANGLE.move_to(45, 50)
 BUTTOM_GRIPPER.move_to(2, 50)
 BRUSHLESS_SERVO.move_to(0, 50)
@@ -424,65 +424,55 @@ Motor_Control(0, 0, 0, 0)
 
 # FRONT_TOP_CAM.set_mode("color")
 
-led_matrix_1.show('OK!', wait = False)
+debug.show('OK!', wait = False)
 power_expand_board.set_power("DC4", DC_LOCK_V)
 # GRIPPER_LOCK.set_angle(0)
 
 while True:
     if not power_manage_module.is_auto_mode():
-        led_matrix_1.show(round(BRUSHLESS_SERVO.get_value("voltage"), 1))
-        # led_matrix_1.show(BUTTOM_GRIPPER.get_value("angle"), wait=False)
-        # led_matrix_1.show(button_1.is_pressed(), wait=False)
-        # led_matrix_1.show(GRIPPER_RANGING.get_distance(), wait=False)
+        debug.show(round(BRUSHLESS_SERVO.get_value("voltage"), 1))
+        # debug.show(BUTTOM_GRIPPER.get_value("angle"), wait=False)
+        # debug.show(button_1.is_pressed(), wait=False)
+        # debug.show(GRIPPER_RANGING.get_distance(), wait=False)
     Motor_Safety_CTL()
     if button_1.is_pressed():
-        # GRIPPER_LOCK.set_angle(60)
-        # auto_align_and_grip()
-        # FRONT_TOP_CAM.set_mode("color")
-        # FRONT_MID_CAM.set_mode("color")
-
-        # FRONT_TOP_CAM.open_light()
-        time.sleep(1)
-        FR_ENCODE_M1.set_power(100)
-        time.sleep(1)
-        FR_ENCODE_M1.set_power(0)
-        time.sleep(1)
-        BR_ENCODE_M2.set_power(100)
-        time.sleep(1)
-        BR_ENCODE_M2.set_power(0)
-        time.sleep(1)
-        FL_ENCODE_M3.set_power(100)
-        time.sleep(1)
-        FL_ENCODE_M3.set_power(0)
-        time.sleep(1)
-        BL_ENCODE_M4.set_power(100)
-        time.sleep(1)
-        BL_ENCODE_M4.set_power(0)
-        # FRONT_TOP_CAM.close_light()
-
-        # GRIPPER_LOCK.set_angle(0)
+        debug.show('WAIT', wait=False)
+        GRIPPER_ANGLE.move_to(45, 50)
+        BUTTOM_GRIPPER.move_to(2, 50)
+        BRUSHLESS_SERVO.move_to(0, 50)
+        Motor_Control(0, 0, 0, 0)
+        # time.sleep(1)
+        # if FRONT_L_RANGING.get_distance() == 0 :
+        #     debug.show('ERR', wait=False)
+        #     time.sleep(1)
+        #     debug.show('FSR', wait=False)
+        #     time.sleep(1)
+        # else:
+        #     debug.show('PASS', wait=False)
+        # time.sleep(1)
+        debug.show('DONE', wait=False)
 
     if power_manage_module.is_auto_mode():
         if not ENABLE_AUTO:
-            led_matrix_1.show('A D', wait=False)
+            debug.show('A D', wait=False)
         elif FRONT_L_RANGING.get_distance() == 0:
-            led_matrix_1.show('ASE', wait=False)
+            debug.show('ASE', wait=False)
             Auto_Maintain_Grip()
         else:
-            led_matrix_1.show('A P', wait=False)
+            debug.show('A P', wait=False)
             FR_ENCODE_M1.set_power(0)
             BR_ENCODE_M2.set_power(0)
             FL_ENCODE_M3.set_power(0)
             BL_ENCODE_M4.set_power(0)
             # FRONT_TOP_CAM.set_mode("color")
-            led_matrix_1.show('A W', wait=False)
+            debug.show('A W', wait=False)
 
             if LEFT_RANGING.get_distance() < RIGHT_RANGING.get_distance():
                 AUTO_SIDE = 'L'
             else:
                 AUTO_SIDE = 'R'
             # avoid ball 2 blocks
-            Auto_stage_new_1()
+            Auto_stage_new_2()
 
             # avoid ball 3 blocks (only deploy on left right)
             # Auto_stage2()
@@ -491,16 +481,16 @@ while True:
             # Auto_stage99()
     else:
         if gamepad.is_key_pressed("L2") and gamepad.is_key_pressed("R2"):
-            led_matrix_1.show('K1', wait = False)
+            debug.show('K1', wait = False)
             power_expand_board.set_power("DC4", DC_LOCK_V)
             power_expand_board.set_power(SPINNER_PORT, 0)
             CTLMODE = 1
         elif gamepad.is_key_pressed("L1") and gamepad.is_key_pressed("R1"):
-            led_matrix_1.show('K2', wait = False)
+            debug.show('K2', wait = False)
             power_expand_board.set_power("DC4", DC_LOCK_V)
             CTLMODE = 2
         elif gamepad.is_key_pressed("+") and gamepad.is_key_pressed("≡"):
-            led_matrix_1.show('K3', wait = False)
+            debug.show('K3', wait = False)
             power_expand_board.set_power("DC4", DC_LOCK_V)
             power_expand_board.set_power(SPINNER_PORT, 0)
             CTLMODE = 3
