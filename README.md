@@ -21,6 +21,10 @@ and a fully custom python intelsense for
 and CAD/STLs for the part we 3D printed and I have the copy off,  
 the custom mag assembly and the bottom gripper is out of the question because I did not have copy of it  
 
+4 copies of the code for different drive systems, omni/mechanum, and 4 wheel drive tank (yes a tank style drive system, using 4 encoders, and lot's of gear),  
+the keymap is not carried over for every drive system, we use mechanum as the main  
+and another copy for the skill test (shooting only, grippers disabled)   
+
 Here's a picture of the bot
 ![Overall](https://github.com/ChokunPlayZ/MakeX-2023-Mango-Sticky-Rice/blob/main/assets/IMG_5876.jpg?raw=true "")
 ![Electronics](https://github.com/ChokunPlayZ/MakeX-2023-Mango-Sticky-Rice/blob/main/assets/IMG_5882.jpg?raw=true "")
