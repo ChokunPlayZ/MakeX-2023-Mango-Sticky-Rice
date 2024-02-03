@@ -7,7 +7,7 @@ I also decided to restructure the whole automatic code in the morning of the com
 there's gonna be a branch for our code out for the skill test (as far as I know its MakeX Thailand Exclusive)  
 
 so I ended up taking the repo private again because we got another competetion, not as big as the thai tournament,  
-but we ended up getting a planned second place, our brother wins!  
+but we ended up getting a planned second place!
 
 so it's public again 
 
