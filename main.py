@@ -301,7 +301,8 @@ def Reverse_movement ():
     else:
         Motor_RPM(0, 0, 0, 0)
 
-def S1_Keymap ():
+# Button map for keymap 1, controls shooting system
+def S1_Keymap():
     # main loading system controls
     if gamepad.is_key_pressed("N1"):
         power_expand_board.set_power("DC1", 100)
@@ -346,6 +347,7 @@ def S1_Keymap ():
     elif gamepad.is_key_pressed("L2"):
         power_expand_board.set_power("DC1", 0)
 
+# Button map for keymap 2, controls main gripper
 def S2_Keymap ():
     global SPIN_TIG
     if SPIN_TIG:
@@ -384,6 +386,7 @@ def S2_Keymap ():
         elif gamepad.is_key_pressed("L1"):
             GRIPPER_ANGLE.move_to(45, 50)
         
+# Button map for keymap 3, controls bottom recovery gripper
 def S3_Keymap ():
     if gamepad.is_key_pressed("N1"):
         #Release
@@ -411,10 +414,12 @@ def S3_Keymap ():
         # BUTTOM_GRIPPER.move(1, 100)
         BUTTOM_GRIPPER.move(5, 100) 
 
+# function to control buttom gripper maxium power draw to prvent over current cutoff
 def Motor_Safety_CTL ():
     if BUTTOM_GRIPPER.get_value("current") > 500:
         BRUSHLESS_SERVO.set_power(0)
 
+# Startup
 power_expand_board.set_power("DC4", 100)
 debug.show('S0', wait = False)
 GRIPPER_ANGLE.move_to(45, 50)
@@ -428,6 +433,7 @@ debug.show('OK!', wait = False)
 power_expand_board.set_power("DC4", DC_LOCK_V)
 # GRIPPER_LOCK.set_angle(0)
 
+# main loop
 while True:
     if not power_manage_module.is_auto_mode():
         debug.show(round(BRUSHLESS_SERVO.get_value("voltage"), 1))
