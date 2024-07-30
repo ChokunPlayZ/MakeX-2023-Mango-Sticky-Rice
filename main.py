@@ -1,3 +1,4 @@
+# enable_firefly
 # code make you sleepy
 # https://makex.ckl.moe/lol
 import novapi
@@ -12,9 +13,10 @@ from mbuild.led_matrix import led_matrix_class
 from mbuild.button import button_class
 import mbuild
 import time
+import math
 
 # Control System Config
-Speed_Modifier = 2.5
+Speed_Modifier = 250
 Speed_Modifier2 = 1.2
 TURN_SPEED_MODIFIER = 1.5
 CTLMODE = 2
@@ -160,12 +162,6 @@ def Auto_stage_new_1():
         Auto_Maintain_Grip()
 
         if V_AUTO_STAGE == 0:
-            # if AUTO_SIDE == "L":
-            #     Auto_Turn(0.01)
-            # else:
-            #     Auto_Turn(-0.01)
-            V_AUTO_STAGE = V_AUTO_STAGE + 1
-        if V_AUTO_STAGE == 1:
             power_expand_board.set_power(SPINNER_PORT, -100)
             Move_FB(250)
             while FRONT_L_RANGING.get_distance() > 20:
@@ -173,14 +169,10 @@ def Auto_stage_new_1():
                 Auto_Maintain_Grip()
             V_AUTO_STAGE = V_AUTO_STAGE + 1
             
-        elif V_AUTO_STAGE == 2:
+        elif V_AUTO_STAGE == 1:
             power_expand_board.set_power(SPINNER_PORT, -100)
             if FRONT_L_RANGING.get_distance() > 8:
                 Move_FB(100)
-                # if AUTO_SIDE == "L":
-                #     Move_Diag("FL", 200)
-                # else:
-                #     Move_Diag("FR", 200)
             elif No_Drift():
                 if AUTO_SIDE == "R": 
                     if LEFT_RANGING.get_distance() < 20:
@@ -197,7 +189,7 @@ def Auto_stage_new_1():
                     else:
                         Motor_Control(130, -90, 130, -90)
 
-        elif V_AUTO_STAGE == 3:
+        elif V_AUTO_STAGE == 2:
             Move_FB(0)
             Auto_Maintain_Grip()
             power_expand_board.set_power(SPINNER_PORT, 0)
@@ -207,7 +199,7 @@ def Auto_stage_new_1():
         time.sleep(0.001)
 
 def Auto_stage_new_2():
-    """new spinner auto, w/sinsare"""
+    """new spinner auto for co-op"""
     global ENABLE_AUTO, V_AUTO_STAGE, AUTO_SIDE
     while power_manage_module.is_auto_mode():
         debug.show('A' + str(str(AUTO_SIDE) + str(V_AUTO_STAGE)), wait=False)
@@ -267,36 +259,19 @@ def Auto_stage_new_2():
 ## END
 ## END
 ## END
-def Movement ():
-    LYp = gamepad.get_joystick("Ly") * Speed_Modifier
-    LYn = LYp * -1
-    LXp = gamepad.get_joystick("Lx") * Speed_Modifier2
-    LXn = LXp * -1
-    RXp = gamepad.get_joystick("Rx") * Speed_Modifier
-    RXn = RXp * -1
-    TURN_SPEED = RXn * TURN_SPEED_MODIFIER
-    if LYp > 5 or LYp < -5:
-        Motor_RPM(LYn, LYn, LYp, LYp)
-    elif LXp > 5 or LXp < -5:
-        Motor_RPM(LXp, LXn, LXp, LXn)
-    elif RXp > 5 or RXp < -5:
-        Motor_RPM(TURN_SPEED, TURN_SPEED, TURN_SPEED, TURN_SPEED)
-    else:
-        Motor_RPM(0, 0, 0, 0)
 
-def Reverse_movement ():
-    LYp = gamepad.get_joystick("Ly") * Speed_Modifier
-    LYn = LYp * -1
-    LXp = gamepad.get_joystick("Lx") * Speed_Modifier2
-    LXn = LXp * -1
-    RXp = gamepad.get_joystick("Rx") * Speed_Modifier
-    RXn = RXp * -1
-    TURN_SPEED = RXn * TURN_SPEED_MODIFIER
-    if LYp > 5 or LYp < -5:
-        Motor_RPM(LYp, LYp, LYn, LYn)
-    elif LXp > 5 or LXp < -5:
-        Motor_RPM(LXn, LXp, LXn, LXp)
-    elif RXp > 5 or RXp < -5:
+def Movement(flip=1):
+    LX = gamepad.get_joystick("Lx") * flip
+    LY = gamepad.get_joystick("Ly") * flip
+    RX = gamepad.get_joystick("Rx")
+
+    if abs(LX) > 10 or abs(LY) > 10:
+        left_angle = math.atan2(-LY, LX)
+        cross_left_power = math.sin(left_angle + (1/4 * math.pi)) * Speed_Modifier
+        cross_right_power = math.sin(left_angle - (1/4 * math.pi)) * Speed_Modifier
+        Motor_RPM(cross_right_power, -cross_left_power, cross_left_power, -cross_right_power)
+    elif abs(RX) > 10:
+        TURN_SPEED = RX * TURN_SPEED_MODIFIER
         Motor_RPM(TURN_SPEED, TURN_SPEED, TURN_SPEED, TURN_SPEED)
     else:
         Motor_RPM(0, 0, 0, 0)
@@ -417,7 +392,7 @@ def S3_Keymap ():
 # function to control buttom gripper maxium power draw to prvent over current cutoff
 def Motor_Safety_CTL ():
     if BUTTOM_GRIPPER.get_value("current") > 500:
-        BRUSHLESS_SERVO.set_power(0)
+        BUTTOM_GRIPPER.set_power(0)
 
 # Startup
 power_expand_board.set_power("DC4", 100)
@@ -437,9 +412,6 @@ power_expand_board.set_power("DC4", DC_LOCK_V)
 while True:
     if not power_manage_module.is_auto_mode():
         debug.show(round(BRUSHLESS_SERVO.get_value("voltage"), 1))
-        # debug.show(BUTTOM_GRIPPER.get_value("angle"), wait=False)
-        # debug.show(button_1.is_pressed(), wait=False)
-        # debug.show(GRIPPER_RANGING.get_distance(), wait=False)
     Motor_Safety_CTL()
     if button_1.is_pressed():
         debug.show('WAIT', wait=False)
@@ -447,15 +419,6 @@ while True:
         BUTTOM_GRIPPER.move_to(2, 50)
         BRUSHLESS_SERVO.move_to(0, 50)
         Motor_Control(0, 0, 0, 0)
-        # time.sleep(1)
-        # if FRONT_L_RANGING.get_distance() == 0 :
-        #     debug.show('ERR', wait=False)
-        #     time.sleep(1)
-        #     debug.show('FSR', wait=False)
-        #     time.sleep(1)
-        # else:
-        #     debug.show('PASS', wait=False)
-        # time.sleep(1)
         debug.show('DONE', wait=False)
 
     if power_manage_module.is_auto_mode():
@@ -508,11 +471,11 @@ while True:
             S1_Keymap()
         elif CTLMODE == 2:
             BUTTOM_GRIPPER.move_to(6, 50)
-            Reverse_movement()
+            Movement()
             S2_Keymap()
             # Auto_Maintain_Grip_Range(14, 12)
             # Auto_Maintain_Grip()
         elif CTLMODE == 3:
             Auto_Maintain_Grip(t_distance=3)
-            Reverse_movement()
+            Movement(-1)
             S3_Keymap()
