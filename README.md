@@ -27,7 +27,7 @@ Here are some pictures of the bot:
 ![Secondary Gripper](https://github.com/ChokunPlayZ/MakeX-2023-Mango-Sticky-Rice/blob/main/assets/IMG_5883.jpg?raw=true "")
 ![Shooter](https://github.com/ChokunPlayZ/MakeX-2023-Mango-Sticky-Rice/blob/main/assets/IMG_5892.jpg?raw=true "")
 
-Python go Brrrrrr. #Eatsuki No1
+Python go Brrrrrr. #Eatsuki No1  
 ![Eatsuki Surping Starbucks](https://github.com/ChokunPlayZ/MakeX-2023-Mango-on-Sticky-Rice/blob/main/assets/1025769196648411206.png?raw=true "")
 
 This is also the reason most of the team from Assumption College Sriracha now runs Python codebase instead of block, kids learn and they apprently hate block code after knowing they can build their stuff off this without putting in too much work.
