@@ -15,7 +15,7 @@ The script includes a custom Python intellisense for the following components:
 
 There are four copies of the code for different drive systems: 
 - omni
-- mechanum 
+- mecanum 
 - 4-wheel drive tank
 The tank-style drive system uses 4 encoders and lots of gears. The keymap is not carried over for every drive system; we primarily use mecanum.  
 There is also another copy of the code specifically for the skill test, with the grippers disabled and focusing only on shooting.
