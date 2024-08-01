@@ -1,37 +1,30 @@
 # Mango Engine
-a not so simple sub 600 lines python script that powers the mango robot  
+In this repo, you can find a Python script that powers the Mango bot, and copies of most of the custom 3D printed model I have copy of.
 
-altought we didnt win, me, myself has learnt a lot from building this  
-I can confiedently say that the issue was the aliance matching system not us  
-I also decided to restructure the whole automatic code in the morning of the competetion causing issue with untested code  
-there's gonna be a branch for our code out for the skill test (as far as I know its MakeX Thailand Exclusive)  
+Although we didn't win, we learned a lot from building this robot. I made the decision to restructure the entire automatic code on the morning of the competition, which caused issues with untested code. There will be a branch for our code available for the skill test, specifically for MakeX Thailand.
 
-so I ended up taking the repo private again because we got another competetion, not as big as the thai tournament,  
-but we ended up getting a planned second place!
+After the Thai tournament, we participated in another competition, although it was not as big. We ended up securing a planned second place.
 
-so it's public again 
-
-and a fully custom python intelsense for
+The script includes a fully custom Python intellisense for the following components:
 - MakeBlock NovaPi
 - NovaPi Power Expander Board
+- Makeblock Power Management Module
 - MakeBlock Bluetooth Gamepad
-- mBuild Sensors (Smart Camera, Ranging, Button, LED Matrix)
-- Encoder Motor
+- mBuild Sensors (Smart Camera, Ranging, Button, LED Matrix, Servo Driver)
+- Encoder Motor, Smart Servo
 
-and CAD/STLs for the part we 3D printed and I have the copy off,  
-the custom mag assembly and the bottom gripper is out of the question because I did not have copy of it  
+There are four copies of the code for different drive systems: 
+- omni
+- mechanum 
+- 4-wheel drive tank
+The tank-style drive system uses 4 encoders and lots of gears. The keymap is not carried over for every drive system; we primarily use mecanum.  There is also another copy of thecode specifically for the skill test, with the grippers disabled and focusing only on shooting.
 
-4 copies of the code for different drive systems, omni/mechanum, and 4 wheel drive tank (yes a tank style drive system, using 4 encoders, and lot's of gear),  
-the keymap is not carried over for every drive system, we use mechanum as the main  
-and another copy for the skill test (shooting only, grippers disabled)   
-
-Here's a picture of the bot
+Here are some pictures of the bot:
 ![Overall](https://github.com/ChokunPlayZ/MakeX-2023-Mango-Sticky-Rice/blob/main/assets/IMG_5876.jpg?raw=true "")
 ![Electronics](https://github.com/ChokunPlayZ/MakeX-2023-Mango-Sticky-Rice/blob/main/assets/IMG_5882.jpg?raw=true "")
 ![Main Gripper](https://github.com/ChokunPlayZ/MakeX-2023-Mango-Sticky-Rice/blob/main/assets/IMG_5896.jpg?raw=true "")
 ![Secondary Gripper](https://github.com/ChokunPlayZ/MakeX-2023-Mango-Sticky-Rice/blob/main/assets/IMG_5883.jpg?raw=true "")
-![Shotter](https://github.com/ChokunPlayZ/MakeX-2023-Mango-Sticky-Rice/blob/main/assets/IMG_5892.jpg?raw=true "")
+![Shooter](https://github.com/ChokunPlayZ/MakeX-2023-Mango-Sticky-Rice/blob/main/assets/IMG_5892.jpg?raw=true "")
 
-PYTHON GO BRRR  
-#Eatsuki No1  
+Python is the language of choice for this project. #Eatsuki No1
 ![Eatsuki Surping Starbucks](https://github.com/ChokunPlayZ/MakeX-2023-Mango-on-Sticky-Rice/blob/main/assets/1025769196648411206.png?raw=true "")
